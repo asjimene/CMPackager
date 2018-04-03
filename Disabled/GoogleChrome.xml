@@ -26,8 +26,7 @@
 			$Version = ($($Output.Comments).Split(" "))[0]</DownloadVersionCheck>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<ExtraCopyFunctions>Copy-Item $ScriptRoot\ExtraFiles\GoogleChrome\installChrome.ps1 -Destination $DestinationPath\installChrome.ps1
-			Copy-Item $ScriptRoot\ExtraFiles\GoogleChrome\uninstallChrome.ps1 -Destination $DestinationPath\uninstallChrome.ps1</ExtraCopyFunctions>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 	</Downloads>
 	<DeploymentTypes>
