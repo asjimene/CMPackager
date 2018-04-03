@@ -39,9 +39,13 @@ See also the list of [contributors](https://github.com/asjimene/SCCM-Application
 
 Used and Modified code from the following, Thanks to all their work: 
 
-*Janik von Rots - [Copy-CMDeploymentTypeRule](https://janikvonrotz.ch/2017/10/20/configuration-manager-configure-requirement-rules-for-deployment-types-with-powershell/)
-*Jaap Brasser - [Get-ExtensionAttribute](http://www.jaapbrasser.com)
+*Janik von Rots - [Copy-CMDeploymentTypeRule](https://janikvonrotz.ch/2017/10/20/configuration-manager-configure-requirement-rules-for-deployment-types-with-powershell/) 
+
+*Jaap Brasser - [Get-ExtensionAttribute](http://www.jaapbrasser.com) 
+
 *Nickolaj Andersen - [Get-MSIInfo](http://www.scconfigmgr.com/2014/08/22/how-to-get-msi-file-information-with-powershell/)
 
-Some Recipes use the 7-Zip Project for extraction
+
+Some Recipes use the 7-Zip Project for extraction:
+
 *7-Zip - [Project Page](https://www.7-zip.org/)
