@@ -1,0 +1,23 @@
+<PackagerPrefs>
+	<!-- TempDir - [String] Temporary Location for File Downloads and Processing -->
+	<TempDir>C:\Temp\SCCMPackager</TempDir>
+	<!-- LogPath - [String] Location for Log File (Maximum Log File Size can be set in the Script itself) -->
+	<LogPath>C:\Temp\SCCMPackager.log</LogPath>
+	<!-- ContentLocationRoot - [String] Location for the SCCM Content - Applications will end up in a folder under this Root like: ApplicationName\Packages\ApplicationVersion -->
+	<ContentLocationRoot>\\server\share\Apps\All</ContentLocationRoot>
+	<!-- IconRepo - [String] Repository for Application Icons to be used in software Center -->
+	<IconRepo>\\Server\Share\Apps\Application Icons</IconRepo>
+	<!-- SCCMSite - [String] SCCM Site Name -->
+	<SCCMSite>SITE:</SCCMSite>
+	<!-- RequirementsTemplateAppName - [String] Application used to copy requirements rules from -->
+	<RequirementsTemplateAppName>Application Requirements Template</RequirementsTemplateAppName>
+	<!-- Email Preferences - An Email can optionally be sent after packaging is complete if any applications were Packaged -->
+	<!-- EmailTo - [String] Who to send the email to -->
+	<EmailTo></EmailTo>
+	<!-- EmailFrom - [String] Who the email should be from -->
+	<EmailFrom></EmailFrom>
+	<!-- EmailServer - [String] SMTP Server to send the email through -->
+	<EmailServer></EmailServer>
+	<!-- SendEmailPreference - [Boolean] Switch for sending the email after completion -->
+	<SendEmailPreference>True</SendEmailPreference>
+</PackagerPrefs>

@@ -1,0 +1,90 @@
+<ApplicationDef>
+	<Application>
+		<Name>7-Zip</Name>
+		<Description>7-Zip is a file archiver with a high compression ratio. Free and Open Source Software</Description>
+		<Publisher>Igor Pavlov</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>http://www.7-zip.org/</UserDocumentation>
+		<Icon>7Zip.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = "https://www.7-zip.org/$((Invoke-WebRequest https://www.7-zip.org/download.html |Select -ExpandProperty Links |where -Property href -like "*-x64.msi")[0].href)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>7Zipx64.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()
+			$Version = ($version.Split('.'))[0..1] -join "."</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>$URL = "https://www.7-zip.org/$((Invoke-WebRequest https://www.7-zip.org/download.html |Select -ExpandProperty Links |where -Property href -like "*.msi")[0].href)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>7Zipx86.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()
+			$Version = ($version.Split('.'))[0..1] -join "."</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>7Zip Silent Install x86</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for 7Zip</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>7Zipx86.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<Requirements>
+				<RuleName>OS Architecture x86</RuleName>
+			</Requirements>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>7Zip Silent Install x64</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for 7Zip</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>7Zipx64.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<Requirements>
+				<RuleName>OS Architecture x64</RuleName>
+			</Requirements>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

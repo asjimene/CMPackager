@@ -1,0 +1,60 @@
+<ApplicationDef>
+	<Application>
+		<Name>Zoom</Name>
+		<Description>Video Conferencing Application.</Description>
+		<Publisher>Zoom Video Communications Inc.</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://zoom.us/</UserDocumentation>
+		<Icon>Zoom.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript></PrefetchScript>
+			<URL>https://zoom.us/client/latest/ZoomInstallerFull.msi</URL>
+			<DownloadFileName>ZoomInstallerFull.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>New-Item -itemtype Directory -path $TempDir\Zoom
+			push-location
+			cd $TempDir\Zoom
+			$ExtractArgs = "/a","$TempDir\ZoomInstallerFull","/qb","TARGETDIR=$TempDir\Zoom"
+			#msiexec /a $TempDir\ZoomInstallerFull.msi /qb TARGETDIR=$TempDir\Zoom
+			Start-Process msiexec -ArgumentList $ExtractArgs -Wait
+			$FullVersion = ((Get-item "$TempDir\Zoom\Program Files Folder\Zoom\bin\Zoom.exe").VersionInfo.FileVersion).Replace(",",".")
+			$VersionID = $FullVersion.Split(".")
+			$Version = "$($VersionID[0]).$($VersionID[1]).$($VersionID[2][0])"
+			pop-location
+			write-host $Version $FullVersion
+			</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Zoom Silent Installer</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i ZoomInstallerFull.msi /quiet /qn /norestart ZConfig='nogoogle=1;nofacebook=1;AddFWException=1'</InstallProgram>
+			<InstallationMSI>ZoomInstallerFull.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>False</DistributeContent>
+		<DistributeToGroup></DistributeToGroup>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

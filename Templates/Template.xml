@@ -1,0 +1,294 @@
+<ApplicationDef>
+	<!-- Application - Sets the information shown in SCCM and in Software Center for the Application -->
+	<Application>
+		<!-- Name - [String] The Name of the Application (version number is appended)-->
+		<Name></Name>
+		<!-- Description - [String] Application and Software Center Description -->
+		<Description></Description>
+		<!-- Publisher - [String] Application Publisher -->
+		<Publisher></Publisher>
+		<!-- AutoInstall - [Boolean] Allow Install In Task Sequence -->
+		<AutoInstall></AutoInstall>
+		<!-- UserDocumentation - [String] Information Link for Software Center -->
+		<UserDocumentation></UserDocumentation>
+		<!-- Icon - [String] Icon File Name in Icon Repository (Repository is set in the Preferences File) -->
+		<Icon></Icon>
+	</Application>
+	<!-- Downloads - Sets the Definition for the downloads required for the Application -->
+	<Downloads>
+		<Download DeploymentType="MatchThisToDeplpoymentTypeName">
+			<!-- PrefetchScript - [String(PowerShell Script Block)] Used to fetch the $URL for download, or download the software itself if the software is behind a login screen etc. -->
+			<PrefetchScript></PrefetchScript>
+			<!--URL - [String] The URL the Installer will be downloaded from, you can set the $URL variable to fill in this value dynamically -->
+			<URL></URL>
+			<!-- DownloadFileName - [String] The name of the file after it has been downloaded -->
+			<DownloadFileName></DownloadFileName>
+			<!-- DownloadVersionCheck - [String(PowerShell Script Block)] PowerShell Scripting Block that can be used to determine the version, you should set the $Version and optionally the $FullVersion in this script
+			the Application will be named using this $version, there are a few built in functions to help ease this process:
+				1. Get-ExtensionAttribute - Determines the Extension Attributes of a file (values that are found in the windows properties menu of a file)
+				2. Get-MSIInfo - Used to get information from an MSI File (Things like ProductCode, ProductVersion, etc)
+			Important Variables:
+				$Version - The Version of the Application should be set here, it is used to name the Application
+				$FullVersion - The FullVersion of the Application (Usually used for Detection Methods) can optionally be set here
+			-->
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<!-- Version - [String(Empty)] Placeholder, will be filled with the $Version set above-->
+			<Version></Version>
+			<!-- FullVersion - [String(Empty)] Placeholder, optional, Can be set with the $FullVersion in the DownloadVersionCheck Scripting Block -->
+			<FullVersion></FullVersion>
+			<!-- AppRepoFolder - [String] When making multiple deployment Types, this can be used to create separate folders for each deployment type (like x64 and x86 folders)-->
+			<AppRepoFolder></AppRepoFolder>
+			<!-- ExtraCopyFunctions - [String(PowerShell Script Block)] PowerShell Script Block used to copy extra files and folders to the repository, things like MSTs etc. can be saved in the ExtraFiles folder and copied here. 
+			Important Variables:
+			$DestinationPath - The Path to the Repository
+			-->
+			<ExtraCopyFunctions>Custom Script to Copy Extra Files/Folders to Content Location, or post processing of downloaded files, runs after Files are copied to Content Location</ExtraCopyFunctions>
+		</Download>
+		<!-- Below are some of the combinations that can be used for different types of downloads and deployment types, notice that each download has a deployment type that matches it-->
+		<Download DeploymentType="MSI">
+			<URL></URL>
+			<DownloadFileName></DownloadFileName>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="MSIwithCustomInstall">
+			<URL></URL>
+			<DownloadFileName></DownloadFileName>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="MSIwithCustomDetectionScript">
+			<URL></URL>
+			<DownloadFileName></DownloadFileName>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="Script">
+			<URL></URL>
+			<DownloadFileName></DownloadFileName>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="MatchThisToDeplpoymentTypeName">
+			<!-- DeploymentTypeName - The Name of the deploymentType in SCCM -->
+			<DeploymentTypeName></DeploymentTypeName>
+			<!-- InstallationType - The Type of Installation in SCCM for this deployment Type -->
+			<InstallationType>[MSI/Script]</InstallationType>
+			<!-- Comments - Administrative Comments in Deployment Type -->
+			<Comments></Comments>
+			<!-- CacheContent - [Boolean]Cache Content on Client -->
+			<CacheContent></CacheContent>
+			<!-- BranchCache - [Boolean]Enable BranchCache -->
+			<BranchCache></BranchCache>
+			<!-- ContentFallback - [Boolean]Enable Content Fallback -->
+			<ContentFallback>[Boolean]Enable Content Fallback</ContentFallback>
+			<!-- OnSlowNetwork - [string]Slow Network Mode -->
+			<OnSlowNetwork> [DoNothing/Download/DownloadContentForStreaming]</OnSlowNetwork>
+			<!-- InstallProgram -[String]InstallationProgram command line -->
+			<InstallProgram></InstallProgram>
+			<!-- InstallationMSI - [String]MSI File Name -->
+			<InstallationMSI></InstallationMSI>
+			<!-- UninstallCmd - [String] Uninstallation Command Line -->
+			<UninstallCmd></UninstallCmd>
+			<!-- Force32bit - [Boolean] Force 32 bit install -->
+			<Force32bit></Force32bit>
+			<!-- InstallationBehaviorType - [String] Installation behavior -->
+			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
+			<!-- LogonReqType - [String] Logon requirement Type -->
+			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<!-- UserInteractionMode - [String] Visibility -->
+			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
+			<!-- ReqUserInteraction - [Boolean] Allow User Interaction -->
+			<ReqUserInteraction></ReqUserInteraction>
+			<!-- EstRuntimeMins - [Int] Estimated Run Time -->
+			<EstRuntimeMins></EstRuntimeMins>
+			<!-- MaxRuntimeMins - [int] Maximum Run Time -->
+			<MaxRuntimeMins></MaxRuntimeMins>
+			<!-- RebootBehavior - [String]Reboot after Install -->
+			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
+			<!-- DetectionMethodType - [String] Type Of DetectionMethod -->
+			<DetectionMethodType>[MSI/CustomScript/Custom]</DetectionMethodType>
+			<!-- ScriptLanguage - [String] Language for Detection Method -->
+			<ScriptLanguage>[PowerShell/VBScript]</ScriptLanguage>
+			<!-- DetectionMethod - [String] Content of Script Detection Method Script Block -->
+			<DetectionMethod></DetectionMethod>
+			<!-- The following are all of the possible detection method clauses if you choose a custom detection method-->
+			<CustomDetectionClauses>
+				<DetectionClause>
+					<DetectionClauseType>[Directory/File]</DetectionClauseType>
+					<Name>(Required)</Name>
+					<Path>(Required)</Path>
+					<PropertyType>[Directory:{DateCreated/DateModified}] [File:{DateCreated/DateModified/Version/Size}]</PropertyType>
+					<ExpectedValue></ExpectedValue>
+					<ExpressionOperator>[IsEquals/NotEquals/GreaterThan/GreaterEquals/LessThan/LessEquals/Between/OneOf/NoneOf]</ExpressionOperator>
+					<Value></Value>
+					<Is64Bit></Is64Bit>
+				</DetectionClause>
+				<DetectionClause>
+					<DetectionClauseType>[Directory/File]</DetectionClauseType>
+					<Name>(Required)</Name>
+					<Path>(Required)</Path>
+					<Existance></Existance>
+					<Is64Bit></Is64Bit>
+				</DetectionClause>
+				<DetectionClause>
+					<DetectionClauseType>[RegistryKey/RegistryKeyValue]</DetectionClauseType>
+					<Hive>(Required)</Hive>
+					<KeyName>(Required)</KeyName>
+					<Existance></Existance>
+					<Is64Bit></Is64Bit>
+					<PropertyType>(Required - Only for RegKeyValue)</PropertyType>
+					<ValueName>(Required - Only for RegKeyValue)</ValueName>
+				</DetectionClause>
+				<DetectionClause>
+					<DetectionClauseType>[RegistryKeyValue]</DetectionClauseType>
+					<ExpressionOperator>(Required)</ExpressionOperator>
+					<Hive>(Required)</Hive>
+					<KeyName>(Required)</KeyName>
+					<PropertyType>(Required)</PropertyType>
+					<ValueName>(Required)</ValueName>
+					<ExpectedValue>(Required)</ExpectedValue>
+					<Is64Bit></Is64Bit>
+					<Value></Value>
+				</DetectionClause>
+				<DetectionClause>
+					<DetectionClauseType>[WindowsInstaller]</DetectionClauseType>
+					<ProductCode>(Required)</ProductCode>
+					<Existance>(only needed if providing Product code)</Existance>
+					<ExpressionOperator>(Required for ExpectedValue)</ExpressionOperator>
+					<ExpectedValue>(Required for ExpressionOperator)</ExpectedValue>
+					<PropertyType>[Optional Only if ExpectedValue]</PropertyType>
+					<Value>[Optional only if ExpectedValue]</Value>
+				</DetectionClause>
+			</CustomDetectionClauses>
+			<!-- Requirements - Requirements can be added to all applications, you should set up an application that the requirements can be copied from in the preferences file-->
+			<Requirements>
+			<!-- RuleName - [String] You can assign requirements to an application by using the rule name on the existing template application -->
+				<RuleName></RuleName>
+			</Requirements>
+		</DeploymentType>
+		<!-- Below are some of the possible deploymentTypes based on the Type of Install, These also show which fields are required for each type of deployment, 
+		anything not required can be left off and they should use the defaults in SCCM -->
+		<DeploymentType Name="MSI">
+			<DeploymentTypeName>(Required)</DeploymentTypeName>
+			<InstallationType>(Required)[MSI]</InstallationType>
+			<Comments></Comments>
+			<CacheContent></CacheContent>
+			<BranchCache></BranchCache>
+			<ContentFallback></ContentFallback>
+			<OnSlowNetwork>[DoNothing/Download/DownloadContentForStreaming]</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>(Required)</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit></Force32bit>
+			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
+			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
+			<ReqUserInteraction></ReqUserInteraction>
+			<EstRuntimeMins></EstRuntimeMins>
+			<MaxRuntimeMins></MaxRuntimeMins>
+			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
+			<DetectionMethodType>(Required)[MSI]</DetectionMethodType>
+			<ScriptLanguage>[String] Language for Detection Method [PowerShell/VBScript]</ScriptLanguage>
+			<ScriptDetection32Bit></ScriptDetection32Bit>
+			<DetectionMethod>[String] Content of Script Detection Method</DetectionMethod>
+		</DeploymentType>
+		<DeploymentType Name="MSIwithCustomInstall">
+			<DeploymentTypeName>(Required)</DeploymentTypeName>
+			<InstallationType>(Required)[MSI]</InstallationType>
+			<Comments></Comments>
+			<CacheContent></CacheContent>
+			<BranchCache></BranchCache>
+			<ContentFallback></ContentFallback>
+			<OnSlowNetwork>[DoNothing/Download/DownloadContentForStreaming]</OnSlowNetwork>
+			<InstallProgram>(Required)</InstallProgram>
+			<InstallationMSI>(Required)</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit></Force32bit>
+			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
+			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
+			<ReqUserInteraction></ReqUserInteraction>
+			<EstRuntimeMins></EstRuntimeMins>
+			<MaxRuntimeMins></MaxRuntimeMins>
+			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
+			<DetectionMethodType>(Required)[MSI]</DetectionMethodType>
+		</DeploymentType>
+		<DeploymentType Name="MSIwithCustomDetectionScript">
+			<DeploymentTypeName>(Required)</DeploymentTypeName>
+			<InstallationType>(Required)[MSI]</InstallationType>
+			<Comments></Comments>
+			<CacheContent></CacheContent>
+			<BranchCache></BranchCache>
+			<ContentFallback></ContentFallback>
+			<OnSlowNetwork>[DoNothing/Download/DownloadContentForStreaming]</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>(Required)</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit></Force32bit>
+			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
+			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
+			<ReqUserInteraction></ReqUserInteraction>
+			<EstRuntimeMins></EstRuntimeMins>
+			<MaxRuntimeMins></MaxRuntimeMins>
+			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
+			<DetectionMethodType>(Required)[CustomScript]</DetectionMethodType>
+			<ScriptLanguage>(Required)[PowerShell/VBScript]</ScriptLanguage>
+			<ScriptDetection32Bit></ScriptDetection32Bit>
+			<DetectionMethod>(Required)</DetectionMethod>
+		</DeploymentType>
+		<DeploymentType Name="Script">
+			<DeploymentTypeName>(Required)</DeploymentTypeName>
+			<InstallationType>(Required)[Script]</InstallationType>
+			<Comments></Comments>
+			<CacheContent></CacheContent>
+			<BranchCache></BranchCache>
+			<ContentFallback></ContentFallback>
+			<OnSlowNetwork>[DoNothing/Download/DownloadContentForStreaming]</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>(Required)</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit></Force32bit>
+			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
+			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
+			<ReqUserInteraction></ReqUserInteraction>
+			<EstRuntimeMins></EstRuntimeMins>
+			<MaxRuntimeMins></MaxRuntimeMins>
+			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
+			<DetectionMethodType>(Required)[CustomScript]</DetectionMethodType>
+			<ScriptLanguage>[String] Language for Detection Method [PowerShell/VBScript]</ScriptLanguage>
+			<ScriptDetection32Bit></ScriptDetection32Bit>
+			<DetectionMethod>[String] Content of Script Detection Method</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<!-- You can optionally Distribute the content to a Group of DPs here -->
+	<Distribution>
+		<!-- DistributeContent - [Boolean] Switch for distributing content for this application -->
+		<DistributeContent></DistributeContent>
+		<!-- DistributeToGroup - [String] Name of Distribution Point Group to distribute the Content to -->
+		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
+	</Distribution>
+	<!-- You can optionally deploy the application to a specified Collection here -->
+	<Deployment>
+		<!-- DeploySoftware - [Boolean] Switch for Software Deployment, Application should be distributed before deployment -->
+		<DeploySoftware></DeploySoftware>
+		<!-- DeploymentCollection - [String] Collection for the software to be deployed to -->
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

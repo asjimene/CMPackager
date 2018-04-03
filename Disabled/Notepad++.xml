@@ -1,0 +1,60 @@
+<ApplicationDef>
+	<Application>
+		<Name>NotePad++</Name>
+		<Description>Notepad++ is a free source code editor and Notepad replacement that supports several languages. Running in the MS Windows environment, its use is governed by GPL License.</Description>
+		<Publisher>Don Ho</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://notepad-plus-plus.org/</UserDocumentation>
+		<Icon>Notepad++.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://notepad-plus-plus.org/download) | Select-Object -ExpandProperty Links | Where-Object -Property OuterText -Like "*Notepad++ Installer 32-bit x86").href
+			$URL = "https://notepad-plus-plus.org$LinkPath"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>NotePadppInstaller.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = (Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>NotePad++ Silent Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>NotePadppInstaller.exe /noUpdater /S</InstallProgram>
+			<UninstallCmd>%ProgramFiles(x86)%\Notepad++\uninstall.exe /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>notepad++.exe</Name>
+					<Path>%ProgramFiles(x86)%\Notepad++\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>False</DistributeContent>
+		<DistributeToGroup></DistributeToGroup>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

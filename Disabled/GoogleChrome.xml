@@ -1,0 +1,84 @@
+<ApplicationDef>
+	<Application>
+		<Name>Google Chrome</Name>
+		<Description>Google Chrome is a freeware web browser developed by Google.</Description>
+		<Publisher>Google Inc.</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.google.com/chrome/</UserDocumentation>
+		<Icon>Google Chrome.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<URL>https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise64.msi</URL>
+			<DownloadFileName>googlechromestandaloneenterprise64.msi</DownloadFileName>
+			<DownloadVersionCheck>#Script to check version
+			$Output = Get-ExtensionAttribute -FullName $Global:TempDir\$DownloadFileName -ExtensionAttribute Comments
+			$Version = ($($Output.Comments).Split(" "))[0]</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download>
+			<URL>https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise.msi</URL>
+			<DownloadFileName>googlechromestandaloneenterprise.msi</DownloadFileName>
+			<DownloadVersionCheck>#Script to check version
+			$Output = Get-ExtensionAttribute -FullName $Global:TempDir\$DownloadFileName -ExtensionAttribute Comments
+			$Version = ($($Output.Comments).Split(" "))[0]</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<ExtraCopyFunctions>Copy-Item $ScriptRoot\ExtraFiles\GoogleChrome\installChrome.ps1 -Destination $DestinationPath\installChrome.ps1
+			Copy-Item $ScriptRoot\ExtraFiles\GoogleChrome\uninstallChrome.ps1 -Destination $DestinationPath\uninstallChrome.ps1</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Google Chrome Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<Comments>Silent Installer for Google Chrome</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>powershell -executionpolicy bypass .\installChrome.ps1</InstallProgram>
+			<UninstallCmd>powershell -executionpolicy bypass .\uninstallChrome.ps1</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>CustomScript</DetectionMethodType>
+			<ScriptLanguage>Powershell</ScriptLanguage>
+			<DetectionMethod>
+$AppName = "Google Chrome*"
+$AppVersion = "REPLACEMEWITHTHEAPPVERSION"
+
+ If ((Get-WMIObject -Class Win32_OperatingSystem).OSArchitecture -like "64-bit") {
+	 $FindRegKey = Get-ChildItem -Path HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall -recurse | Get-ItemProperty | Select-Object -Property DisplayName, DisplayVersion | Where-Object { $_.DisplayName -Like $AppName}
+	 if ($FindRegKey -eq $null) {
+			 $FindRegKey = Get-ChildItem -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall -recurse | Get-ItemProperty | Select-Object -Property DisplayName, DisplayVersion | Where-Object { $_.DisplayName -Like $AppName}
+	 }
+ } Else {
+	 $FindRegKey = Get-ChildItem -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall -recurse | Get-ItemProperty | Select-Object -Property DisplayName, DisplayVersion | Where-Object { $_.DisplayName -Like $AppName}
+ }
+
+ ForEach ($DiscoveredRegKey in $FindRegKey) {
+	 If ($DiscoveredRegKey.DisplayVersion -ge $AppVersion) {
+			 Write-Output "Already at $AppVersion or higher!"
+	 }
+ }
+			</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>False</DistributeContent>
+		<DistributeToGroup></DistributeToGroup>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>
