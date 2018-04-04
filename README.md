@@ -22,6 +22,7 @@ Setting Up the Requirements Template Application
 1. Set the Name for your requirements Template Application in SCCM
 2. Create an Application in your SCCM environment with that same name
 3. Use a "script installer" and for the installation program, just use something that will close immediately, i just used "hostname"
+NOTE: There is now a default recipe in the Recipes folder that does step 1, 2 and 3 for you! All you have to do now is add the requirements to the deployment type created there.
 4. Add any requirements that you plan to use for the packager to this App, OS Version, and architecture are most common
 
 ## Contributing
