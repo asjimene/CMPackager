@@ -10,7 +10,7 @@
 	<!-- SCCMSite - [String] SCCM Site Name -->
 	<SCCMSite>SITE:</SCCMSite>
 	<!-- RequirementsTemplateAppName - [String] Application used to copy requirements rules from -->
-	<RequirementsTemplateAppName>Application Requirements Template</RequirementsTemplateAppName>
+	<RequirementsTemplateAppName>Application Requirements Template 1</RequirementsTemplateAppName>
 	<!-- Email Preferences - An Email can optionally be sent after packaging is complete if any applications were Packaged -->
 	<!-- EmailTo - [String] Who to send the email to -->
 	<EmailTo></EmailTo>

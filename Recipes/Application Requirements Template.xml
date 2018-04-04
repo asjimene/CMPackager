@@ -1,0 +1,48 @@
+<ApplicationDef>
+	<Application>
+		<Name>Application Requirements Template</Name>
+		<Description>Template Used for SCCM Application Packager, Used as a template for Requirements Rules, Rules are Copied from this Application, the Application does nothing</Description>
+		<Publisher></Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://github.com/asjimene/SCCM-Application-Packager</UserDocumentation>
+		<Icon></Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<URL>https://raw.githubusercontent.com/asjimene/SCCM-Application-Packager/master/README.md</URL>
+			<DownloadFileName>README.MD</DownloadFileName>
+			<DownloadVersionCheck>$Version = 1</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Requirements Template</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>hostname.exe</InstallProgram>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>CustomScript</DetectionMethodType>
+			<ScriptLanguage>PowerShell</ScriptLanguage>
+			<DetectionMethod>Write-Output 1</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>False</DistributeContent>
+		<DistributeToGroup></DistributeToGroup>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>
