@@ -13,7 +13,8 @@ This Application is a PowerShell Script that can be used to create applications 
 ### Prerequisites
 
 SCCM ConfigMgr Console - Tested on SCCM 1710
-Some Recipes require the 7za.exe from the 7-Zip Project, which can be found here: [Project Page](https://www.7-zip.org/) 7za.exe should be placed in the same folder as the SCCMPackager.ps1 Application.
+
+Some Recipes require the 7za.exe from the 7-Zip Project, which can be found here: [Project Page](https://www.7-zip.org/) - 7za.exe should be placed in the same folder as the SCCMPackager.ps1 Application.
 
 ### Installing
 
