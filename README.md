@@ -28,7 +28,7 @@ NOTE: There is now a default recipe in the Recipes folder that does step 1, 2 an
 
 ## Contributing
 
-Feel free to create your own packages, Contribute to the main code, or provide feedback!
+Feel free to create your own Recipes, Contribute to the main code, or provide feedback!
 
 ## Authors
 
