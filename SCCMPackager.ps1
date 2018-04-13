@@ -41,6 +41,7 @@ $Global:RequirementsTemplateAppName = "Application Requirements Template"
 $Global:EmailFrom = $PackagerPrefs.PackagerPrefs.EmailFrom
 $Global:EmailServer = $PackagerPrefs.PackagerPrefs.EmailServer
 $Global:SendEmailPreference = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.SendEmailPreference)
+$Global:NotifyOnDownloadFailure = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NotifyOnDownloadFailure)
 
 $Global:EmailSubject = "SCCM Application Packager Report - $(Get-date -format d)"
 $Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n`n"
@@ -273,7 +274,7 @@ Function Download-Application {
 			Add-LogContent "Downloading $ApplicationName from $URL"
 		    $ProgressPreference = 'SilentlyContinue'
 		    $request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
-		    Add-LogContent "Completed Downloading $ApplicationName"
+		    Add-LogContent "Completed Downloading $ApplicationName - $request"
 		} else {
             Add-LogContent "URL Not Specified, Skipping Download"
         }
@@ -285,10 +286,18 @@ Function Download-Application {
 		$Download.FullVersion = [string]$FullVersion
 		$ApplicationSWVersion = $Download.Version
 		Add-LogContent "Found Version $ApplicationSWVersion from Download FullVersion: $FullVersion"
+
+        ## Determine if the Download Failed or if an Application Version was not detected, and add the Failure to the email if the Flag is set
+        if ((-not (Test-Path $DownloadFile)) -or ([System.String]::IsNullOrEmpty($ApplicationSWVersion))) {
+            Add-LogContent "ERROR: Failed to Download or find the Version for $ApplicationName"
+            if ($Global:NotifyOnDownloadFailure) {
+                $Global:SendEmail = $True
+                $Global:EmailBody += "   - Failed to Download: $ApplicationName`n"
+            }
+        }
 		
 		## Contact SCCM and determine if the Application Version is New
 		Push-Location
-		Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 		Set-Location $Global:SCCMSite
 		If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
             $newApp = $true			
@@ -354,7 +363,6 @@ Function Create-Application {
 	Push-Location
 	Set-Location $Global:SCCMSite
 	Add-LogContent "Creating Application: $ApplicationName $ApplicationSWVersion"
-	
 	Try {
 		If ($ApplicationIcon -ne "$Global:IconRepo\") {
             Add-LogContent "Command: New-CMApplication -Name $ApplicationName $ApplicationSWVersion -Description $ApplicationDescription -Publisher $ApplicationPublisher -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName $ApplicationName $ApplicationSWVersion -LocalizedDescription $ApplicationDescription -UserDocumentation $ApplicationDocURL -IconLocationFile"
@@ -920,11 +928,23 @@ Function Send-EmailMessage {
 ################################### MAIN ########################################
 ## Startup
 Add-LogContent "--- Starting SCCM AutoPackager ---" -Load
-Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+if (-not (Get-Module ConfigurationManager)) {
+    try {
+        Add-LogContent "Importing ConfigurationManager Module"
+        Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+    } 
+    catch {
+        $ErrorMessage = $_.Exception.Message
+		Add-LogContent "ERROR: Importing ConfigurationManager Module Failed!"
+		Add-LogContent "ERROR: $ErrorMessage"
+    }
+}
 
-## Create the Temp Folder
+## Create the Temp Folder if needed
 Add-LogContent "Creating SCCMPackager Folder"
-New-Item -ItemType Container -Path "$Global:TempDir" -Force -ErrorAction SilentlyContinue
+if (-not (Test-Path $Global:TempDir)) {
+    New-Item -ItemType Container -Path "$Global:TempDir" -Force -ErrorAction SilentlyContinue
+}
 
 ## Get the Recipes
 $RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml"
@@ -945,22 +965,22 @@ ForEach ($Recipe In $RecipeList) {
 	
 	## Perform Packaging Tasks
 	$Download = Download-Application -Recipe $ApplicationRecipe
-	Add-LogContent "Download $Download"
+	Add-LogContent "Continue to Download: $Download"
 	If ($Download) {
 		$ApplicationCreation = Create-Application -Recipe $ApplicationRecipe
-		Add-LogContent "ApplicationCreation $ApplicationCreation"
+		Add-LogContent "Continue to ApplicationCreation: $ApplicationCreation"
 	}
 	If ($ApplicationCreation) {
 		$DeploymentTypeCreation = Add-DeploymentType -Recipe $ApplicationRecipe
-		Add-LogContent "DeploymentTypeCreation $DeploymentTypeCreation"
+		Add-LogContent "Continue to DeploymentTypeCreation: $DeploymentTypeCreation"
 	}
 	If ($DeploymentTypeCreation) {
 		$ApplicationDistribution = Distribute-Application -Recipe $ApplicationRecipe
-		Add-LogContent "ApplicationDistribution $ApplicationDistribution"
+		Add-LogContent "Continue to ApplicationDistribution: $ApplicationDistribution"
 	}
 	If ($ApplicationDistribution) {
 		$ApplicationDeployment = Deploy-Application -Recipe $ApplicationRecipe
-		Add-LogContent "ApplicationDeployment $ApplicationDeployment"
+		Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
 	}
 }
 

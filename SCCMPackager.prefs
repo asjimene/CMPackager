@@ -20,4 +20,6 @@
 	<EmailServer></EmailServer>
 	<!-- SendEmailPreference - [Boolean] Switch for sending the email after completion -->
 	<SendEmailPreference>True</SendEmailPreference>
+	<!-- NotifyOnDownloadFailure - [Boolean] Notify in Email if Downloading an application fails, requires SendEmailPreference to be True -->
+	<NotifyOnDownloadFailure>True</NotifyOnDownloadFailure>
 </PackagerPrefs>
