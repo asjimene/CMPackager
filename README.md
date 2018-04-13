@@ -27,7 +27,7 @@ NOTE: There is now a default recipe in the Recipes folder that does step 1, 2 an
 
 ## Contributing
 
-This is really a side project of mine, I would love to have people add new recipes and improve the scripting! 
+Feel free to create your own packages, Contribute to the main code, or provide feedback!
 
 ## Authors
 
@@ -50,3 +50,6 @@ Used and Modified code from the following, Thanks to all their work:
 Some Recipes use the 7-Zip Project for extraction:
 
 * 7-Zip - [Project Page](https://www.7-zip.org/)
+
+## NOTE
+This Project does not provide Applications directly, Recipies provide the links to the Applications. Downloading and packaging software using this tool does not grant you a license for the software. Please ensure you are properly licensed for all software you package and distribute!
