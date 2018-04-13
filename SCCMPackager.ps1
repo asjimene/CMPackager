@@ -12,9 +12,6 @@
 		Copy-CMDeploymentTypeRule - https://janikvonrotz.ch/2017/10/20/configuration-manager-configure-requirement-rules-for-deployment-types-with-powershell/
 		Get-ExtensionAttribute - Jaap Brasser - http://www.jaapbrasser.com
 		Get-MSIInfo - Nickolaj Andersen - http://www.scconfigmgr.com/2014/08/22/how-to-get-msi-file-information-with-powershell/
-	
-	7-Zip Application is Redistributed for Ease of Use:
-		7-Zip Binary - Igor Pavlov - https://www.7-zip.org/
 #>
 
 $Global:ScriptRoot = $PSScriptRoot

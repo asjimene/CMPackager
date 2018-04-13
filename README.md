@@ -7,13 +7,13 @@ This Application is a PowerShell Script that can be used to create applications 
 1. Download the Project
 2. Set up your SCCM Preferences in the SCCMPackager.prefs file (it is a standard XML file)
 3. Create the Requirements Template Application in SCCM and set any Rules that you need in that Application (Instructions Below)
-4. Check out the Recipes in the "Disabled" Folder, Modify them to your needs, and copy them into the "Recipes" Folder
+4. Check out the Recipes in the "Disabled" Folder, Modify them to your needs, and copy them into the "Recipes" Folder (Note: Some Recipes Require 7-Zip which is not included)
 5. Run the SCCMPackager.ps1 (I have mine set up as a scheduled task to run twice a day)
 
 ### Prerequisites
 
 SCCM ConfigMgr Console - Tested on SCCM 1710
-
+Some Recipes require the 7za.exe from the 7-Zip Project, which can be found here: [Project Page](https://www.7-zip.org/) 7za.exe should be placed in the same folder as the SCCMPackager.ps1 Application.
 
 ### Installing
 
@@ -46,10 +46,6 @@ Used and Modified code from the following, Thanks to all their work:
 
 * Nickolaj Andersen - [Get-MSIInfo](http://www.scconfigmgr.com/2014/08/22/how-to-get-msi-file-information-with-powershell/)
 
-
-Some Recipes use the 7-Zip Project for extraction:
-
-* 7-Zip - [Project Page](https://www.7-zip.org/)
 
 ## NOTE
 This Project does not provide Applications directly, Recipies provide the links to the Applications. Downloading and packaging software using this tool does not grant you a license for the software. Please ensure you are properly licensed for all software you package and distribute!
