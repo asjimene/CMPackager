@@ -1,5 +1,6 @@
 <ApplicationDef>
 	<Application>
+		<!-- NOTE: To Package this software correctly, the Packaging script will need to be run as Administrator -->
 		<Name>Java JRE</Name>
 		<Description>Contains both 32bit and 64bit installers. Java Platform, Standard Edition (Java SE) lets you develop and deploy Java applications on desktops and servers, as well as in today's demanding embedded environments. Java offers the rich user interface, performance, versatility, portability, and security that today's applications require. Free Software.</Description>
 		<Publisher>Oracle</Publisher>
@@ -12,63 +13,57 @@
 			<PrefetchScript>$URL = (((Invoke-WebRequest https://java.com/en/download/manual.jsp)|select -ExpandProperty links | where -Property outertext -eq "Windows Offline (64-bit)").href)</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>JavaJREx64.exe</DownloadFileName>
+			<AppRepoFolder>x64</AppRepoFolder>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
+			<DownloadVersionCheck>
+			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJREx64\" -Force -Recurse -ErrorAction SilentlyContinue
+			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jre1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3))64.msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
-			Sleep 10
-			Get-Process "java*" | foreach {Stop-Process $_}
-			New-Item -ItemType Directory -Path "C:\Temp\Java" -Force
-			copy-item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination C:\Temp\Java\ -Force
-			Rename-Item "C:\Temp\Java\$JavaFileName" -NewName JavaJREx64.msi -Force
+			Sleep 15
+			Get-Process -name "Java*JRE*" | Stop-Process
+			New-Item -ItemType Directory -Path "$TempDir\JavaJREx64" -Force
+			Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination $TempDir\JavaJREx64\ -Force
+			Rename-Item "$TempDir\JavaJREx64\$JavaFileName" -NewName JavaJREx64.msi -Force
 			</DownloadVersionCheck>
-			<ExtraCopyFunctions>copy-item C:\Temp\Java\JavaJREx64.msi -Destination $DestinationPath\JavaJREx64.msi -force
+			<ExtraCopyFunctions>
+			Copy-Item "$TempDir\JavaJREx64\*.*" -Destination $DestinationPath\ -force
+			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJREx64\" -Force -Recurse -ErrorAction SilentlyContinue
 			</ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
 			<PrefetchScript>$URL = (((Invoke-WebRequest https://java.com/en/download/manual.jsp )|select -ExpandProperty links | where -Property outertext -eq "Windows Offline").href)</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>JavaJREx86.exe</DownloadFileName>
+			<AppRepoFolder>x86</AppRepoFolder>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
+			<DownloadVersionCheck>
+			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJREx86\" -Force -Recurse -ErrorAction SilentlyContinue
+			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jre1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3)).msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
-			Sleep 10
-			Get-Process "java*" | foreach {Stop-Process $_}
-			Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination C:\Temp\Java\ -Force
-			Rename-Item "C:\Temp\Java\$JavaFileName" -NewName JavaJREx86.msi -Force
+			Sleep 15
+			Get-Process -name "Java*JRE*" | Stop-Process
+			New-Item -ItemType Directory -Path "$TempDir\JavaJREx86" -Force
+			Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination "$TempDir\JavaJREx86\" -Force
+			Rename-Item "$TempDir\JavaJREx86\$JavaFileName" -NewName JavaJREx86.msi -Force
 			</DownloadVersionCheck>
-			<ExtraCopyFunctions>copy-item C:\Temp\Java\JavaJREx86.msi -Destination $DestinationPath\JavaJREx86.msi -force
+			<ExtraCopyFunctions>
+			Copy-Item "$TempDir\JavaJREx86\*.*" -Destination $DestinationPath\ -Force
+			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJREx86\" -Force -Recurse -ErrorAction SilentlyContinue
 			</ExtraCopyFunctions>
 		</Download>
 	</Downloads>
 	<DeploymentTypes>
 		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>JRE Silent Install x86</DeploymentTypeName>
-			<InstallationType>MSI</InstallationType>
-			<Comments>Silent Installer for Java JRE</Comments>
-			<Language>English</Language>
-			<CacheContent>False</CacheContent>
-			<BranchCache>True</BranchCache>
-			<ContentFallback>True</ContentFallback>
-			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallationMSI>JavaJREx86.msi</InstallationMSI>
-			<UninstallCmd></UninstallCmd>
-			<Force32bit>False</Force32bit>
-			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
-			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
-			<UserInteractionMode>Hidden</UserInteractionMode>
-			<ReqUserInteraction>False</ReqUserInteraction>
-			<EstRuntimeMins>15</EstRuntimeMins>
-			<MaxRuntimeMins>60</MaxRuntimeMins>
-			<RebootBehavior>BasedOnExitCode</RebootBehavior>
-			<DetectionMethodType>MSI</DetectionMethodType>
-		</DeploymentType>
-		<DeploymentType Name="DeploymentType2">
 			<DeploymentTypeName>JRE Silent Install x64</DeploymentTypeName>
 			<InstallationType>MSI</InstallationType>
 			<Comments>Silent Installer for Java JRE</Comments>
@@ -92,13 +87,34 @@
 				<RuleName>OS Architecture x64</RuleName>
 			</Requirements>
 		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>JRE Silent Install x86</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for Java JRE</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>JavaJREx86.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
+		<DistributeContent>True</DistributeContent>
+		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploySoftware>True</DeploySoftware>
+		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
 	</Deployment>
 </ApplicationDef>

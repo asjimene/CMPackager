@@ -1,5 +1,6 @@
 <ApplicationDef>
 	<Application>
+		<!-- NOTE: To Package this software correctly, the Packaging script will need to be run as Administrator -->
 		<Name>Java JDK</Name>
 		<Description>Includes both 64bit and 32bit Java Platform, Standard Edition Development Kit (JDK). The JDK is a development environment for building applications, applets, and components using the Java programming language. The JDK includes tools useful for developing and testing programs written in the Java programming language and running on the Java platform.</Description>
 		<Publisher>Oracle</Publisher>
@@ -34,7 +35,10 @@ Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -Er
 			<AppRepoFolder>x64</AppRepoFolder>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
+			<DownloadVersionCheck>
+			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "C:\Temp\JavaJDKx64\" -Force -Recurse -ErrorAction SilentlyContinue
+			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jdk1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3))64.msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
@@ -75,7 +79,10 @@ Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -Er
 			<AppRepoFolder>x86</AppRepoFolder>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
+			<DownloadVersionCheck>
+			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "C:\Temp\JavaJDKx86\" -Force -Recurse -ErrorAction SilentlyContinue
+			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jdk1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3)).msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
@@ -143,10 +150,10 @@ Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -Er
 	</DeploymentTypes>
 	<Distribution>
 		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
+		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
 	</Distribution>
 	<Deployment>
 		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
 	</Deployment>
 </ApplicationDef>
