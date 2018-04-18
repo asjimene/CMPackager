@@ -150,10 +150,10 @@ Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -Er
 	</DeploymentTypes>
 	<Distribution>
 		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
+		<DistributeToGroup></DistributeToGroup>
 	</Distribution>
 	<Deployment>
 		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
+		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
 </ApplicationDef>

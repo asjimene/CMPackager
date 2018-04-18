@@ -110,11 +110,11 @@
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>True</DistributeContent>
-		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
+		<DistributeContent>False</DistributeContent>
+		<DistributeToGroup></DistributeToGroup>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>True</DeploySoftware>
-		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
 </ApplicationDef>
