@@ -17,17 +17,31 @@
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>
+			Add-LogContent "Running Version Check on Java JRE x64"
 			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
 			Remove-Item "$TempDir\JavaJREx64\" -Force -Recurse -ErrorAction SilentlyContinue
 			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jre1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3))64.msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
-			Sleep 15
-			Get-Process -name "Java*JRE*" | Stop-Process
-			New-Item -ItemType Directory -Path "$TempDir\JavaJREx64" -Force
-			Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination $TempDir\JavaJREx64\ -Force
-			Rename-Item "$TempDir\JavaJREx64\$JavaFileName" -NewName JavaJREx64.msi -Force
+			for ($i=0;$i -lt 120; $i++){
+				if (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*.msi"){
+					New-Item -ItemType Directory -Path "$TempDir\JavaJREx64" -Force
+					Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination $TempDir\JavaJREx64\ -Force
+					Rename-Item "$TempDir\JavaJREx64\$JavaFileName" -NewName JavaJREx64.msi -Force
+					break
+				}
+				sleep 1
+			}
+			Get-Process "Java*JRE*" | Stop-Process
+			Add-LogContent "Waiting for Java Process to exit"
+			for ($i=0;$i -lt 120; $i++){
+				if (-not (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\JAVA_INSTALL_FLAG")){
+					break
+				}
+				sleep 1
+			}
+			Add-LogContent "Finished Checking Version for Java JRE x64"
 			</DownloadVersionCheck>
 			<ExtraCopyFunctions>
 			Copy-Item "$TempDir\JavaJREx64\*.*" -Destination $DestinationPath\ -force
@@ -43,17 +57,30 @@
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>
+			Add-LogContent "Running Version Check on Java JRE x86"
 			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
 			Remove-Item "$TempDir\JavaJREx86\" -Force -Recurse -ErrorAction SilentlyContinue
 			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jre1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3)).msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
-			Sleep 15
-			Get-Process -name "Java*JRE*" | Stop-Process
-			New-Item -ItemType Directory -Path "$TempDir\JavaJREx86" -Force
-			Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination "$TempDir\JavaJREx86\" -Force
-			Rename-Item "$TempDir\JavaJREx86\$JavaFileName" -NewName JavaJREx86.msi -Force
+			for ($i=0;$i -lt 120; $i++){
+				if (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*.msi"){
+					New-Item -ItemType Directory -Path "$TempDir\JavaJREx86" -Force
+					Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination "$TempDir\JavaJREx86\" -Force
+					Rename-Item "$TempDir\JavaJREx86\$JavaFileName" -NewName JavaJREx86.msi -Force
+				}
+				sleep 1
+			}
+			Get-Process "Java*JRE*" | Stop-Process
+			Add-LogContent "Waiting for Java Process to exit"
+			for ($i=0;$i -lt 120; $i++){
+				if (-not (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\JAVA_INSTALL_FLAG")){
+					break
+				}
+				sleep 1
+			}
+			Add-LogContent "Finished Checking Version for Java JRE x86"
 			</DownloadVersionCheck>
 			<ExtraCopyFunctions>
 			Copy-Item "$TempDir\JavaJREx86\*.*" -Destination $DestinationPath\ -Force

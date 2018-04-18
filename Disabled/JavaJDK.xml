@@ -11,6 +11,8 @@
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>
+			Add-Logcontent "Downloading JavaJDKx64"
+			$ProgressPreference = SilentlyContinue
 $request = Invoke-WebRequest http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 $dnlds = ($request.Scripts | where innerHTML -like "*var downloads = new Array();*").InnerHTML
 
@@ -29,32 +31,51 @@ $URI
 $Webclient = New-Object System.Net.WebClient
 $Webclient.Headers.add('cookie','oraclelicense=accept-securebackup-cookie')
 $Webclient.DownloadFile($uri,$DownloadFile)
-Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue</PrefetchScript>
+Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+Add-LogContent "Finished Download for Java JDK x64"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>JavaJDKx64.exe</DownloadFileName>
 			<AppRepoFolder>x64</AppRepoFolder>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>
+			Add-LogContent "Running Version Check on Java JDK x64"
 			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
-			Remove-Item "C:\Temp\JavaJDKx64\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJDKx64\" -Force -Recurse -ErrorAction SilentlyContinue
 			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jdk1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3))64.msi"
+			Add-LogContent "Waiting for Java MSI to be extracted"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
-			Sleep 15
-			get-process "msiexec*" | where MainWindowTitle -Like "*java SE Devel*" |Stop-Process
-			New-Item -ItemType Directory -Path "C:\Temp\JavaJDKx64" -Force -ErrorAction SilentlyContinue
-			copy-item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jdk1*64\*.*" -Destination C:\Temp\JavaJDKx64\ -Force -ErrorAction SilentlyContinue
-			Rename-Item "C:\Temp\JavaJDKx64\$JavaFileName" -NewName JavaJDKx64.msi -Force -ErrorAction SilentlyContinue
+			for ($i=0;$i -lt 120; $i++){
+				if (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jdk1*\*.msi"){
+					Add-LogContent "jdk found"
+					New-Item -ItemType Directory -Path "$TempDir\JavaJDKx64" -Force -ErrorAction SilentlyContinue
+					copy-item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jdk1*64\*.*" -Destination $TempDir\JavaJDKx64\ -Force -ErrorAction SilentlyContinue
+					Rename-Item "$TempDir\JavaJDKx64\$JavaFileName" -NewName JavaJDKx64.msi -Force -ErrorAction SilentlyContinue
+					break
+				}
+				sleep 1
+			}
+			Get-Process -Name "JavaJDK*" | Stop-Process
+			Get-Process "msiexec*" | where MainWindowTitle -Like "*java*" |Stop-Process
+			Add-LogContent "Waiting for Java Installer to Exit"
+			for ($i=0;$i -lt 120; $i++){
+				if (-not (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\JAVA_INSTALL_FLAG")){
+					break
+				}
+				sleep 1
+			}
+			Add-LogContent "Finished Checking Version for Java JDK x64"
 			</DownloadVersionCheck>
-			<ExtraCopyFunctions>Copy-Item C:\Temp\JavaJDKx64\*.* -Destination $DestinationPath\ -Force
+			<ExtraCopyFunctions>Copy-Item $TempDir\JavaJDKx64\*.* -Destination $DestinationPath\ -Force
 			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
-			Remove-Item "C:\Temp\JavaJDKx64\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJDKx64\" -Force -Recurse -ErrorAction SilentlyContinue
 			</ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
 			<PrefetchScript>
+			Add-Logcontent "Downloading JavaJDKx86"
 $request = Invoke-WebRequest http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 $dnlds = ($request.Scripts | where innerHTML -like "*var downloads = new Array();*").InnerHTML
 
@@ -73,28 +94,46 @@ $URI
 $Webclient = New-Object System.Net.WebClient
 $Webclient.Headers.add('cookie','oraclelicense=accept-securebackup-cookie')
 $Webclient.DownloadFile($uri,$DownloadFile)
-Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue</PrefetchScript>
+Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
+Add-LogContent "Finished Download for Java JDK x86"
+</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>JavaJDKx86.exe</DownloadFileName>
 			<AppRepoFolder>x86</AppRepoFolder>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>
+			Add-LogContent "Running Version Check on Java JDK x86"
 			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
-			Remove-Item "C:\Temp\JavaJDKx86\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJDKx86" -Force -Recurse -ErrorAction SilentlyContinue
 			$FullVersion = (Get-Item $TempDir\$DownloadFileName).VersionInfo.FileVersion
 			$Version = "$($FullVersion[0])u$($FullVersion.Split(".")[2].substring(0,3))"
 			$JavaFileName = "jdk1.$($Fullversion.Substring(0,3))_$($FullVersion.Split(".")[2].substring(0,3)).msi"
 			$JavaProc = Start-Process $TempDir\$DownloadFileName -PassThru
-			Sleep 15
-			get-process "msiexec*" | where MainWindowTitle -Like "*java SE Devel*" |Stop-Process
-			New-Item -ItemType Directory -Path "C:\Temp\JavaJDKx86" -Force -ErrorAction SilentlyContinue
-			Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jdk1*\*.*" -Destination C:\Temp\JavaJDKx86\ -Force -ErrorAction SilentlyContinue
-			Rename-Item "C:\Temp\JavaJDKx86\$JavaFileName" -NewName JavaJDKx86.msi -Force -ErrorAction SilentlyContinue
+			Add-LogContent "Waiting for Java MSI to be extracted"
+			for ($i=0;$i -lt 120; $i++){
+				if (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jdk1*"){
+					New-Item -ItemType Directory -Path "$TempDir\JavaJDKx86" -Force -ErrorAction SilentlyContinue
+					Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jdk1*\*.*" -Destination $TempDir\JavaJDKx86 -Force -ErrorAction SilentlyContinue
+					Rename-Item "$TempDir\JavaJDKx86\$JavaFileName" -NewName JavaJDKx86.msi -Force -ErrorAction SilentlyContinue
+					break
+				}
+				sleep 1
+			}
+			Get-Process -Name "JavaJDK*" | Stop-Process
+			Get-Process "msiexec*" | where MainWindowTitle -Like "*java*" |Stop-Process
+			Add-LogContent "Waiting for Java Process to exit"
+			for ($i=0;$i -lt 120; $i++){
+				if (-not (Test-Path "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\JAVA_INSTALL_FLAG")){
+					break
+				}
+				sleep 1
+			}
+			Add-LogContent "Finished Checking Version for Java JDK x86"
 			</DownloadVersionCheck>
-			<ExtraCopyFunctions>Copy-Item C:\Temp\JavaJDKx86\*.* -Destination $DestinationPath\ -Force
+			<ExtraCopyFunctions>Copy-Item $TempDir\JavaJDKx86\*.* -Destination $DestinationPath\ -Force
 			Remove-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\" -Force -Recurse -ErrorAction SilentlyContinue
-			Remove-Item "C:\Temp\JavaJDKx86\" -Force -Recurse -ErrorAction SilentlyContinue
+			Remove-Item "$TempDir\JavaJDKx86" -Force -Recurse -ErrorAction SilentlyContinue
 			</ExtraCopyFunctions>
 		</Download>
 	</Downloads>
