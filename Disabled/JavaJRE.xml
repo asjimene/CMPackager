@@ -69,6 +69,7 @@
 					New-Item -ItemType Directory -Path "$TempDir\JavaJREx86" -Force
 					Copy-Item "$env:USERPROFILE\AppData\LocalLow\Oracle\Java\jre1*\*" -Destination "$TempDir\JavaJREx86\" -Force
 					Rename-Item "$TempDir\JavaJREx86\$JavaFileName" -NewName JavaJREx86.msi -Force
+					break
 				}
 				sleep 1
 			}
