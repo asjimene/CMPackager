@@ -37,7 +37,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>VSCodeSetup-x64.exe /VERYSILENT /NORESTART</InstallProgram>
+			<InstallProgram>VSCodeSetup-x64.exe /VERYSILENT /NORESTART /MERGETASKS=!runcode</InstallProgram>
 			<UninstallCmd>`"%ProgramFiles%\Microsoft VS Code\unins000.exe`" /VERYSILENT</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -68,7 +68,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>VSCodeSetup-ia32.exe /VERYSILENT /NORESTART</InstallProgram>
+			<InstallProgram>VSCodeSetup-ia32.exe /VERYSILENT /NORESTART /MERGETASKS=!runcode</InstallProgram>
 			<UninstallCmd>`"%ProgramFiles(x86)%\Microsoft VS Code\unins000.exe`" /VERYSILENT</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
