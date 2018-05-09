@@ -127,7 +127,7 @@
 			<!-- DetectionMethod - [String] Content of Script Detection Method Script Block -->
 			<DetectionMethod></DetectionMethod>
 			<!-- The following are all of the possible detection method clauses if you choose a custom detection method-->
-			<CustomDetectionClauses>
+			<CustomDetectionMethods>
 				<DetectionClause>
 					<DetectionClauseType>[Directory/File]</DetectionClauseType>
 					<Name>(Required)</Name>
@@ -174,7 +174,7 @@
 					<PropertyType>[Optional Only if ExpectedValue]</PropertyType>
 					<Value>[Optional only if ExpectedValue]</Value>
 				</DetectionClause>
-			</CustomDetectionClauses>
+			</CustomDetectionMethods>
 			<!-- Requirements - Requirements can be added to all applications, you should set up an application that the requirements can be copied from in the preferences file-->
 			<Requirements>
 			<!-- RuleName - [String] You can assign requirements to an application by using the rule name on the existing template application -->
