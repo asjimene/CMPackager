@@ -27,8 +27,8 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>"FirefoxSetup.exe" -ms</InstallProgram>
-			<UninstallCmd>%ProgramFiles(x86)%\Mozilla Firefox\uninstall\helper.exe -ms</UninstallCmd>
+			<InstallProgram>FirefoxSetup.exe -ms</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles(x86)%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -45,17 +45,14 @@
 					<ExpectedValue>$FullVersion</ExpectedValue>
 					<ExpressionOperator>IsEquals</ExpressionOperator>
 					<Value>True</Value>
-					<Is64Bit></Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
+		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
 </ApplicationDef>

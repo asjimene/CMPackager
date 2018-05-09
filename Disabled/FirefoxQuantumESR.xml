@@ -1,0 +1,96 @@
+<ApplicationDef>
+	<Application>
+		<Name>Mozilla Firefox Quantum ESR</Name>
+		<Description>Mozilla Firefox (or simply Firefox) is a free and open-source web browser developed by the Mozilla Foundation and its subsidiary, the Mozilla Corporation.</Description>
+		<Publisher>Mozilla</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://support.mozilla.org/en-US/</UserDocumentation>
+		<Icon>FirefoxQ.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<URL>https://download.mozilla.org/?product=firefox-60.0esr-SSL&amp;os=win64&amp;lang=en-US</URL>
+			<DownloadFileName>FirefoxQuantumx64.exe</DownloadFileName>
+			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\FirefoxQuantumx64.exe" -o"$TempDir\FireFoxqTempx64" -y
+			$Version = (get-item $TempDir\FireFoxQTempx64\Setup.exe).VersionInfo.ProductVersion
+			$FullVersion = (Get-item $TempDir\FirefoxQTempx64\core\firefox.exe).VersionInfo.FileVersionRaw
+			</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<URL>https://download.mozilla.org/?product=firefox-60.0esr-SSL&amp;os=win&amp;lang=en-US</URL>
+			<DownloadFileName>FirefoxQuantumx86.exe</DownloadFileName>
+			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\FirefoxQuantumx86.exe" -o"$TempDir\FireFoxQTempx86" -y
+			$Version = (get-item $TempDir\FireFoxQTempx86\Setup.exe).VersionInfo.ProductVersion
+			$FullVersion = (Get-item $TempDir\FirefoxQTempx86\core\firefox.exe).VersionInfo.FileVersionRaw
+			</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Firefox Quantum ESR x64 Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>FirefoxQuantumx64.exe -ms</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>firefox.exe</Name>
+					<Path>%ProgramFiles%\Mozilla Firefox</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>Firefox Quantum ESR x86 Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>FirefoxQuantumx86.exe -ms</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles(x86)%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>firefox.exe</Name>
+					<Path>%ProgramFiles(x86)%\Mozilla Firefox</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
