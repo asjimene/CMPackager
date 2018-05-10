@@ -37,7 +37,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>msiexec /i ZoomInstallerFull.msi /quiet /qn /norestart ZConfig='nogoogle=1;nofacebook=1;AddFWException=1'</InstallProgram>
+			<InstallProgram>msiexec /i ZoomInstallerFull.msi /quiet /qn /norestart ZConfig=`"nogoogle=1;nofacebook=1;AddFWException=1`"</InstallProgram>
 			<InstallationMSI>ZoomInstallerFull.msi</InstallationMSI>
 			<UninstallCmd></UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>

@@ -30,7 +30,7 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>VLCInstallerx86.exe /L=1033 /S /qb</InstallProgram>
-			<UninstallCmd>%ProgramFiles(x86)\VideoLAN\VLC\uninstall.exe /S</UninstallCmd>
+			<UninstallCmd>`"%ProgramFiles(x86)%\VideoLAN\VLC\uninstall.exe`" /S</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -53,10 +53,8 @@
 	</DeploymentTypes>
 	<Distribution>
 		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
 	</Distribution>
 	<Deployment>
 		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
 </ApplicationDef>

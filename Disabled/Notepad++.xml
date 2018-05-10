@@ -28,7 +28,7 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>NotePadppInstaller.exe /noUpdater /S</InstallProgram>
-			<UninstallCmd>%ProgramFiles(x86)%\Notepad++\uninstall.exe /S</UninstallCmd>
+			<UninstallCmd>`"%ProgramFiles(x86)%\Notepad++\uninstall.exe`" /S</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
