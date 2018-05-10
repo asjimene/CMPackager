@@ -1,0 +1,61 @@
+<ApplicationDef>
+	<Application>
+		<Name>WinSCP</Name>
+		<Description>WinSCP is an open source free SFTP client, FTP client, WebDAV client and SCP client for Windows. Its main function is file transfer between a local and a remote computer. Beyond this, WinSCP offers scripting and basic file manager functionality.</Description>
+		<Publisher>WinSCP.net</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://winscp.net/eng/download.php</UserDocumentation>
+		<Icon>WinSCP.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+			$URL = "https://winscp.net$((invoke-webrequest https://winscp.net/eng/download.php -UseBasicParsing | Select -ExpandProperty links | where -property href -like "*/download/WinSCP-*-Setup.exe")[0].href)"
+			$URL = (Invoke-webrequest $URL | Select -ExpandProperty Links | Where innerHTML -eq "Direct Download")[0].href
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>WinSCP-Setup.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>WinSCP Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>WinSCP-Setup.exe /VerySilent</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles(x86)%\WinSCP\unins000.exe`" /VERYSILENT</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>40</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>RegistryKeyValue</DetectionClauseType>
+					<Hive>LocalMachine</Hive>
+					<KeyName>SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\winscp3_is1</KeyName>
+					<ValueName>DisplayVersion</ValueName>
+					<PropertyType>Version</PropertyType>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpectedValue>$Version</ExpectedValue>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
