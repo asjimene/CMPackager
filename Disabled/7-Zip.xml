@@ -7,11 +7,11 @@
 		<UserDocumentation>http://www.7-zip.org/</UserDocumentation>
 		<Icon>7Zip.ico</Icon>
 	</Application>
-	<Downloads>
-		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = "https://www.7-zip.org/$((Invoke-WebRequest https://www.7-zip.org/download.html |Select -ExpandProperty Links |where -Property href -like "*-x64.msi")[0].href)"</PrefetchScript>
+		<Downloads>
+			<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = "https://www.7-zip.org/$((Invoke-WebRequest https://www.7-zip.org/download.html |Select -ExpandProperty Links |where -Property href -like "*.msi")[0].href)"</PrefetchScript>
 			<URL></URL>
-			<DownloadFileName>7Zipx64.msi</DownloadFileName>
+			<DownloadFileName>7Zipx86.msi</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()
@@ -19,9 +19,9 @@
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$URL = "https://www.7-zip.org/$((Invoke-WebRequest https://www.7-zip.org/download.html |Select -ExpandProperty Links |where -Property href -like "*.msi")[0].href)"</PrefetchScript>
+			<PrefetchScript>$URL = "https://www.7-zip.org/$((Invoke-WebRequest https://www.7-zip.org/download.html |Select -ExpandProperty Links |where -Property href -like "*-x64.msi")[0].href)"</PrefetchScript>
 			<URL></URL>
-			<DownloadFileName>7Zipx86.msi</DownloadFileName>
+			<DownloadFileName>7Zipx64.msi</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()
@@ -81,10 +81,8 @@
 	</DeploymentTypes>
 	<Distribution>
 		<DistributeContent>True</DistributeContent>
-		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
 	</Distribution>
 	<Deployment>
 		<DeploySoftware>True</DeploySoftware>
-		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
 	</Deployment>
 </ApplicationDef>
