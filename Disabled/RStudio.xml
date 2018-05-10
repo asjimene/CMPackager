@@ -1,0 +1,64 @@
+<ApplicationDef>
+	<Application>
+		<Name>RStudio</Name>
+		<Description>RStudio is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management. Free and Open Source Software.</Description>
+		<Publisher>RStudio Inc.</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.rstudio.com/</UserDocumentation>
+		<Icon>RStudio.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+			[xml]$RStudioDLs = (Invoke-WebRequest https://download1.rstudio.org/).Content
+			$LatestDL = ($RStudioDLs.ListBucketResult.Contents | where Key -like "*.exe" | sort -Property lastModified -Descending)[0].key
+			$URL = "https://download1.rstudio.org/$LatestDL"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>RStudioSetup.exe</DownloadFileName>
+			<DownloadVersionCheck>
+			$FullVersion = (Get-ExtensionAttribute -FullName $DownloadFile -ExtensionAttribute ProductVersion).ProductVersion
+			$Version = ($FullVersion.split('.'))[0..2] -join '.'
+			</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>RStudio Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>RStudioSetup.exe /S</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\RStudio\Uninstall.exe`" /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>35</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>RStudio.exe</Name>
+					<Path>%ProgramFiles%\RStudio\bin</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<Value>True</Value>
+					<Is64Bit></Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
