@@ -12,6 +12,9 @@
 		Copy-CMDeploymentTypeRule - https://janikvonrotz.ch/2017/10/20/configuration-manager-configure-requirement-rules-for-deployment-types-with-powershell/
 		Get-ExtensionAttribute - Jaap Brasser - http://www.jaapbrasser.com
 		Get-MSIInfo - Nickolaj Andersen - http://www.scconfigmgr.com/2014/08/22/how-to-get-msi-file-information-with-powershell/
+	
+	7-Zip Application is Redistributed for Ease of Use:
+		7-Zip Binary - Igor Pavlov - https://www.7-zip.org/
 #>
 
 $Global:ScriptRoot = $PSScriptRoot
@@ -32,6 +35,9 @@ $Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
 # SCCM Vars
 $Global:SCCMSite = $PackagerPrefs.PackagerPrefs.SCCMSite
 $Global:RequirementsTemplateAppName = "Application Requirements Template"
+$Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
+$Global:PreferredDeployCollection = $PackagerPrefs.PackagerPrefs.PreferredDeployCollection
+
 
 # Email Vars
 [string[]]$Global:EmailTo = [string[]]$PackagerPrefs.PackagerPrefs.EmailTo
@@ -44,7 +50,7 @@ $Global:EmailSubject = "SCCM Application Packager Report - $(Get-date -format d)
 $Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n`n"
 
 #This gets switched to True if Applications are Packaged
-$Global:SendEmail = $false 
+$Global:SendEmail = $false
 
 ## Functions
 function Add-LogContent {
@@ -271,7 +277,7 @@ Function Download-Application {
 			Add-LogContent "Downloading $ApplicationName from $URL"
 		    $ProgressPreference = 'SilentlyContinue'
 		    $request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
-		    Add-LogContent "Completed Downloading $ApplicationName - $request"
+		    Add-LogContent "Completed Downloading $ApplicationName"
 		} else {
             Add-LogContent "URL Not Specified, Skipping Download"
         }
@@ -839,7 +845,6 @@ Function Distribute-Application {
 	Set-Location $SCCMSite
 	$DistContent = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Distribution.DistributeContent)
 	If ($DistContent) {
-		
 		If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToGroup))) {
 			$DistributionGroup = $Recipe.ApplicationDef.Distribution.DistributeToGroup
 			Add-LogContent "Distributing Content for $ApplicationName $ApplicationSWVersion to $($Recipe.ApplicationDef.Distribution.DistributeToGroup)"
@@ -868,6 +873,19 @@ Function Distribute-Application {
 				}
 			}
 		}
+		If ((([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToDPs)) -and ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToGroup))) -and (-not ([String]::IsNullOrEmpty($Global:PreferredDistributionLoc)))) {
+			$DistributionGroup = $Global:PreferredDistributionLoc
+			Add-LogContent "Distribution was set to True but No Distribution Points or Groups were Selected, Using Preferred Distribution Group: $Global:PreferredDistributionLoc"
+			Try {
+				Start-CMContentDistribution -ApplicationName "$ApplicationName $ApplicationSWVersion" -DistributionPointGroupName $DistributionGroup -ErrorAction Stop
+			}
+			Catch {
+				$ErrorMessage = $_.Exception.Message
+				Add-LogContent "ERROR: Content Distribution Failed!"
+				Add-LogContent "ERROR: $ErrorMessage"
+				$Success = $false
+			}
+		}
 	}
 	Pop-Location
 	Return $Success
@@ -894,6 +912,18 @@ Function Deploy-Application {
 			Try {
 				Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $($Recipe.ApplicationDef.Deployment.DeploymentCollection)"
 				New-CMApplicationDeployment -CollectionName $Recipe.ApplicationDef.Deployment.DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
+			}
+			Catch {
+				$ErrorMessage = $_.Exception.Message
+				Add-LogContent "ERROR: Deployment Failed!"
+				Add-LogContent "ERROR: $ErrorMessage"
+				$Success = $false
+			}
+		}
+		ElseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
+			Try {
+				Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $Global:PreferredDeployCollection"
+				New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
 			}
 			Catch {
 				$ErrorMessage = $_.Exception.Message
