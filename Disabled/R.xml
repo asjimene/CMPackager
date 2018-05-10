@@ -1,0 +1,116 @@
+<!-- NOTE: This package REQUIRES 7za.exe from the 7-Zip Project to be placed in the ExtraFiles\R Directory to work correctly! -->
+<ApplicationDef>
+	<Application>
+		<Name>R</Name>
+		<Description>R is a free software environment for statistical computing and graphics. It compiles and runs on a wide variety of UNIX platforms, Windows and MacOS.</Description>
+		<Publisher>The R Foundation</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.r-project.org/</UserDocumentation>
+		<Icon>R.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = "https://cran.cnr.berkeley.edu/bin/windows/base/$((Invoke-WebRequest https://cran.cnr.berkeley.edu/bin/windows/base/ | Select -ExpandProperty Links | Where innerText -like "Download R*for Windows")[0].href)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>RInstall.exe</DownloadFileName>
+			<DownloadVersionCheck>
+$PathToDownload = "$TempDir\$DownloadFileName"
+$FullVersion = (Get-Item $PathToDownload).VersionInfo.FileVersion
+$Version = ($FullVersion.split('.'))[0..2] -join '.'
+Add-LogContent "Found Version: $Version FullVersion $FullVersion"
+			</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+			<ExtraCopyFunctions>
+# The Functions below will also package the packages/plugins for R if you modify the InstallRPackages.R script in the ExtraFiles folder, 
+# if you do not need to install additional R packages, you can remove everything except for the final "Copy-Item" line
+
+$PathToScript = "$ScriptRoot\ExtraFiles\R\InstallRPackages.R"
+$PathToR = "C:\Program Files\R\R-$Version"
+$PathToRexe = "$PathToR\bin\R.exe"
+$PathtoRLib = "$PathToR\Library"
+Add-LogContent "Path To Script: $PathToScript`n Path To R: $PathToR`n Path To R.exe: $PathToRexe`n Path To R Library: $PathToRLib"
+
+# Install R
+Add-LogContent "Installing R"
+Start-Process $PathToDownload -ArgumentList "/Silent" -Wait
+
+for ($i=0; $i -le 120; $i++){
+    if (Test-Path $PathToRexe){
+        sleep 10
+        break
+    }
+    sleep 1
+}
+
+# Run R with the Script to Install the Packages
+Add-Logcontent "Starting $PathToRexe with Script $PathToScript"
+Start-Process $PathToRexe -ArgumentList "-f `"$PathToScript`"" -Wait
+Add-LogContent "End of $PathToRexe"
+
+#Set a new FullVersion based on the Bin Version
+$Download.FullVersion = ([String]((Get-Item $PathtoRexe).VersionInfo.FileVersionRaw)).TrimStart().TrimEnd()
+
+# Zip the Library Folder
+Add-LogContent "Zipping the R Library Folder"
+Start-Process .\7za.exe -ArgumentList "a `"$TempDir\library.7z`" `"$PathtoRLib`"" -Wait
+
+# Uninstall R
+Add-LogContent "Uninstalling R"
+Start-Process "$PathToR\unins000.exe" -ArgumentList "/Silent" -Wait
+
+# Wait for R To be Uninstalled
+for ($i=0; $i -le 120; $i++){
+    if (-not (Test-Path $PathToRexe)){
+        sleep 10
+        Remove-Item -Path $PathToR -Recurse -Force
+        break
+    }
+    sleep 1
+}
+
+Add-LogContent "Copying Library.7z and other Files to Destination"
+Copy-Item $TempDir\library.7z -Destination $DestinationPath\library.7z -force
+Copy-item $ScriptRoot\ExtraFiles\R\*.* $DestinationPath\ -force -recurse
+
+			</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>R Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>powershell -executionpolicy bypass .\install.ps1</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\R\R-$Version\unins000.exe`" /Silent</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>45</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>R.exe</Name>
+					<Path>%ProgramFiles%\R\R-`$Version\bin</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<Value>True</Value>
+					<Is64Bit></Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
