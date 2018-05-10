@@ -1,0 +1,60 @@
+<ApplicationDef>
+	<Application>
+		<!-- Note: This Recipe requires 7-zip to extract the software and determine the proper version -->
+		<Name>Zotero</Name>
+		<Description>Zotero is a free, open-source research tool that helps you collect, organize, and analyze research and share it in a variety of ways. Zotero includes the best parts of older reference manager software - the ability to store author, title, and publication fields and to export that information as formatted references - and the best aspects of modern software and web applications, such as the ability to organize, tag, and search in advanced ways. Zotero interacts seamlessly with online resources: when it senses you are viewing a book, article, or other object on the web, it can automatically extract and save complete bibliographic references. Zotero effortlessly transmits information to and from other web services and applications, and it runs both as a web service and offline on your personal devices.</Description>
+		<Publisher>Roy Rosenzweig Center for History and New Media</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.zotero.org/download/</UserDocumentation>
+		<Icon>zotero.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript></PrefetchScript>
+			<URL>https://www.zotero.org/download/client/dl?channel=release&amp;platform=win32</URL>
+			<DownloadFileName>ZoteroInstaller.exe</DownloadFileName>
+			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\ZoteroInstaller.exe" -o"$TempDir\ZoteroTemp" -y
+			$Version = (get-item $TempDir\ZoteroTemp\Setup.exe).VersionInfo.ProductVersion
+			$FullVersion = (Get-item $TempDir\ZoteroTemp\core\zotero.exe).VersionInfo.FileVersionRaw
+			</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Zotero Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>ZoteroInstaller.exe -ms</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles(x86)%\Zotero\uninstall\helper.exe`" -ms</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>zotero.exe</Name>
+					<Path>%ProgramFiles(x86)%\Zotero</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
