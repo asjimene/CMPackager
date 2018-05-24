@@ -9,6 +9,10 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+			$Version = (ConvertFrom-JSON (Invoke-WebRequest -URI "https://product-details.mozilla.org/1.0/firefox_versions.json").Content).FIREFOX_ESR_NEXT
+			$URL = "https://download.mozilla.org/?product=firefox-$Version-SSL&amp;os=win64&amp;lang=en-US"
+			</PrefetchScript>
 			<URL>https://download.mozilla.org/?product=firefox-60.0esr-SSL&amp;os=win64&amp;lang=en-US</URL>
 			<DownloadFileName>FirefoxQuantumx64.exe</DownloadFileName>
 			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\FirefoxQuantumx64.exe" -o"$TempDir\FireFoxqTempx64" -y
@@ -19,6 +23,10 @@
 			<Version></Version>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>
+			$Version = (ConvertFrom-JSON (Invoke-WebRequest -URI "https://product-details.mozilla.org/1.0/firefox_versions.json").Content).FIREFOX_ESR_NEXT
+			$URL = "https://download.mozilla.org/?product=firefox-$Version-SSL&amp;os=win&amp;lang=en-US"
+			</PrefetchScript>
 			<URL>https://download.mozilla.org/?product=firefox-60.0esr-SSL&amp;os=win&amp;lang=en-US</URL>
 			<DownloadFileName>FirefoxQuantumx86.exe</DownloadFileName>
 			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\FirefoxQuantumx86.exe" -o"$TempDir\FireFoxQTempx86" -y
