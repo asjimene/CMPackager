@@ -34,7 +34,7 @@ $Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
 
 # SCCM Vars
 $Global:SCCMSite = $PackagerPrefs.PackagerPrefs.SCCMSite
-$Global:RequirementsTemplateAppName = "Application Requirements Template"
+$Global:RequirementsTemplateAppName = $PackagerPrefs.PackagerPrefs.RequirementsTemplateAppName
 $Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
 $Global:PreferredDeployCollection = $PackagerPrefs.PackagerPrefs.PreferredDeployCollection
 
