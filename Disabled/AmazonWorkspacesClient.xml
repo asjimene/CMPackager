@@ -1,0 +1,50 @@
+<ApplicationDef>
+	<Application>
+		<Name>Amazon Workspaces Client</Name>
+		<Description>Amazon WorkSpaces is a managed, secure cloud desktop service. You can use Amazon WorkSpaces to provision either Windows or Linux desktops in just a few minutes and quickly scale to provide thousands of desktops to workers across the globe. You can pay either monthly or hourly, just for the WorkSpaces you launch, which helps you save money when compared to traditional desktops and on-premises VDI solutions. Amazon WorkSpaces help you eliminate the complexity in managing inventory, OS versions and patches, and Virtual Desktop Infrastructure (VDI), which helps simplify your desktop delivery strategy. With Amazon WorkSpaces, your users get a fast, responsive desktop of their choice that they can access anywhere, anytime, from any supported. Free install with account required for use.</Description>
+		<Publisher>Amazon Web Services, Inc</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://clients.amazonworkspaces.com/</UserDocumentation>
+		<Icon>AWS.ico</Icon>
+	</Application>
+		<Downloads>
+			<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = ((Invoke-WebRequest -Uri https://clients.amazonworkspaces.com).Links | where href -like *.msi).href</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>AmazonWorkspaces.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>AWS Workspaces</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for Amazon Workspaces Client</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>AmazonWorkspaces.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
