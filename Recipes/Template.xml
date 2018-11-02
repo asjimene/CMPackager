@@ -138,6 +138,7 @@
 					<Value></Value>
 					<Is64Bit></Is64Bit>
 				</DetectionClause>
+				<!-- Multiple Detection Clauses can be specified under CustomDetectionMethods, they will automatically be added with an "And" connector, "Or" connectors are not possible at this time -->
 				<DetectionClause>
 					<DetectionClauseType>[Directory/File]</DetectionClauseType>
 					<Name>(Required)</Name>
