@@ -138,7 +138,7 @@
 					<Value></Value>
 					<Is64Bit></Is64Bit>
 				</DetectionClause>
-				<!-- Multiple Detection Clauses can be specified under CustomDetectionMethods, they will automatically be added with an "And" connector, "Or" connectors are not possible at this time -->
+				<!-- Multiple Detection Clauses can be specified under CustomDetectionMethods, Specifiy the Connector to use between clauses with the DETECTIONCLAUSEEXPRESSION (below) -->
 				<DetectionClause>
 					<DetectionClauseType>[Directory/File]</DetectionClauseType>
 					<Name>(Required)</Name>
@@ -175,6 +175,15 @@
 					<PropertyType>[Optional Only if ExpectedValue]</PropertyType>
 					<Value>[Optional only if ExpectedValue]</Value>
 				</DetectionClause>
+				<DetectionClauseExpression>
+					<DetectionClauseConnector>
+						<!-- The connector clause specifies the index of the detection method above to apply the clasue to. For a detection method with 2 clauses, you would choose
+						1 as the connector clause to add the Connector between clause0 and clause1 -->
+						<ConnectorClause>(required if using mulitple detection clauses)[$index of the detection clause starting at 0]</ConnectorClause>
+						<ConnectorClauseConnector>(Required)[OR/AND]</ConnectorClauseConnector>
+					</DetectionClauseConnector>
+					<DetectionClauseGrouping><!--Grouping is unavailable at this time--></DetectionClauseGrouping>
+				</DetectionClauseExpression>
 			</CustomDetectionMethods>
 			<!-- Requirements - Requirements can be added to all applications, you should set up an application that the requirements can be copied from in the preferences file-->
 			<Requirements>

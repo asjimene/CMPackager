@@ -2,8 +2,10 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
+	 Last Updated:  2/21/2019 9:20 AM
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
+	 Version:		2.1.0
 	===========================================================================
 	.DESCRIPTION
 		Packages Applications for SCCM using XML Based Recipe Files
@@ -623,11 +625,23 @@ Function Add-DeploymentType {
 		If (($DepTypeDetectionMethodType -eq "Custom") -and (-not ([System.String]::IsNullOrEmpty($DeploymentType.CustomDetectionMethods.ChildNodes)))) {
 			$DepTypeDetectionMethods = @()
 			$DepTypeAddDetectionMethods = $true
+			$DepTypeDetectionClauseConnector = @()
 			Add-LogContent "Adding Detection Method Clauses"
-			
-			ForEach ($DetectionMethod In $DeploymentType.CustomDetectionMethods.ChildNodes) {
+			ForEach ($DetectionMethod In $($DeploymentType.CustomDetectionMethods.ChildNodes | where Name -NE "DetectionClauseExpression")) {
 				Add-LogContent "New Detection Method Clause $Version $FullVersion"
 				$DepTypeDetectionMethods += Add-DetectionMethodClause -DetectionMethod $DetectionMethod -AppVersion $Version -AppFullVersion $FullVersion
+			}
+			if (-not [System.string]::IsNullOrEmpty($($DeploymentType.CustomDetectionMethods.ChildNodes | where Name -EQ "DetectionClauseExpression"))){
+				$CustomDetectionMethodExpression = ($DeploymentType.CustomDetectionMethods.ChildNodes | where Name -EQ "DetectionClauseExpression").ChildNodes
+			}
+			ForEach ($DetectionMethodExpression In $CustomDetectionMethodExpression) {
+				if ($DetectionMethodExpression.Name -eq "DetectionClauseConnector"){
+					Add-LogContent "New Detection Clause Connector $($DetectionMethodExpression.ConnectorClause),$($DetectionMethodExpression.ConnectorClauseConnector)"
+					$DepTypeDetectionClauseConnector += @{"LogicalName"=$DepTypeDetectionMethods[$DetectionMethodExpression.ConnectorClause].Setting.LogicalName;"Connector"="$($DetectionMethodExpression.ConnectorClauseConnector)"}
+				}
+				if ($DetectionMethodExpression.Name -eq "DetectionClauseGrouping") {
+					Add-LogContent "New Detection Clause Grouping Statement Found - NOT READY YET"
+				}
 			}
 		}
 		
@@ -704,11 +718,16 @@ Function Add-DeploymentType {
 				## Add Detection Methods if required for this Deployment Type
 				If ($DepTypeAddDetectionMethods) {
 					Add-LogContent "Adding Detection Methods"
-					Add-LogContent "Set-CMScriptDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName -AddDetectionClause $($DepTypeDetectionMethods[0].DataType.Name)"
-					Try {
-						Set-CMScriptDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
+					
+					Add-LogContent "Number of Detection Methods: $($DepTypeDetectionMethods.Count)"
+					if ($DepTypeDetectionMethods.Count -eq 1){
+					
+						Add-LogContent "Set-CMScriptDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName -AddDetectionClause $($DepTypeDetectionMethods[0].DataType.Name)"
+						Try {
+							Set-CMScriptDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
 					}
 					Catch {
+						Write-host $_
 						$ErrorMessage = $_.Exception.Message
 						$FullyQualified = $_.Exeption.FullyQualifiedErrorID
 						Add-LogContent "ERROR: Adding Detection Method Failed!"
@@ -716,9 +735,24 @@ Function Add-DeploymentType {
 						Add-LogContent "ERROR: $FullyQualified"
 						$DepTypeReturn = $false
 					}
+					} 
+					Else {
+						Add-LogContent "Set-CMScriptDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName -AddDetectionClause $($DepTypeDetectionMethods[0].DataType.Name) -DetectionClauseConnector $DepTypeDetectionClauseConnector"
+						Try {	
+							Set-CMScriptDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods -DetectionClauseConnector $DepTypeDetectionClauseConnector
+						}
+						Catch {
+							Write-host $_
+							$ErrorMessage = $_.Exception.Message
+							$FullyQualified = $_.Exeption.FullyQualifiedErrorID
+							Add-LogContent "ERROR: Adding Detection Method Failed!"
+							Add-LogContent "ERROR: $ErrorMessage"
+							Add-LogContent "ERROR: $FullyQualified"
+							$DepTypeReturn = $false
+						}	
+					}		
 				}
-				Pop-Location
-				
+				Pop-Location	
 			}
 			MSI {
 				$DepTypeInstallationMSI = $DeploymentType.InstallationMSI
@@ -797,17 +831,35 @@ Function Add-DeploymentType {
 				}
 				If ($DepTypeAddDetectionMethods) {
 					Add-LogContent "Adding Detection Methods"
-					Add-LogContent "Set-CMMsiDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName -AddDetectionClause $($DepTypeDetectionMethods[0].DataType.Name)"
-					Try {
-						Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
+					
+					Add-LogContent "Number of Detection Methods: $($DepTypeDetectionMethods.Count)"
+					if ($DepTypeDetectionMethods.Count -eq 1) {
+						Add-LogContent "Set-CMMsiDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName -AddDetectionClause $($DepTypeDetectionMethods[0].DataType.Name)"
+						Try {
+							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
+						}
+						Catch {
+							$ErrorMessage = $_.Exception.Message
+							$FullyQualified = $_.Exeption.FullyQualifiedErrorID
+							Add-LogContent "ERROR: Adding Detection Method Failed!"
+							Add-LogContent "ERROR: $ErrorMessage"
+							Add-LogContent "ERROR: $FullyQualified"
+							$DepTypeReturn = $false
+						}
 					}
-					Catch {
-						$ErrorMessage = $_.Exception.Message
-						$FullyQualified = $_.Exeption.FullyQualifiedErrorID
-						Add-LogContent "ERROR: Adding Detection Method Failed!"
-						Add-LogContent "ERROR: $ErrorMessage"
-						Add-LogContent "ERROR: $FullyQualified"
-						$DepTypeReturn = $false
+					else {
+						Add-LogContent "Set-CMMsiDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName -AddDetectionClause $($DepTypeDetectionMethods[0].DataType.Name) -"
+						Try {
+							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods -DetectionClauseConnector $DepTypeDetectionClauseConnector
+						}
+						Catch {
+							$ErrorMessage = $_.Exception.Message
+							$FullyQualified = $_.Exeption.FullyQualifiedErrorID
+							Add-LogContent "ERROR: Adding Detection Method Failed!"
+							Add-LogContent "ERROR: $ErrorMessage"
+							Add-LogContent "ERROR: $FullyQualified"
+							$DepTypeReturn = $false
+						}
 					}
 				}
 				Pop-Location
