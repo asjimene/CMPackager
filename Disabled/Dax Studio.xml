@@ -1,0 +1,58 @@
+<ApplicationDef>
+	<Application>
+		<Name>Dax Studio</Name>
+		<Description>DAX Studio is a tool to write, execute, and analyze DAX queries in Power BI Designer, Power Pivot for Excel, and Analysis Services Tabular.It includes an Object Browser, query editing and execution, formula and measure editing, syntax highlighting and formatting, integrated tracing and query execution breakdowns.Visit http://daxstudio.org to read the full documentation and download the latest release of DAX Studio. The project is open source on GitHub.</Description>
+		<Publisher>SQLBI</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.sqlbi.com/tools/dax-studio/</UserDocumentation>
+		<Icon>daxstudio.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+			$URL = "https://github.com$((Invoke-WebRequest https://github.com/DaxStudio/DaxStudio/releases/latest -UseBasicParsing |Select -ExpandProperty Links |where -Property href -like "*_setup.exe")[0].href)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>DaxStudioSetup.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>DaxStudio Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>DaxStudioSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\DAX Studio\unins000.exe`" /SILENT</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>40</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>DaxStudio.exe</Name>
+					<Path>%ProgramFiles%\DAX Studio</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
