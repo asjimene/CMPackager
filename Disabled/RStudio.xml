@@ -50,7 +50,6 @@
 					<ExpectedValue>$FullVersion</ExpectedValue>
 					<ExpressionOperator>IsEquals</ExpressionOperator>
 					<Value>True</Value>
-					<Is64Bit></Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
 		</DeploymentType>

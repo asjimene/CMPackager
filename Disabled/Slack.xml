@@ -1,7 +1,7 @@
 <ApplicationDef>
 	<Application>
 		<Name>Slack</Name>
-		<Description>Slack is a cloud-based team collaboration tool.</Description>
+		<Description>Slack is a cloud-based team collaboration tool. Slack is Licensed for all UTO Staff.</Description>
 		<Publisher>Slack</Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://get.slack.help/hc/en-us/articles/212475728-Deploy-Slack-via-Microsoft-Installer</UserDocumentation>
@@ -38,11 +38,9 @@
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
+		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
 </ApplicationDef>

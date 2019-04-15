@@ -1,6 +1,6 @@
 <ApplicationDef>
 	<Application>
-		<!-- Note: Microsoft does not recommend deploying updated versions of the MSI, so it is recommended to run this once then move it to disabled -->
+		<!-- Note: Microsoft does not recommend deploying updated versions of the MSI, so it is recommeded to run this once then move it to disabled -->
 		<Name>Microsoft Teams</Name>
 		<Description>Microsoft Teams is a platform that combines workplace chat, meetings, notes, and attachments. The service integrates with the company's Office 365 subscription office productivity suite, including Microsoft Office and Skype, and features extensions that can integrate with non-Microsoft products.</Description>
 		<Publisher>Microsoft</Publisher>
@@ -46,10 +46,10 @@
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
 			<Requirements>
-				<RuleName>OS Architecture x64</RuleName>
+				<RuleName>AutoPackage - OSArchitecture x64 Equals True</RuleName>
 			</Requirements>
 		</DeploymentType>
-		<DeploymentType Name="DeploymentType2">
+		<DeploymentType Name="DeploymentType1">
 			<DeploymentTypeName>Microsoft Teams x86 Install</DeploymentTypeName>
 			<InstallationType>MSI</InstallationType>
 			<CacheContent>False</CacheContent>

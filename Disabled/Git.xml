@@ -58,7 +58,7 @@
 				</DetectionClause>
 			</CustomDetectionMethods>
 			<Requirements>
-				<RuleName>OS Architecture x64</RuleName>
+				<RuleName>AutoPackage - OSArchitecture x64 Equals True</RuleName>
 			</Requirements>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
@@ -88,17 +88,12 @@
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
-			<Requirements>
-				<RuleName>OS Architecture x86</RuleName>
-			</Requirements>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
+		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
 </ApplicationDef>

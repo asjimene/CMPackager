@@ -1,0 +1,83 @@
+<ApplicationDef>
+	<Application>
+		<Name>Microsoft Power BI Desktop for Report Server</Name>
+		<Description>Power BI is a suite of business analytics tools that deliver insights throughout your organization. Connect to hundreds of data sources, simplify data prep, and drive ad hoc analysis. Produce beautiful reports, then publish them for your organization to consume on the web and across mobile devices. Everyone can create personalized dashboards with a unique, 360-degree view of their business. And scale across the enterprise, with governance and security built-in.</Description>
+		<Publisher>Microsoft</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.microsoft.com/en-us/download/details.aspx?id=45331</UserDocumentation>
+		<Icon>PowerBIDesktopRS.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=55330" -UseBasicParsing).Links | Where-Object href -like "*PBIDesktopRS_x64.msi")[0].href</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>PBIDesktopRS_x64.msi</DownloadFileName>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=55330" -UseBasicParsing).Links | Where-Object href -like "*PBIDesktopRS.msi")[0].href</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>PBIDesktopRS.msi</DownloadFileName>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silent Installer for Microsoft PowerBI Desktop RS x64</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for Microsoft PowerBI Desktop RS x64</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i PBIDesktopRS_x64.msi /qn /norestart ACCEPT_EULA=1</InstallProgram>
+			<InstallationMSI>PBIDesktopRS_x64.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>45</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<Requirements>
+				<RuleName>AutoPackage - OSArchitecture x64 Equals True</RuleName>
+			</Requirements>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>Silent Installer for Microsoft PowerBI Desktop RS x86</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for Microsoft PowerBI Desktop RS x86</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i PBIDesktopRS.msi /qn /norestart ACCEPT_EULA=1</InstallProgram>
+			<InstallationMSI>PBIDesktopRS.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>45</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

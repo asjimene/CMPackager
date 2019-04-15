@@ -56,7 +56,7 @@
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
 			<Requirements>
-				<RuleName>OS Architecture x64</RuleName>
+				<RuleName>AutoPackage - OSArchitecture x64 Equals True</RuleName>
 			</Requirements>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
@@ -80,9 +80,6 @@
 			<MaxRuntimeMins>30</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
-			<Requirements>
-				<RuleName>OS Architecture x86</RuleName>
-			</Requirements>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>

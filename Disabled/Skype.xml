@@ -1,0 +1,52 @@
+<ApplicationDef>
+	<Application>
+		<Name>Skype</Name>
+		<Description>Skype is an application that provides video chat and voice call services. Users may exchange such digital documents as images, text, video and any others, and may transmit both text and video messages. Skype allows the creation of video conference calls. Free Software, Requires Account</Description>
+		<Publisher>Microsoft</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.skype.com/en/</UserDocumentation>
+		<Icon>Skype.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript></PrefetchScript>
+			<URL>http://www.skype.com/go/getskype-msi</URL>
+			<DownloadFileName>SkypeSetup.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $TempDir\SkypeSetup.msi -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Skype Silent Install</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i `"SkypeSetup.msi`" /q FEATURE_IEPLUGIN=0 FEATURE_FFPLUGIN=0 INSTALLLEVEL=1</InstallProgram>
+			<InstallationMSI>SkypeSetup.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>45</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<Requirements>
+				<RuleName></RuleName>
+			</Requirements>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+		<DeploymentCollection>Deployment Testing - All Apps Available</DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

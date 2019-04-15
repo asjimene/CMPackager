@@ -5,7 +5,7 @@
 		<Publisher>Amazon Web Services, Inc</Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://clients.amazonworkspaces.com/</UserDocumentation>
-		<Icon>AWSWorkDocsDrive.ico</Icon>
+		<Icon>AWS.ico</Icon>
 	</Application>
 		<Downloads>
 			<Download DeploymentType="DeploymentType1">
@@ -28,6 +28,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i `"AWSWorkDocsDriveClient.msi`" REBOOT=REALLYSUPPRESS /norestart /qn</InstallProgram>
 			<InstallationMSI>AWSWorkDocsDriveClient.msi</InstallationMSI>
 			<UninstallCmd></UninstallCmd>
 			<Force32bit>False</Force32bit>

@@ -1,0 +1,59 @@
+<ApplicationDef>
+	<Application>
+		<Name>DBeaver</Name>
+		<Description>DBeaver is free and open source universal database tool for developers and database administrators. Free multi-platform database tool for developers, SQL programmers, database administrators and analysts. Supports all popular databases: MySQL, PostgreSQL, MariaDB, SQLite, Oracle, DB2, SQL Server, Sybase, MS Access, Teradata, Firebird, Derby, etc.</Description>
+		<Publisher>DBeaver Corp</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://dbeaver.io/</UserDocumentation>
+		<Icon>dbeaver.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+			$URL = "https://github.com$((Invoke-WebRequest https://github.com/dbeaver/dbeaver/releases/latest -UseBasicParsing |Select -ExpandProperty Links |where -Property href -like "*dbeaver-ce*-x86_64-setup.exe")[0].href)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>dbeaver-ce-x86_64-setup.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>dbeaver Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>dbeaver-ce-x86_64-setup.exe /allusers /S</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\DBeaver\uninstall.exe`" /VERYSILENT</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>40</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>RegistryKeyValue</DetectionClauseType>
+					<Hive>LocalMachine</Hive>
+					<KeyName>SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DBeaver</KeyName>
+					<ValueName>DisplayVersion</ValueName>
+					<PropertyType>Version</PropertyType>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpectedValue>$Version</ExpectedValue>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

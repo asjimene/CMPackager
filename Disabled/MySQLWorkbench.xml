@@ -1,0 +1,51 @@
+<ApplicationDef>
+	<Application>
+		<Name>MySQL Workbench Community Edition</Name>
+		<Description>MySQL Workbench is a unified visual tool for database architects, developers, and DBAs. MySQL Workbench provides data modeling, SQL development, and comprehensive administration tools for server configuration, user administration, backup, and more. The Community (OSS) Edition is available under the GPL.</Description>
+		<Publisher>Oracle</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://dev.mysql.com/downloads/workbench/</UserDocumentation>
+		<Icon>mysqlworkbench.ico</Icon>
+	</Application>
+		<Downloads>
+			<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$MySQL = Invoke-WebRequest "https://dev.mysql.com/downloads/workbench/"
+							$MySQL = Invoke-WebRequest "https://dev.mysql.com$(($MySQL.Links | where {$_.href -like "*downloads/file*" -and $_.outerText -eq "Download"})[0].href)"
+							$URL = "https://dev.mysql.com$(($MySQL.Links | where outerText -eq "No thanks, just start my download.")[0].href)"
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>mysql-workbench.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>MySQL Workbench Silent Install</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for MySQL Workbench</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>mysql-workbench.msi</InstallationMSI>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>25</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

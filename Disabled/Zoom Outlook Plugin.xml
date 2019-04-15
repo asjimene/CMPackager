@@ -30,7 +30,6 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallationMSI>ZoomOutlookPluginSetup.msi</InstallationMSI>
-			<InstallProgram>msiexec /i ZoomOutlookPluginSetup.msi /qn /norestart</InstallProgram>
 			<UninstallCmd></UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>

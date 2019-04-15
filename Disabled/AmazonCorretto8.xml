@@ -1,52 +1,50 @@
 <ApplicationDef>
 	<Application>
-		<Name>Google Chrome</Name>
-		<Description>Google Chrome is a freeware web browser developed by Google.</Description>
-		<Publisher>Google Inc.</Publisher>
+		<Name>Java 8 - Amazon Corretto JDK</Name>
+		<Description>Amazon Corretto is a no-cost, multiplatform, production-ready distribution of the Open Java Development Kit (OpenJDK). Corretto comes with long-term support that will include performance enhancements and security fixes.</Description>
+		<Publisher>Amazon Inc</Publisher>
 		<AutoInstall>True</AutoInstall>
-		<UserDocumentation>https://www.google.com/chrome/</UserDocumentation>
-		<Icon>Google Chrome.ico</Icon>
+		<UserDocumentation>https://aws.amazon.com/corretto/</UserDocumentation>
+		<Icon>java.ico</Icon>
 	</Application>
-	<Downloads>
-		<Download DeploymentType="DeploymentType1">
-			<URL>https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise64.msi</URL>
-			<DownloadFileName>googlechromestandaloneenterprise64.msi</DownloadFileName>
-			<DownloadVersionCheck>#Script to check version
-			$Output = Get-ExtensionAttribute -FullName $Global:TempDir\$DownloadFileName -ExtensionAttribute Comments
-			$Version = ($($Output.Comments).Split(" "))[0]</DownloadVersionCheck>
+		<Downloads>
+			<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = ((Invoke-WebRequest -Uri "https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html").Links | where href -like "*windows-x64.msi").href</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>AmazonCorrettox64.msi</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
-		<Download DeploymentType="DeploymentType2">
-			<URL>https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise.msi</URL>
-			<DownloadFileName>googlechromestandaloneenterprise.msi</DownloadFileName>
-			<DownloadVersionCheck>#Script to check version
-			$Output = Get-ExtensionAttribute -FullName $Global:TempDir\$DownloadFileName -ExtensionAttribute Comments
-			$Version = ($($Output.Comments).Split(" "))[0]</DownloadVersionCheck>
-			<Version></Version>
-			<FullVersion></FullVersion>
-			<ExtraCopyFunctions></ExtraCopyFunctions>
-		</Download>
+			<Download DeploymentType="DeploymentType2">
+				<PrefetchScript>$URL = ((Invoke-WebRequest -Uri "https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html").Links | where href -like "*windows-x86.msi").href</PrefetchScript>
+				<URL></URL>
+				<DownloadFileName>AmazonCorrettox86.msi</DownloadFileName>
+				<Version></Version>
+				<FullVersion></FullVersion>
+				<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+				<ExtraCopyFunctions></ExtraCopyFunctions>
+			</Download>
 	</Downloads>
 	<DeploymentTypes>
 		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>Google Chrome Silent Install x64</DeploymentTypeName>
+			<DeploymentTypeName>Amazon Corretto x64</DeploymentTypeName>
 			<InstallationType>MSI</InstallationType>
-			<Comments>Silent Installer for Google Chrome</Comments>
+			<Comments>Silent Installer for Amazon Corretto x64</Comments>
 			<Language>English</Language>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallationMSI>googlechromestandaloneenterprise64.msi</InstallationMSI>
+			<InstallationMSI>AmazonCorrettox64.msi</InstallationMSI>
 			<UninstallCmd></UninstallCmd>
 			<Force32bit>False</Force32bit>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
 			<ReqUserInteraction>False</ReqUserInteraction>
-			<EstRuntimeMins>15</EstRuntimeMins>
+			<EstRuntimeMins>10</EstRuntimeMins>
 			<MaxRuntimeMins>30</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
@@ -55,22 +53,22 @@
 			</Requirements>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
-			<DeploymentTypeName>Google Chrome Silent Install x86</DeploymentTypeName>
+			<DeploymentTypeName>Amazon Corretto x86</DeploymentTypeName>
 			<InstallationType>MSI</InstallationType>
-			<Comments>Silent Installer for Google Chrome</Comments>
+			<Comments>Silent Installer for Amazon Corretto x86</Comments>
 			<Language>English</Language>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallationMSI>googlechromestandaloneenterprise.msi</InstallationMSI>
+			<InstallationMSI>AmazonCorrettox86.msi</InstallationMSI>
 			<UninstallCmd></UninstallCmd>
 			<Force32bit>False</Force32bit>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
 			<ReqUserInteraction>False</ReqUserInteraction>
-			<EstRuntimeMins>15</EstRuntimeMins>
+			<EstRuntimeMins>10</EstRuntimeMins>
 			<MaxRuntimeMins>30</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>

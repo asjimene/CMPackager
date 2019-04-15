@@ -1,0 +1,61 @@
+<ApplicationDef>
+	<Application>
+		<Name>GeoDa</Name>
+		<Description>GeoDa is a free and open source software tool that serves as an introduction to spatial data analysis. It is designed to facilitate new insights from data analysis by exploring and modeling spatial patterns.</Description>
+		<Publisher>GeoDa Team</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://geodacenter.github.io/</UserDocumentation>
+		<Icon>GeoDa.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+			$LatestRel = "https://github.com$((Invoke-WebRequest https://github.com/GeoDaCenter/geoda/tags -UseBasicParsing |Select -ExpandProperty Links |where -Property href -like "*/tag/*")[0].href)"
+			$URL = "https://github.com$((Invoke-WebRequest $LatestRel -UseBasicParsing |Select -ExpandProperty Links |where -Property href -like "*Windows-64bit.exe")[0].href)"
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>GeoDa-Windows-64bit.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.ProductVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>GeoDa Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>GeoDa-Windows-64bit.exe /VerySilent</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\GeoDa Software\unins000.exe`" /SILENT</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>40</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>RegistryKeyValue</DetectionClauseType>
+					<Hive>LocalMachine</Hive>
+					<KeyName>SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\GeoDa_is1</KeyName>
+					<ValueName>DisplayVersion</ValueName>
+					<PropertyType>Version</PropertyType>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpectedValue>$Version</ExpectedValue>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

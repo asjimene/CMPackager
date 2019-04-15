@@ -50,11 +50,9 @@
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
-		<DistributeToGroup></DistributeToGroup>
+		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
 </ApplicationDef>
