@@ -6,9 +6,10 @@ This Application is a PowerShell Script that can be used to create applications 
 
 1. Download the Project
 2. Set up your SCCM Preferences in the SCCMPackager.prefs file (it is a standard XML file)
-3. Create the Requirements Template Application in SCCM and set any Rules that you need in that Application (Instructions Below)
-4. Check out the Recipes in the "Disabled" Folder, Modify them to your needs, and copy them into the "Recipes" Folder (Note: Some Recipes Require 7-Zip which is not included)
-5. Run the SCCMPackager.ps1 (I have mine set up as a scheduled task to run twice a day)
+3. Check out the Recipes in the "Disabled" Folder, Modify them to your needs, and copy them into the "Recipes" Folder (Note: Some Recipes Require 7-Zip which is not included)
+4. Run the SCCMPackager.ps1 - This will automatically create an Application Requirements Template App and Appropriate Global Conditions. Check the ExtraFiles\Scripts folder for more information
+5. Run the SCCMPackager.ps1 once more - This will add the requirements to the Application Requirements Template App, and begin packaging software
+6. Future runs will update the Application Requirements Template app's requirements list.
 
 ### Prerequisites
 
@@ -20,11 +21,17 @@ Some Recipes require the 7za.exe from the 7-Zip Project, which can be found here
 
 Setting Up the Requirements Template Application
 
-1. Set the Name for your requirements Template Application in SCCM
-2. Create an Application in your SCCM environment with that same name
-3. Use a "script installer" and for the installation program, just use something that will close immediately, i just used "hostname"
-NOTE: There is now a default recipe in the Recipes folder that does step 1, 2 and 3 for you! All you have to do now is add the requirements to the deployment type created there.
-4. Add any requirements that you plan to use for the packager to this App, OS Version, and architecture are most common
+1. Run the SCCMPackager.ps1 with the "_Application Requirements Template.xml" in the Recipes folder. The first run will create the "Application Requirements Template 1" Application in SCCM and exit.
+2. Run the SCCMPackager.ps1 with the "_Application Requirements Template.xml" in the Recipes folder again. This run will add all Requiremtents to the template Application. It will then process all other recipes as normal.
+
+### Enabling the Packaging of Microsoft Surface Device Drivers and Firmware
+
+1. Open the "_Application Requirements Template.xml" and remove the comments on the following lines:
+	#Add-LogContent "Updating Microsoft Surface Drivers Recipes";
+	#Invoke-Expression ".\ExtraFiles\Scripts\CreateMicrosoftDriverRecipes.ps1";
+2. Navigate to ".\ExtraFiles\Scripts" and open "MicrosoftDrivers.csv", Remove any Drivers that you want packaged, All models currently supported by the script should already be there.
+3. Run the SCCMPackager App as usual (with the "_Application Requirements Template.xml" Recipe in the recipes folder), the first run will create the recipes and put them in the recipes folder, future runs will update the recipes and download the drivers.
+
 
 ## Contributing
 

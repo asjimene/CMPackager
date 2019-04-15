@@ -5,7 +5,7 @@
 	 Last Updated:  2/21/2019 9:20 AM
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
-	 Version:		2.1.0
+	 Version:		2.2.0
 	===========================================================================
 	.DESCRIPTION
 		Packages Applications for SCCM using XML Based Recipe Files
@@ -53,6 +53,7 @@ $Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n
 
 #This gets switched to True if Applications are Packaged
 $Global:SendEmail = $false
+$Global:TemplateApplicationCreatedFlag = $false
 
 ## Functions
 function Add-LogContent {
@@ -217,7 +218,7 @@ function Get-MSIInfo {
 		[System.IO.FileInfo]$Path,
 		[parameter(Mandatory = $true)]
 		[ValidateNotNullOrEmpty()]
-		[ValidateSet("ProductCode", "ProductVersion", "ProductName", "Manufacturer", "ProductLanguage", "FullVersion")]
+        [ValidateSet("ProductCode", "ProductVersion", "ProductName", "Manufacturer", "ProductLanguage", "FullVersion", "InstallPrerequisites")]
 		[string]$Property
 	)
 	
@@ -526,11 +527,19 @@ Function Copy-CMDeploymentTypeRule {
 			
 		}
 		$i++
-	}
-	
-	# get requirement rules from source application
-    $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object {$_.Name -match $RuleName}
- 
+    }
+    
+    $Available = ($SourceApplication.DeploymentTypes[0].Requirements).Name
+	Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join '`r`n')"
+    
+    # get requirement rules from source application
+    $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { ($_.Name).TrimStart().TrimEnd() -eq $RuleName }
+    if (-not ([System.String]::IsNullOrEmpty($Requirements))) {
+        Add-LogContent "No Requirement rule was an exact match for $RuleName"
+        $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { $_.Name -match $RuleName }
+    }
+    Add-LogContent "$($Requirements.Name) will be added"
+
     # apply requirement rules
     $Requirements | ForEach-Object {
      
@@ -1026,7 +1035,7 @@ if (-not (Test-Path $Global:TempDir)) {
 }
 
 ## Get the Recipes
-$RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml"
+$RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
 Add-LogContent -Content "All Recipes: $RecipeList"
 
 ## Begin Looping through all the Recipes 
@@ -1060,7 +1069,11 @@ ForEach ($Recipe In $RecipeList) {
 	If ($ApplicationDistribution) {
 		$ApplicationDeployment = Deploy-Application -Recipe $ApplicationRecipe
 		Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
-	}
+    }
+    if ($Global:TemplateApplicationCreatedFlag -eq $true){
+        Add-LogContent "WARN: The Requirements Application is being created, please run the SCCMPackager again to finish prerequisite setup and begin packaging software. Exiting."
+        Exit 0
+    }
 }
 
 If ($SendEmail -and $SendEmailPreference) {

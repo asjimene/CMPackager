@@ -1,0 +1,55 @@
+<ApplicationDef>
+	<Application>
+		<Name>Microsoft %MODEL% Drivers</Name>
+		<Description>Cumulative and current firmware and drivers for the %MODEL%. This firmware and driver package contains drivers for all of the components in the %MODEL%, as well as updates to the system firmware that have been released via Windows Update. These drivers and firmware are compatible with Windows 10, including Enterprise versions.</Description>
+		<Publisher>Microsoft</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>%DOCUMENTATIONLINK%</UserDocumentation>
+		<Icon>SurfaceDriver.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="%WINVER%">
+			<PrefetchScript>$URL = ((Invoke-WebRequest "%DOWNLOADLINK%" -UseBasicParsing).Links | Where-Object href -like "*.msi" | select href -Unique | where href -like "*%WINVER%*")[0].href</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>%MODELSHORTNAME%_%WINVER%.msi</DownloadFileName>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="%WINVER%">
+			<DeploymentTypeName>%WINVER%</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Driver install for Microsoft Drivers for %MODEL% - %WINVER%</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i `"%MODELSHORTNAME%_%WINVER%.msi`" /qn /norestart</InstallProgram>
+			<InstallationMSI>%MODELSHORTNAME%_%WINVER%.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>45</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<Requirements>
+				<RuleName>AutoPackage - Computer Manufacturer Equals Microsoft Corporation</RuleName>
+				<RuleName>AutoPackage - Computer Model Equals %MODEL%</RuleName>
+				<RuleName>AutoPackage - Windows 10 Build Number Integer Greater than or equal to %WINVER%</RuleName>
+			</Requirements>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
