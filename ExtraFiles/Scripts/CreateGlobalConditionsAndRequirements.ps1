@@ -30,7 +30,7 @@ if (-not (Get-CMGlobalCondition -Name "AutoPackage - Computer Model")) {
 }
 
 if (-not (Get-CMGlobalCondition -Name "AutoPackage - OSArchitecture x64")) {
-    New-CMGlobalConditionWqlQuery -DataType String -Class Win32_ComputerSystem -Namespace root\cimv2 -Property OSArchitecture -WhereClause "OSArchitecture = `'64-bit`'" -Name "AutoPackage - OSArchitecture x64" -Description "Returns True if Win32_ComputerSystem is True. Use as existential rule for 64-bit operating system"
+    New-CMGlobalConditionWqlQuery -DataType String -Class Win32_OperatingSystem -Namespace root\cimv2 -Property OSArchitecture -WhereClause "OSArchitecture = `'64-bit`'" -Name "AutoPackage - OSArchitecture x64" -Description "Returns True if Win32_ComputerSystem is True. Use as existential rule for 64-bit operating system"
 }
 
 # Only add the Requirements if the Application Already Exists
