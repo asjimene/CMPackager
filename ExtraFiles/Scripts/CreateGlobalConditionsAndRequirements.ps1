@@ -53,10 +53,10 @@ if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
     
     # Add OS Architecture Query to Template
     Add-LogContent "Processing - Add OS Architecture to Template"
-    if (-not ($ExistingRequirements -contains "AutoPackage - OSArchitecture x64 Equals True")) {
+    if (-not ($ExistingRequirements -contains "Existential of AutoPackage - OSArchitecture x64 Not Equal to 0")) {
         Add-LogContent "OSArchitecture x64 is being added"
         $rule = Get-CMGlobalCondition -Name "AutoPackage - OSArchitecture x64" | New-CMRequirementRuleCommonValue -Value1 $true -RuleOperator IsEquals
-        $rule.Name = "AutoPackage - OSArchitecture x64 Equals True"
+        $rule.Name = "Existential of AutoPackage - OSArchitecture x64 Not Equal to 0"
         Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
     }
 

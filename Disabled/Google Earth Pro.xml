@@ -78,7 +78,7 @@
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
 			<Requirements>
-				<RuleName>AutoPackage - OSArchitecture x64 Equals True</RuleName>
+				<RuleName>Existential of AutoPackage - OSArchitecture x64 Not Equal to 0</RuleName>
 			</Requirements>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
