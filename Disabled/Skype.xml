@@ -36,9 +36,6 @@
 			<MaxRuntimeMins>45</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
-			<Requirements>
-				<RuleName></RuleName>
-			</Requirements>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
