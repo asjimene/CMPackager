@@ -58,6 +58,11 @@
 			<Requirements>
 				<RuleName>Existential of AutoPackage - OSArchitecture x64 Not Equal to 0</RuleName>
 			</Requirements>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="iTunes">
+					<InstallBehaviorExe>iTunes.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
 			<DeploymentTypeName>iTunes x86 Silent Install</DeploymentTypeName>
@@ -80,6 +85,11 @@
 			<MaxRuntimeMins>30</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="iTunes">
+					<InstallBehaviorExe>iTunes.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>

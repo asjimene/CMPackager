@@ -190,6 +190,13 @@
 			<!-- RuleName - [String] You can assign requirements to an application by using the rule name on the existing template application -->
 				<RuleName></RuleName>
 			</Requirements>
+			<InstallBehavior>
+			<!--InstallBehavior - Add Entries to the "Install Behavior" Tab in the Deployment Type. SCCM will check if these applications are running before starting the install process. NOTE: A single "Install Behavior" Entry must be defined in the "Requirements Template" Application before this process will work-->
+				<InstallBehaviorProcess DisplayName="[Application Display Name]">
+				<!--InstallBehaviorExe - The executable that SCCM should check if running before beginning the install process1`-->
+					<InstallBehaviorExe>[Application Executable Name]</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 		<!-- Below are some of the possible deploymentTypes based on the Type of Install, These also show which fields are required for each type of deployment, 
 		anything not required can be left off and they should use the defaults in SCCM -->

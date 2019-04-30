@@ -565,6 +565,51 @@ Function Copy-CMDeploymentTypeRule {
     Pop-Location
 }
 
+Function New-CMDeploymentTypeProcessRequirement {
+    # Creates a Deployment Type Process Requirement "Install Behavior tab in Deployment types" by copying an existing Process Requirement.
+    # A Process requirement needs to be Defined in the "Install Behavior" Tab of the "SourceApplicationName" Variable before this script will function properly
+    Param (
+        [System.String]$SourceApplicationName,
+        [System.String]$DestApplicationName,
+        [System.String]$DestDeploymentTypeName,
+        [System.String]$ProcessRequirementDisplayName,
+        [System.String]$ProcessRequirementExecutable
+    )
+    Push-Location
+    Set-Location $SCCMSite
+    $DestDeploymentTypeIndex = 0
+ 
+    # get the applications
+    $SourceApplication = Get-CMApplication -Name $SourceApplicationName | ConvertTo-CMApplication
+    $DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
+	
+    # Get DestDeploymentTypeIndex by finding the Title
+    $DestApplication.DeploymentTypes | ForEach-Object {
+        $i = 0
+    } {
+        If ($_.Title -eq "$DestDeploymentTypeName") {
+            $DestDeploymentTypeIndex = $i
+			
+        }
+        $i++
+    }
+    
+    # Get requirement rules from source application
+    $ProcessRequirementsList = $SourceApplication.DeploymentTypes[0].Installer.InstallProcessDetection.ProcessList[0]
+    $ProcessRequirementsList
+    if (-not ([System.String]::IsNullOrEmpty($ProcessRequirementsList))) {
+        $ProcessRequirementsList.Name = $ProcessRequirementExecutable
+        $ProcessRequirementsList.DisplayInfo[0].DisplayName = $ProcessRequirementDisplayName
+        $ProcessRequirementsList
+        $DestApplication.DeploymentTypes[$DestDeploymentTypeIndex].Installer.InstallProcessDetection.ProcessList.Add($ProcessRequirementsList)
+    }
+ 
+    # push changes
+    $CMApplication = ConvertFrom-CMApplication -Application $DestApplication
+    $CMApplication.Put()
+    Pop-Location
+}
+
 Function Add-DeploymentType {
 	Param (
 		$Recipe
@@ -885,7 +930,16 @@ Function Add-DeploymentType {
 			ForEach ($DepTypeRule In $DepTypeRules) {
 				Copy-CMDeploymentTypeRule -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -RuleName $DepTypeRule
 			}
-		}
+        }
+        
+        ## Add Requirements for Deployment Type if they exist
+        If (-not [System.String]::IsNullOrEmpty($DeploymentType.InstallBehavior)) {
+            Add-LogContent "Adding Install Behavior to $DepTypeDeploymentTypeName"
+            $DepTypeInstallBehaviorProcesses = $DeploymentType.InstallBehavior.InstallBehaviorProcess
+            ForEach ($DepTypeInstallBehavior In $DepTypeInstallBehaviorProcesses) {
+                New-CMDeploymentTypeProcessRequirement -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -ProcessRequirementDisplayName $DepTypeInstallBehavior.DisplayName -ProcessRequirementExecutable $DepTypeInstallBehavior.InstallBehaviorExe
+            }
+        }
 	}
 	Return $DepTypeReturn
 }
@@ -1071,7 +1125,7 @@ ForEach ($Recipe In $RecipeList) {
 		Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
     }
     if ($Global:TemplateApplicationCreatedFlag -eq $true){
-        Add-LogContent "WARN: The Requirements Application is being created, please run the SCCMPackager again to finish prerequisite setup and begin packaging software. Exiting."
+        Add-LogContent "WARN: The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the SCCMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
         Exit 0
     }
 }
