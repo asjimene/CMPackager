@@ -2,10 +2,10 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  2/21/2019 9:20 AM
+	 Last Updated:  4/30/2019 8:14 AM
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
-	 Version:		2.2.0
+	 Version:		2.2.1
 	===========================================================================
 	.DESCRIPTION
 		Packages Applications for SCCM using XML Based Recipe Files
