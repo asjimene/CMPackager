@@ -45,16 +45,16 @@
 					<Path>%ProgramFiles(x86)%\VideoLAN\VLC</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$Version</ExpectedValue>
-					<ExpressionOperator>Equals</ExpressionOperator>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
+		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
+		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
 </ApplicationDef>
