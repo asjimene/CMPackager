@@ -1,0 +1,56 @@
+<ApplicationDef>
+	<Application>
+		<Name>Citrix Workspace App</Name>
+		<Description>Access everything you need – SaaS, mobile, virtual apps and files – all in one place.</Description>
+		<Publisher>Citrix</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.citrix.com/downloads/workspace-app/windows/workspace-app-for-windows-latest.html</UserDocumentation>
+		<Icon>CitrixWorkspaceApp.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+			$URL = "https:$(((Invoke-WebRequest "https://www.citrix.com/downloads/workspace-app/windows/workspace-app-for-windows-latest.html").links | where rel -like "*CitrixWorkspaceApp.exe*")[0].rel)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>CitrixWorkspaceApp.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>
+			#Get Version
+			$Version = (get-item $DownloadFile).VersionInfo.ProductVersion
+			
+			#Get ProductKey
+			Add-LogContent "Extracting Installer to Grab ProductKey"
+			&amp; $ScriptRoot\7za.exe x "$DownloadFile" -o"$TempDir\WorkspaceTemp" -y
+			</DownloadVersionCheck>
+			<ExtraCopyFunctions>Copy-Item "$TempDir\WorkspaceTemp\RIInstaller.msi" -Destination "$DestinationPath\RIInstaller.msi" -Force
+</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Citrix Workspace Silent Install</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>`"CitrixWorkspaceApp.exe`" /silent /AutoUpdateCheck=manual /AutoUpdateStream=LTSR ADDLOCAL=`"ReceiverInside,ICA_Client,WebHelper,DesktopViewer,USB,Flash,Vd3d,WorkspaceHub`" /ENABLE_SSON=No /ALLOWADDSTORE=N /RCU /noreboot</InstallProgram>
+			<UninstallCmd>`"CitrixWorkspaceApp.exe`" /uninstall /silent</UninstallCmd>
+			<InstallationMSI>RIInstaller.msi</InstallationMSI>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
