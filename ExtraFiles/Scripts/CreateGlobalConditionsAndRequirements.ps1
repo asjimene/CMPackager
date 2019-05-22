@@ -1,4 +1,4 @@
-$Windows10Versions = "10586","14393","15063","16299","17134","17763"
+$Windows10Versions = "10586","14393","15063","16299","17134","17763","18362"
 $ModelQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").ModelName
 $ManufacturerQueries = "Microsoft Corporation"
 
