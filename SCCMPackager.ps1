@@ -2,7 +2,7 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  4/30/2019 8:14 AM
+	 Last Updated:  5/22/2019 12:13 AM
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
 	 Version:		2.2.1
@@ -1088,6 +1088,10 @@ if (-not (Test-Path $Global:TempDir)) {
     New-Item -ItemType Container -Path "$Global:TempDir" -Force -ErrorAction SilentlyContinue
 }
 
+## Allow all Cookies to download (Prevents Script from Freezing)
+Add-LogContent "Allowing All Cookies to Download (This prevents the script from freezing on a download)"
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /t REG_DWORD /v 1A10 /f /d 0
+
 ## Get the Recipes
 $RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
 Add-LogContent -Content "All Recipes: $RecipeList"
@@ -1136,4 +1140,9 @@ If ($SendEmail -and $SendEmailPreference) {
 
 Add-LogContent "Cleaning Up Temp Directory $TempDir"
 Remove-Item -Path $TempDir -Recurse -Force
+
+## Reset all Cookies to download (Prevents Script from Freezing)
+Add-LogContent "Clearing All Cookies Download Setting"
+reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /v 1A10 /f
+
 Add-LogContent "--- End Of SCCM AutoPackager ---"
