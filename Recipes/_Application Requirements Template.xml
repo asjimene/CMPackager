@@ -12,8 +12,8 @@
 			<PrefetchScript>Add-LogContent "Starting Global Requirements Script: `"$ScriptRoot\ExtraFiles\Scripts\CreateGlobalConditionsAndRequirements.ps1`"";
 			Invoke-Expression "&amp; `"$ScriptRoot\ExtraFiles\Scripts\CreateGlobalConditionsAndRequirements.ps1`"";
 			# Un-Comment the Lines Below to Package Microsoft Surface Drivers
-			Add-LogContent "Updating Microsoft Surface Drivers Recipes";
-			Invoke-Expression "&amp; `"$ScriptRoot\ExtraFiles\Scripts\CreateMicrosoftDriverRecipes.ps1`"";
+			# Add-LogContent "Updating Microsoft Surface Drivers Recipes";
+			# Invoke-Expression "&amp; `"$ScriptRoot\ExtraFiles\Scripts\CreateMicrosoftDriverRecipes.ps1`"";
 			</PrefetchScript>
 			<URL>https://raw.githubusercontent.com/asjimene/SCCM-Application-Packager/master/README.md</URL>
 			<DownloadFileName>README.MD</DownloadFileName>
