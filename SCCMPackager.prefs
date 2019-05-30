@@ -9,6 +9,8 @@
 	<IconRepo>\\Server\Share\Apps\Application Icons</IconRepo>
 	<!-- SCCMSite - [String] SCCM Site Name -->
 	<SCCMSite>SITE:</SCCMSite>
+	<!-- FQDN of the Primary Site Server -->
+	<SiteServer>primarysite.contoso.com</SiteServer>
 	<!-- RequirementsTemplateAppName - [String] Application used to copy requirements rules from -->
 	<RequirementsTemplateAppName>Application Requirements Template 1</RequirementsTemplateAppName>
 	<!-- Email Preferences - An Email can optionally be sent after packaging is complete if any applications were Packaged -->

@@ -36,6 +36,8 @@ $Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
 
 # SCCM Vars
 $Global:SCCMSite = $PackagerPrefs.PackagerPrefs.SCCMSite
+$Global:SiteCode = ($Global:SCCMSite).Replace(':', '')
+$Global:SiteServer = $PackagerPrefs.PackagerPrefs.SiteServer
 $Global:RequirementsTemplateAppName = $PackagerPrefs.PackagerPrefs.RequirementsTemplateAppName
 $Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
 $Global:PreferredDeployCollection = $PackagerPrefs.PackagerPrefs.PreferredDeployCollection
@@ -1078,7 +1080,19 @@ if (-not (Get-Module ConfigurationManager)) {
     catch {
         $ErrorMessage = $_.Exception.Message
 		Add-LogContent "ERROR: Importing ConfigurationManager Module Failed!"
-		Add-LogContent "ERROR: $ErrorMessage"
+        Add-LogContent "ERROR: $ErrorMessage"
+        Exit 1
+    }
+}
+
+if ($null -eq (Get-PSDrive -Name $Global:SiteCode -ErrorAction SilentlyContinue)) {
+    try {
+        New-PSDrive -Name $Global:SiteCode -PSProvider "AdminUI.PS.Provider\CMSite" -Root $Global:SiteServer
+    }
+    catch {
+        Add-LogContent "ERROR - The SCCM PSDrive could not be loaded. Exiting..."
+        Add-LogContent "ERROR: $ErrorMessage"
+        Exit 1
     }
 }
 
