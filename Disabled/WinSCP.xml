@@ -11,7 +11,7 @@
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 			$URL = "https://winscp.net$((invoke-webrequest https://winscp.net/eng/download.php -UseBasicParsing | Select -ExpandProperty links | where -property href -like "*/download/WinSCP-*-Setup.exe")[0].href)"
-			$URL = (Invoke-webrequest $URL | Select -ExpandProperty Links | Where innerHTML -eq "Direct Download")[0].href
+			$URL = (Invoke-webrequest $URL -MaximumRedirection 0 | Select -ExpandProperty Links | Where innerHTML -eq "Direct Download")[0].href
 			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>WinSCP-Setup.exe</DownloadFileName>
