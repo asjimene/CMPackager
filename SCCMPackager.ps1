@@ -67,7 +67,7 @@ function Add-LogContent {
 		$Content
 	)
 	if ($Load) {
-		if ((Get-Item $LogPath).length -gt $MaxLogSize) {
+		if ((Get-Item $LogPath -ErrorAction SilentlyContinue).length -gt $MaxLogSize) {
 			Write-Output "$(Get-Date -Format G) - $Content" > $LogPath
 		}
 		else {
@@ -934,14 +934,39 @@ Function Add-DeploymentType {
 			}
         }
         
-        ## Add Requirements for Deployment Type if they exist
+        ## Add Install Behavior for Deployment Type if they exist
         If (-not [System.String]::IsNullOrEmpty($DeploymentType.InstallBehavior)) {
             Add-LogContent "Adding Install Behavior to $DepTypeDeploymentTypeName"
             $DepTypeInstallBehaviorProcesses = $DeploymentType.InstallBehavior.InstallBehaviorProcess
             ForEach ($DepTypeInstallBehavior In $DepTypeInstallBehaviorProcesses) {
                 New-CMDeploymentTypeProcessRequirement -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -ProcessRequirementDisplayName $DepTypeInstallBehavior.DisplayName -ProcessRequirementExecutable $DepTypeInstallBehavior.InstallBehaviorExe
             }
-        }
+		}
+		
+		## Add Dependencies for Deployment Type if they exist
+		if (-not [System.String]::IsNullOrEmpty($DeploymentType.Dependencies)){
+			Add-LogContent "Adding Dependencies to $DepTypeDeploymentTypeName"
+			$DepTypeDependencyGroups = $DeploymentType.Dependencies.DependencyGroup
+			foreach ($DepTypeDependencyGroup in $DepTypeDependencyGroups){
+				Add-LogContent "Creating Dependency Group $($DepTypeDependencyGroup.GroupName) on $DepTypeDeploymentTypeName"
+				Push-Location
+				Set-Location $SCCMSite
+				$DependencyGroup = Get-CMDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName | New-CMDeploymentTypeDependencyGroup -GroupName $DepTypeDependencyGroup.GroupName
+				$DepTypeDependencyGroupApps = $DepTypeDependencyGroup.DependencyGroupApp
+				foreach ($DepTypeDependencyGroupApp in $DepTypeDependencyGroupApps){
+					$DependencyGroupAppAutoInstall = [System.Convert]::ToBoolean($DepTypeDependencyGroupApp.DependencyAutoInstall)
+					$DependencyAppName = ((Get-CMApplication $DepTypeDependencyGroupApp.AppName | Sort-Object -Property Version -Descending | Select-Object -First 1).LocalizedDisplayName)
+					if (-not [System.String]::IsNullOrEmpty($DepTypeDependencyGroupApp.DependencyDepType)){
+						Add-LogContent "Selecting Deployment Type for App Dependency: $($DepTypeDependencyGroupApp.DependencyDepType)"
+						$DependencyAppObject = Get-CMDeploymentType -ApplicationName $DependencyAppName -DeploymentTypeName "$($DepTypeDependencyGroupApp.DependencyDepType)"
+					} else {
+						$DependencyAppObject = Get-CMDeploymentType -ApplicationName $DependencyAppName
+					}
+					$DependencyGroup | Add-CMDeploymentTypeDependency -DeploymentTypeDependency $DependencyAppObject -IsAutoInstall $DependencyGroupAppAutoInstall
+				}
+				Pop-Location
+			}
+		}
 	}
 	Return $DepTypeReturn
 }

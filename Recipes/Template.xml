@@ -197,6 +197,17 @@
 					<InstallBehaviorExe>[Application Executable Name]</InstallBehaviorExe>
 				</InstallBehaviorProcess>
 			</InstallBehavior>
+			<!-- Add Dependencies to a Deployment Type -->
+			<Dependencies>
+				<!-- Add Entries to the "Dependency Group" to create a new Dependency Group-->
+				<DependencyGroup GroupName="Dependency1">
+					<!-- Each "DependencyGroup" Can have multiple applications defined-->
+					<DependencyGroupApp AppName="(Required)[SCCM Application Name]">
+						<DependentDepType>[Optional - Not specifying this will add all Deployment types]</DependentDepType>
+						<DependencyAutoInstall>(Required)[True/False]</DependencyAutoInstall>
+					</DependencyGroupApp>
+				</DependencyGroup>
+			</Dependencies>
 		</DeploymentType>
 		<!-- Below are some of the possible deploymentTypes based on the Type of Install, These also show which fields are required for each type of deployment, 
 		anything not required can be left off and they should use the defaults in SCCM -->
