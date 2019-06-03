@@ -37,7 +37,7 @@ Setting Up the Requirements Template Application
 
 Feel free to create your own Recipes, Contribute to the main code, or provide feedback!
 
-* If you have questions feel free to post an issue with the "Question" tag here on GitHub, or ask me on Twitter (publicly is preferred, but I don't mind DMs)
+* If you have questions feel free to post an issue with the "Question" label here on GitHub, or ask me on Twitter (publicly is preferred, but I don't mind DMs)
 
 
 ## Authors
