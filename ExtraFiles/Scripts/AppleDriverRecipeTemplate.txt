@@ -1,0 +1,84 @@
+<ApplicationDef>
+	<Application>
+		<Name>Apple BootCamp Software</Name>
+		<Description>Boot Camp is a utility that comes with your Mac and lets you switch between macOS and Windows.</Description>
+		<Publisher>Apple Inc.</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://support.apple.com/boot-camp</UserDocumentation>
+		<Icon>BootCamp.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="%BCIDENTIFIER%">
+			<URL>%DOWNLOADLINK%</URL>
+			<DownloadFileName>%BCIDENTIFIER%.pkg</DownloadFileName>
+			<DownloadVersionCheck>[String]$Version = %LATESTBCDATE%</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+			<AppRepoFolder>%BCIDENTIFIER%</AppRepoFolder>
+			<ExtraCopyFunctions>Add-LogContent "Unzipping %BCIDENTIFIER%.pkg to $TempDir\%BCIDENTIFIER%-Temp"
+			&amp; "C:\Program Files\7-Zip\7z.exe" x "$TempDir\%BCIDENTIFIER%.pkg" -o"$TempDir\%BCIDENTIFIER%-Temp" -y
+			Add-LogContent "Unzipping $TempDir\$BCIDENTIFIER%-Temp\Payload~ to $TempDir\%BCIDENTIFIER%-Temp\Payload"
+			&amp; "C:\Program Files\7-Zip\7z.exe" x "$TempDir\%BCIDENTIFIER%-Temp\Payload~" -o"$TempDir\%BCIDENTIFIER%-Temp\Payload" -y
+			Add-LogContent "Unzipping WindowsSupport.dmg"
+			&amp; "C:\Program Files\7-Zip\7z.exe" x "$TempDir\%BCIDENTIFIER%-Temp\Payload\Library\Application Support\BootCamp\WindowsSupport.dmg" -o"$TempDir\%BCIDENTIFIER%-Temp" -y
+			Add-LogContent "Copying Files to $DestinationPath"
+			
+			# Some of the bundles does not have the "BootCamp Folder
+			if (Test-Path "$TempDir\%BCIDENTIFIER%-Temp\BootCamp\Drivers\*" -ErrorAction SilentlyContinue) {
+				Copy-Item "$TempDir\%BCIDENTIFIER%-Temp\BootCamp\Drivers\*" -Destination $DestinationPath -Recurse -Force
+			} else {
+				Copy-Item "$TempDir\%BCIDENTIFIER%-Temp\Drivers\*" -Destination $DestinationPath -Recurse -Force
+			}
+			
+			# Bundles without BootCamp64.msi are 64-bit only so copy the regular BootCamp.msi to BootCamp64.msi to make the installation process easier
+			if (Test-Path "$DestinationPath\Apple\BootCamp64.msi" -ErrorAction SilentlyContinue){
+				Copy-Item "$DestinationPath\Apple\BootCamp64.msi" -Destination "$DestinationPath\BootCamp64.msi"
+			} else {
+				Add-LogContent "BootCamp64.msi does not exist, copying BootCamp.msi to BootCamp64.msi"
+				Copy-Item "$DestinationPath\Apple\BootCamp.msi" -Destination "$DestinationPath\BootCamp64.msi"
+				Copy-Item "$DestinationPath\Apple\BootCamp.msi" -Destination "$DestinationPath\Apple\BootCamp64.msi"
+			}
+			
+			Copy-Item $ScriptRoot\ExtraFiles\AppleBootCamp\* -Destination $DestinationPath -Recurse -Force
+			
+			Add-LogContent "Cleaning up $DestinationPath"
+			Remove-Item "$DestinationPath\%BCIDENTIFIER%.pkg"
+			Add-LogContent "Completed Processing %BCIDENTIFIER%"
+			</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="%BCIDENTIFIER%">
+			<DeploymentTypeName>%BCIDENTIFIER%</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>BootCamp Drivers %BCIDENTIFIER% for %SUPPORTEDMODELS%</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>powershell -executionpolicy bypass .\install.ps1</InstallProgram>
+			<InstallationMSI>BootCamp64.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>20</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<Requirements>
+				<RuleName>AutoPackage - Computer Manufacturer Equals Apple Inc.</RuleName>
+				<RuleName>AutoPackage - Computer Model OneOf {%MODELS%}</RuleName>
+			</Requirements>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
