@@ -2,10 +2,10 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  5/22/2019 12:13 AM
+	 Last Updated:  6/7/2019 9:38 AM
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
-	 Version:		2.2.1
+	 Version:		2.3.1
 	===========================================================================
 	.DESCRIPTION
 		Packages Applications for SCCM using XML Based Recipe Files
@@ -437,8 +437,8 @@ Function Add-DetectionMethodClause {
 			$detMethodCommand = "New-CMDetectionClauseWindowsInstaller"
 		}
 	}
-	If (([System.Convert]::ToBoolean($DetectionMethod.Existance)) -and (-not ([System.String]::IsNullOrEmpty($DetectionMethod.Existance)))) {
-		$detMethodCommand += " -Existance"
+	If (([System.Convert]::ToBoolean($DetectionMethod.Existence)) -and (-not ([System.String]::IsNullOrEmpty($DetectionMethod.Existence)))) {
+		$detMethodCommand += " -Existence"
 	}
 	If (([System.Convert]::ToBoolean($DetectionMethod.Is64Bit)) -and (-not ([System.String]::IsNullOrEmpty($DetectionMethod.Is64Bit)))) {
 		$detMethodCommand += " -Is64Bit"

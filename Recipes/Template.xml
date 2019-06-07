@@ -143,14 +143,14 @@
 					<DetectionClauseType>[Directory/File]</DetectionClauseType>
 					<Name>(Required)</Name>
 					<Path>(Required)</Path>
-					<Existance></Existance>
+					<Existence></Existence>
 					<Is64Bit></Is64Bit>
 				</DetectionClause>
 				<DetectionClause>
 					<DetectionClauseType>[RegistryKey/RegistryKeyValue]</DetectionClauseType>
 					<Hive>(Required)</Hive>
 					<KeyName>(Required)</KeyName>
-					<Existance></Existance>
+					<Existence></Existence>
 					<Is64Bit></Is64Bit>
 					<PropertyType>(Required - Only for RegKeyValue)</PropertyType>
 					<ValueName>(Required - Only for RegKeyValue)</ValueName>
@@ -169,7 +169,7 @@
 				<DetectionClause>
 					<DetectionClauseType>[WindowsInstaller]</DetectionClauseType>
 					<ProductCode>(Required)</ProductCode>
-					<Existance>(only needed if providing Product code)</Existance>
+					<Existence>(only needed if providing Product code)</Existence>
 					<ExpressionOperator>(Required for ExpectedValue)</ExpressionOperator>
 					<ExpectedValue>(Required for ExpressionOperator)</ExpectedValue>
 					<PropertyType>[Optional Only if ExpectedValue]</PropertyType>
