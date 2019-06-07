@@ -9,8 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<!-- The actualy URL contains an ampersand which isn't xml compliant, this is a hack but it works.  That redirects to https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release -->
-			<PrefetchScript>$releases = 'https://bit.ly/2K2Pk35'
+			<PrefetchScript>$releases = 'https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&amp;type=release'
 			$json = Invoke-WebRequest $releases | ConvertFrom-Json
 			$LinkPath = $json.TBA.downloads.windows.link
 			$Version = "$($json.TBA.build)"
