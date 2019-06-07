@@ -5,7 +5,7 @@
 		<Publisher>Apple Inc.</Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://support.apple.com/boot-camp</UserDocumentation>
-		<Icon>BootCamp.png</Icon>
+		<Icon>AppleBootCamp.ico</Icon>
 	</Application>
 	<Downloads>
 		<Download DeploymentType="%BCIDENTIFIER%">
