@@ -1,0 +1,64 @@
+<ApplicationDef>
+	<Application>
+		<Name>JetBrains Toolbox</Name>
+		<Description>Toolbox App is an application that facilitates easy installation and uninstallation of JetBrains IDEs. It allows users to log in with a JetBrains account and install all of the products they own.</Description>
+		<Publisher>JetBrains</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://toolbox-support.jetbrains.com/hc/en-us</UserDocumentation>
+		<Icon>Jetbrains-toolbox.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<!-- The actualy URL contains an ampersand which isn't xml compliant, this is a hack but it works.  That redirects to https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release -->
+			<PrefetchScript>$releases = 'https://bit.ly/2K2Pk35'
+			$json = Invoke-WebRequest $releases | ConvertFrom-Json
+			$LinkPath = $json.TBA.downloads.windows.link
+			$Version = "$($json.TBA.build)"
+			$URL = $LinkPath
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>jetbrains-toolbox.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>JetBrains Toolbox Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>jetbrains-toolbox.exe /S</InstallProgram>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>jetbrains-toolbox.exe</Name>
+					<Path>%localappdata%\JetBrains\Toolbox\bin\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>
