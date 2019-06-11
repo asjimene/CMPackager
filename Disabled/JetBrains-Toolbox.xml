@@ -31,7 +31,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>jetbrains-toolbox.exe /S</InstallProgram>
+			<InstallProgram>jetbrains-toolbox.exe /S /D=%program files%\JetBrains\Toolbox</InstallProgram>
 			<UninstallCmd></UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -44,7 +44,7 @@
 				<DetectionClause>
 					<DetectionClauseType>File</DetectionClauseType>
 					<Name>jetbrains-toolbox.exe</Name>
-					<Path>%localappdata%\JetBrains\Toolbox\bin\</Path>
+					<Path>%program files%\JetBrains\Toolbox\</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$Version</ExpectedValue>
 					<ExpressionOperator>GreaterEquals</ExpressionOperator>
