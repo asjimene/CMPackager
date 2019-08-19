@@ -471,13 +471,13 @@ Function Add-DetectionMethodClause {
 		$detMethodCommand += " -Hive $($DetectionMethod.Hive)"
 	}
 	If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.KeyName))) {
-		$detMethodCommand += " -KeyName `'$($DetectionMethod.KeyName)`'"
+		$detMethodCommand += " -KeyName `"$($DetectionMethod.KeyName)`""
 	}
 	If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.ValueName))) {
-		$detMethodCommand += " -ValueName `'$($DetectionMethod.ValueName)`'"
+		$detMethodCommand += " -ValueName `"$($DetectionMethod.ValueName)`""
 	}
 	If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.ProductCode))) {
-		$detMethodCommand += " -ProductCode `'$($DetectionMethod.ProductCode)`'"
+		$detMethodCommand += " -ProductCode `"$($DetectionMethod.ProductCode)`""
 	}
 	Add-LogContent "$detMethodCommand"
 	
