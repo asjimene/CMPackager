@@ -2,7 +2,7 @@
 	<Application>
 		<Name>Webex Meetings</Name>
 		<Description>You can use the Cisco Webex Meetings desktop app to easily access your commonly used Webex Meetings controls. With the Cisco Webex Meetings desktop app, you can start and join meetings without going to your Webex site.</Description>
-		<Publisher>Slack</Publisher>
+		<Publisher>Cisco Systems</Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://help.webex.com/en-us/ojsyry/Cisco-Webex-Meetings-Desktop-App</UserDocumentation>
 		<Icon>WebexMeetings.png</Icon>
