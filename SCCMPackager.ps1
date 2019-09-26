@@ -1051,15 +1051,17 @@ Function Deploy-Application {
 	Set-Location $SCCMSite
 	If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
 		If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
-			Try {
-				Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $($Recipe.ApplicationDef.Deployment.DeploymentCollection)"
-				New-CMApplicationDeployment -CollectionName $Recipe.ApplicationDef.Deployment.DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
-			}
-			Catch {
-				$ErrorMessage = $_.Exception.Message
-				Add-LogContent "ERROR: Deployment Failed!"
-				Add-LogContent "ERROR: $ErrorMessage"
-				$Success = $false
+			Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
+				Try {
+					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
+					New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
+				}
+				Catch {
+					$ErrorMessage = $_.Exception.Message
+					Add-LogContent "ERROR: Deployment Failed!"
+					Add-LogContent "ERROR: $ErrorMessage"
+					$Success = $false
+				}
 			}
 		}
 		ElseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
