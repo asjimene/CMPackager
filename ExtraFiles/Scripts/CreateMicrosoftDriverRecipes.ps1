@@ -3,9 +3,15 @@ $ModelList = Import-CSV -Path "$PSScriptRoot\MicrosoftDrivers.csv"
 Foreach ($ModeltoProcess in $ModelList) {
     $Model = $ModeltoProcess.ModelName
     $Downloadid = $ModeltoProcess.linkId
+    $SystemSKU = ($ModeltoProcess.SystemSKU).Replace(',', ', ')
     $ModelShortName = $Model.Replace(' ', '')
     $DownloadLink = "https://www.microsoft.com/en-us/download/confirmation.aspx?id=$Downloadid"
     $DocumentationLink = "https://www.microsoft.com/en-us/download/details.aspx?id=$Downloadid"
+
+    # Special Processing for Models with the Same Model Query but Unique SystemSKU (SystemSKUs variable will determines if this is the case)
+    #if ($Model -match "Surface Laptop 3"){
+    #    $Model = "Surface Laptop 3"
+    #}
 
     $AvailableDrivers = ((Invoke-WebRequest "$DownloadLink" -UseBasicParsing).Links | Where-Object href -like "*.msi" | Select-Object href -Unique).href
     $DriverNames = Split-Path $AvailableDrivers -Leaf | Sort-Object -Descending
@@ -19,7 +25,18 @@ Foreach ($ModeltoProcess in $ModelList) {
             $AvailableWinVersions += $VersionNum
         }
     }
-    $AppTemplate = (Get-Content "$PSScriptRoot\MicrosoftDriverRecipeTemplate.txt").Replace('%MODEL%', $Model).Replace('%MODELSHORTNAME%', $ModelShortName).Replace('%DOCUMENTATIONLINK%', $DocumentationLink).Replace('%DOWNLOADLINK%', $DownloadLink)
+
+    $AppTemplate = (Get-Content "$PSScriptRoot\MicrosoftDriverRecipeTemplate.txt").Replace('%MODELSHORTNAME%', $ModelShortName).Replace('%DOCUMENTATIONLINK%', $DocumentationLink).Replace('%DOWNLOADLINK%', $DownloadLink)
+    
+    # Special Processing for Models with the Same Model Query but Unique SystemSKU
+    if (-not ([System.String]::IsNullOrEmpty($SystemSKU))) {
+        Add-LogContent "$Model requires SKUs instead of Model Queries - $SystemSKUs"
+        $TextToReplace = "<RuleName>AutoPackage - Computer Model Equals %MODEL%</RuleName>"
+        $TextToAdd = "<RuleName>AutoPackage - Computer SystemSKU OneOf {$SystemSKU}</RuleName>"
+        $AppTemplate = $AppTemplate.Replace($TextToReplace, $TextToAdd)
+    }
+
+    $AppTemplate = $AppTemplate.Replace('%MODEL%', $Model)
     [xml]$AppRecipe = $AppTemplate
 
     # Choose only the 3 latest versions of Windows 10

@@ -2,10 +2,9 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  6/7/2019 9:38 AM
+	 Last Updated:  10/29/2019
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
-	 Version:		2.3.1
 	===========================================================================
 	.DESCRIPTION
 		Packages Applications for SCCM using XML Based Recipe Files
@@ -18,6 +17,8 @@
 	7-Zip Application is Redistributed for Ease of Use:
 		7-Zip Binary - Igor Pavlov - https://www.7-zip.org/
 #>
+
+$Global:ScriptVersion = "19.10.29.0"
 
 $Global:ScriptRoot = $PSScriptRoot
 
@@ -541,10 +542,10 @@ Function Copy-CMDeploymentTypeRule {
     }
     
     $Available = ($SourceApplication.DeploymentTypes[0].Requirements).Name
-	Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join '`r`n')"
+	Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join ', ')"
     
     # get requirement rules from source application
-    $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { ($_.Name).TrimStart().TrimEnd() -eq $RuleName }
+    $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { ($_.Name).TrimStart().TrimEnd() -eq $RuleName.TrimStart().TrimEnd() }
     if (-not ([System.String]::IsNullOrEmpty($Requirements))) {
         Add-LogContent "No Requirement rule was an exact match for $RuleName"
         $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { $_.Name -match $RuleName }
@@ -1107,7 +1108,7 @@ Function Send-EmailMessage {
 
 ################################### MAIN ########################################
 ## Startup
-Add-LogContent "--- Starting SCCM AutoPackager ---" -Load
+Add-LogContent "--- Starting SCCM AutoPackager Version $($Global:ScriptVersion) ---" -Load
 if (-not (Get-Module ConfigurationManager)) {
     try {
         Add-LogContent "Importing ConfigurationManager Module"

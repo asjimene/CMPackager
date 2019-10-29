@@ -1,5 +1,6 @@
-$Windows10Versions = "10586", "14393", "15063", "16299", "17134", "17763", "18362", "18363"
+$Windows10Versions = "10586","14393","15063","16299","17134","17763","18362"
 $ModelQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").ModelName
+$SystemSKUQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").SystemSKU
 $ManufacturerQueries = "Microsoft Corporation"
 
 if (-not (Get-Module ConfigurationManager)) {
@@ -27,6 +28,10 @@ if (-not (Get-CMGlobalCondition -Name "AutoPackage - Computer Manufacturer")) {
 
 if (-not (Get-CMGlobalCondition -Name "AutoPackage - Computer Model")) {
     New-CMGlobalConditionWqlQuery -DataType String -Class Win32_ComputerSystem -Namespace root\cimv2 -Property Model -Name "AutoPackage - Computer Model" -Description "Returns the Model from ComputerSystem\Model"
+}
+
+if (-not (Get-CMGlobalCondition -Name "AutoPackage - Computer SystemSKU")) {
+    New-CMGlobalConditionWqlQuery -DataType String -Class MS_SystemInformation -Namespace root\wmi -Property SystemSKU -Name "AutoPackage - Computer SystemSKU" -Description "Returns the SystemSKU from MS_SystemInformation"
 }
 
 if (-not (Get-CMGlobalCondition -Name "AutoPackage - OSArchitecture x64")) {
@@ -64,7 +69,7 @@ if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
     Add-LogContent "Processing - Add Windows 10 Versions to Template"
     foreach ($Version in $Windows10Versions) {
         if (-not ($ExistingRequirements -contains "AutoPackage - Windows 10 Build Number Integer Greater than or equal to $Version")) {
-            Add-LogContent "$Version is being added"
+            Add-LogContent "`"$Version`" is being added"
             $rule = Get-CMGlobalCondition -Name "AutoPackage - Windows 10 Build Number Integer" | New-CMRequirementRuleCommonValue -Value1 $Version -RuleOperator GreaterEquals
             $rule.Name =  "AutoPackage - Windows 10 Build Number Integer Greater than or equal to $Version"
             Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
@@ -75,8 +80,8 @@ if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
     Add-LogContent "Processing - Add Models to Template"
     foreach ($Model in $ModelQueries) {
         if (-not ($ExistingRequirements -contains "AutoPackage - Computer Model Equals $Model")) {
-            Add-LogContent "$Model is being added"
-            $rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Model" | New-CMRequirementRuleCommonValue -Value1 $Model -RuleOperator IsEquals 
+            Add-LogContent "`"$Model`" is being added"
+            $rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Model" | New-CMRequirementRuleCommonValue -Value1 "$Model" -RuleOperator IsEquals 
             $rule.Name = "AutoPackage - Computer Model Equals $Model"
             Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
         }
@@ -86,9 +91,21 @@ if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
     Add-LogContent "Processing - Add Manufacturers to Template"
     foreach ($Manufacturer in $ManufacturerQueries) {
         if (-not ($ExistingRequirements -contains "AutoPackage - Computer Manufacturer Equals $Manufacturer")) {
-            Add-LogContent "$Manufacturer is being added"
-            $rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Manufacturer" | New-CMRequirementRuleCommonValue -Value1 $Manufacturer -RuleOperator IsEquals 
+            Add-LogContent "`"$Manufacturer`" is being added"
+            $rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Manufacturer" | New-CMRequirementRuleCommonValue -Value1 "$Manufacturer" -RuleOperator IsEquals 
             $rule.Name = "AutoPackage - Computer Manufacturer Equals $Manufacturer"
+            Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
+        }
+    }
+
+    Add-LogContent "Processing - Add SystemSKU to Template"
+    foreach ($SystemSKU in $($SystemSKUQueries | where-object {$_ -ne ""})) {
+        $SystemSKUSplit = $SystemSKU.Split(",")
+        $SystemSKU = $SystemSKU.Replace(',',', ')
+        if (-not ($ExistingRequirements -contains "AutoPackage - Computer SystemSKU OneOf {$SystemSKU}")) {
+            Add-LogContent "`"$SystemSKU`" is being added"
+            $rule = Get-CMGlobalCondition -Name "AutoPackage - Computer SystemSKU" | New-CMRequirementRuleCommonValue -Value1 $SystemSKUSplit -RuleOperator OneOf 
+            $rule.Name = "AutoPackage - Computer SystemSKU OneOf {$SystemSKU}"
             Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
         }
     }

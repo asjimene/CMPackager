@@ -1,14 +1,16 @@
-ModelName,LinkID
-Surface Book,49497
-Surface Book 2,56261
-Surface Go,57439
-Surface Laptop,55489
-Surface Laptop 2,57515
-Surface Pro 3,38826
-Surface Pro 4,49498
-Surface Pro 6,57514
-Surface Studio,54311
-Surface Studio 2,57593
-Surface Pro,55484
-Surface 3,49040
-Surface Pro 7,100419
+ModelName,LinkID,SystemSKU
+Surface Book,49497,
+Surface Book 2,56261,
+Surface Go,57439,
+Surface Laptop,55489,
+Surface Laptop 2,57515,
+Surface Pro 3,38826,
+Surface Pro 4,49498,
+Surface Pro 6,57514,
+Surface Studio,54311,
+Surface Studio 2,57593,
+Surface Pro,55484,
+Surface 3,49040,
+Surface Pro 7,100419,
+Surface Laptop 3 (Intel),100429,"Surface_Laptop_3_1867:1868,Surface_Laptop_3_1872"
+Surface Laptop 3 (AMD),100428,Surface_Laptop_3_1873
