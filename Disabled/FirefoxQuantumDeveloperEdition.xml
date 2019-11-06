@@ -43,7 +43,7 @@
 					<Path>%ProgramFiles%\Firefox Developer Edition</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$FullVersion</ExpectedValue>
-					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
 					<Value>True</Value>
 					<Is64Bit>True</Is64Bit>
 				</DetectionClause>

@@ -62,7 +62,7 @@
 					<Path>%ProgramFiles%\Mozilla Firefox</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$FullVersion</ExpectedValue>
-					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
 					<Value>True</Value>
 					<Is64Bit>True</Is64Bit>
 				</DetectionClause>
@@ -94,7 +94,7 @@
 					<Path>%ProgramFiles(x86)%\Mozilla Firefox</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$FullVersion</ExpectedValue>
-					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
