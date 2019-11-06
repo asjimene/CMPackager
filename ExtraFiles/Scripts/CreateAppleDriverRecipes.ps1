@@ -165,7 +165,7 @@ Pop-Location
 
 
 $BootCampInstallers = @()
-$AppleSUCatalog = "https://swscan.apple.com/content/catalogs/others/index-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog"
+$AppleSUCatalog = "https://swscan.apple.com/content/catalogs/others/index-10.15-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog"
 Invoke-WebRequest -URI $AppleSUCatalog -OutFile "$PSScriptRoot\AppleSUCatalog.sucatalog"
 $Plist = ConvertFrom-Plist -plist $([xml](Get-Content "$PSScriptRoot\AppleSUCatalog.sucatalog"))
 foreach ($Values in ($Plist.Products.Values | where { $_.ServerMetadataURL -like "*BootCamp*" } | where {$_.Distributions.English -ne $null})){
