@@ -1,0 +1,48 @@
+<ApplicationDef>
+	<Application>
+		<Name>MakerBot Print</Name>
+		<Description>MakerBot Print is free software that optimizes and streamlines the 3D printing process for any workflow. It allows you to discover, prepare, manage, and share 3D prints.</Description>
+		<Publisher>MakerBot</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.makerbot.com/3d-printers/apps/makerbot-print/download/</UserDocumentation>
+		<Icon>MakerBotPrint.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript></PrefetchScript>
+			<URL>https://s3.amazonaws.com/downloads-makerbot-com/installer/release/MakerBotPrintInstaller.exe</URL>
+			<DownloadFileName>MakerBotPrintInstaller.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>MakerBot Print Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>MakerBotPrintInstaller.exe /quiet</InstallProgram>
+			<UninstallCmd>MakerBotPrintInstaller.exe /uninstall /quiet</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>40</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>CustomScript</DetectionMethodType>
+			<ScriptLanguage>PowerShell</ScriptLanguage>
+			<DetectionMethod>if ("REPLACEMEWITHTHEAPPVERSION" -eq ((Get-Content "$env:ProgramFiles\MakerBot\MakerbotPrint\version.json"  | ConvertFrom-Json).PlatformVersion)){Write-Output "Installed"}</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
