@@ -2,7 +2,7 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  10/29/2019
+	 Last Updated:  11/14/2019
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
 	===========================================================================
@@ -34,7 +34,8 @@ DynamicParam {
 	return  $RuntimeParamDic
 }
 process {
-$Global:ScriptVersion = "19.10.29.0"
+
+$Global:ScriptVersion = "19.11.14.0"
 
 $Global:ScriptRoot = $PSScriptRoot
 
