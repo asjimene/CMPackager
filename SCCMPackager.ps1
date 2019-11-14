@@ -18,6 +18,22 @@
 		7-Zip Binary - Igor Pavlov - https://www.7-zip.org/
 #>
 
+[CmdletBinding()]
+param ()
+DynamicParam {  
+	$ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
+	$ParamAttrib.Mandatory = $true
+	$ParamAttrib.ParameterSetName = '__AllParameterSets'
+	$AttribColl = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
+	$AttribColl.Add($ParamAttrib)
+	$configurationFileNames = Get-ChildItem -Path "$PSScriptRoot\Recipes" | Select-Object -ExpandProperty Name
+	$AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute($configurationFileNames)))
+	$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string], $AttribColl)
+	$RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+	$RuntimeParamDic.Add('SingleRecipe', $RuntimeParam)
+	return  $RuntimeParamDic
+}
+process {
 $Global:ScriptVersion = "19.10.29.0"
 
 $Global:ScriptRoot = $PSScriptRoot
@@ -1146,7 +1162,9 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\
 ## Get the Recipes
 $RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
 Add-LogContent -Content "All Recipes: $RecipeList"
-
+if (-not ([System.String]::IsNullOrEmpty($PSBoundParameters.SingleRecipe))){
+	$RecipeList = $RecipeList | Select-Object $PSBoundParameters.SingleRecipe
+}
 ## Begin Looping through all the Recipes 
 ForEach ($Recipe In $RecipeList) {
 	## Reset All Variables
@@ -1197,3 +1215,4 @@ Add-LogContent "Clearing All Cookies Download Setting"
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /v 1A10 /f
 
 Add-LogContent "--- End Of SCCM AutoPackager ---"
+}
