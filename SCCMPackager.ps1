@@ -1164,7 +1164,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\
 $RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
 Add-LogContent -Content "All Recipes: $RecipeList"
 if (-not ([System.String]::IsNullOrEmpty($PSBoundParameters.SingleRecipe))){
-	$RecipeList = $RecipeList | Select-Object $PSBoundParameters.SingleRecipe
+	$RecipeList = $RecipeList | Where-Object {$_ -eq $PSBoundParameters.SingleRecipe}
 }
 ## Begin Looping through all the Recipes 
 ForEach ($Recipe In $RecipeList) {
