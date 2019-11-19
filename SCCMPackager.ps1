@@ -2,7 +2,7 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  11/14/2019
+	 Last Updated:  11/19/2019
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
 	===========================================================================
@@ -22,7 +22,7 @@
 param ()
 DynamicParam {  
 	$ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
-	$ParamAttrib.Mandatory = $true
+	$ParamAttrib.Mandatory = $false
 	$ParamAttrib.ParameterSetName = '__AllParameterSets'
 	$AttribColl = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
 	$AttribColl.Add($ParamAttrib)
@@ -35,7 +35,7 @@ DynamicParam {
 }
 process {
 
-$Global:ScriptVersion = "19.11.14.0"
+$Global:ScriptVersion = "19.11.19.0"
 
 $Global:ScriptRoot = $PSScriptRoot
 
