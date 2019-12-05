@@ -1,0 +1,49 @@
+<ApplicationDef>
+	<Application>
+		<Name>Fusion 360</Name>
+		<Description>Fusion 360 helps students and educators prepare for the future of design. It's the first 3D CAD, CAM, and CAE tool of its kind, connecting your entire product development process into one cloud-based platform. Download the software today, then turn your ideas into reality.</Description>
+		<Publisher>Autodesk</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.autodesk.com/products/fusion-360/overview</UserDocumentation>
+		<Icon>Fusion360.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<URL>https://dl.appstreaming.autodesk.com/production/installers/Fusion%20360%20Admin%20Install.exe</URL>
+			<DownloadFileName>Fusion 360 Admin Install.exe</DownloadFileName>
+			<DownloadVersionCheck>
+            $Version = ((Invoke-WebRequest -Uri https://dl.appstreaming.autodesk.com/production/67316f5e79bc48318aa5f7b6bb58243d/73e72ada57b7480280f7a6f4a289729f/full.json).Content | Convertfrom-Json).'build-version'
+			</DownloadVersionCheck>
+			<FullVersion></FullVersion>
+			<Version></Version>
+            <ExtraCopyFunctions>copy-item $ScriptRoot\ExtraFiles\Fusion360\install.ps1 -Destination $DestinationPath\install.ps1 -Force -EA SilentlyContinue</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>AutoDesk Fusion 360 Lab Silent Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>powershell -executionpolicy bypass .\install.ps1</InstallProgram>
+			<UninstallCmd>`"Fusion 360 Admin Install.exe`" --process uninstall --quiet</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>25</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>CustomScript</DetectionMethodType>
+            <ScriptLanguage>PowerShell</ScriptLanguage>
+            <DetectionMethod>[version]$InstalledVersion = ((Get-Content "C:\Program Files\AutoDesk\Fusion360.json" -EA SilentlyContinue) | ConvertFrom-Json -ea SilentlyContinue).manifest."build-version";
+if (($InstalledVersion -ge "REPLACEMEWITHTHEAPPVERSION") -and (get-item "C:\Program Files\Autodesk\webdeploy\production\*\Fusion360.exe" -EA SilentlyContinue)){Write-Output "Installed"}</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
