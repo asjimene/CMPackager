@@ -307,8 +307,10 @@ Function Download-Application {
         }
 
 		
-		## Run the Version Check Script and record the Version and FullVersion
-		Invoke-Expression $DownloadVersionCheck | Out-Null
+        ## Run the Version Check Script and record the Version and FullVersion
+        If (-not ([String]::IsNullOrEmpty($DownloadVersionCheck))) {
+            Invoke-Expression $DownloadVersionCheck | Out-Null
+        }
 		$Download.Version = [string]$Version
 		$Download.FullVersion = [string]$FullVersion
 		$ApplicationSWVersion = $Download.Version
