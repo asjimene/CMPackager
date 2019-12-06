@@ -1176,25 +1176,30 @@ ForEach ($Recipe In $RecipeList) {
 	$ApplicationDeployment = $False
 	
 	## Import Recipe
-	Add-LogContent "Importing Content for $Recipe"
+    Add-LogContent "Importing Content for $Recipe"
+    Write-Output "Begin Processing: $Recipe"
 	[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
 	
 	## Perform Packaging Tasks
 	$Download = Download-Application -Recipe $ApplicationRecipe
 	Add-LogContent "Continue to Download: $Download"
 	If ($Download) {
+        Write-Output "Download"
 		$ApplicationCreation = Create-Application -Recipe $ApplicationRecipe
 		Add-LogContent "Continue to ApplicationCreation: $ApplicationCreation"
 	}
 	If ($ApplicationCreation) {
+        Write-Output "Application Creation"
 		$DeploymentTypeCreation = Add-DeploymentType -Recipe $ApplicationRecipe
 		Add-LogContent "Continue to DeploymentTypeCreation: $DeploymentTypeCreation"
 	}
 	If ($DeploymentTypeCreation) {
+        Write-Output "Application Distribution"
 		$ApplicationDistribution = Distribute-Application -Recipe $ApplicationRecipe
 		Add-LogContent "Continue to ApplicationDistribution: $ApplicationDistribution"
 	}
 	If ($ApplicationDistribution) {
+        Write-Output "Application Deployment"
 		$ApplicationDeployment = Deploy-Application -Recipe $ApplicationRecipe
 		Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
     }
