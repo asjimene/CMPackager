@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = "https://www.opera.com$(((Invoke-Webrequest -uri "https://www.opera.com/download/get/?partner=www&amp;opsys=Windows&amp;arch=x64").links | where outerText -eq "try again").href)"</PrefetchScript>
+			<PrefetchScript>$URL = "$(((Invoke-Webrequest -uri "https://www.opera.com/download/get/?partner=www&amp;opsys=Windows&amp;arch=x64").links | where outerText -eq "try again").href)"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Opera_x64.exe</DownloadFileName>
 			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\Opera_x64.exe" -o"$TempDir\Opera_x64Temp" -y
@@ -20,7 +20,7 @@
 			<Version></Version>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$URL = "https://www.opera.com$(((Invoke-Webrequest -uri "https://www.opera.com/download/get/?partner=www&amp;opsys=Windows&amp;arch=x64").links | where outerText -eq "try again").href)"</PrefetchScript>
+			<PrefetchScript>$URL = "$(((Invoke-Webrequest -uri "https://www.opera.com/download/get/?partner=www&amp;opsys=Windows&amp;arch=x64").links | where outerText -eq "try again").href)"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Opera_x86.exe</DownloadFileName>
 			<DownloadVersionCheck>&amp; $ScriptRoot\7za.exe x "$TempDir\Opera_x86.exe" -o"$TempDir\Opera_x86Temp" -y
