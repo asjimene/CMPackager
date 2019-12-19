@@ -92,7 +92,7 @@ Copy-item $ScriptRoot\ExtraFiles\R\*.* $DestinationPath\ -force -recurse
 				<DetectionClause>
 					<DetectionClauseType>File</DetectionClauseType>
 					<Name>R.exe</Name>
-					<Path>%ProgramFiles%\R\R-`$Version\bin</Path>
+					<Path>%ProgramFiles%\R\R-$Version\bin</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$FullVersion</ExpectedValue>
 					<ExpressionOperator>IsEquals</ExpressionOperator>

@@ -479,15 +479,7 @@ Function Add-DetectionMethodClause {
 		$detMethodCommand += " -PropertyType $($DetectionMethod.PropertyType)"
 	}
 	If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.ExpectedValue))) {
-		If ($DetectionMethod.ExpectedValue -like "*`$Version*") {
-			Add-LogContent "Replacing `$Version in $($DetectionMethod.ExpectedValue)"
-			$DetectionMethod.ExpectedValue = ($DetectionMethod.ExpectedValue).Replace('$Version', $AppVersion)
-			
-		}
-		If ($DetectionMethod.ExpectedValue -like "*`$FullVersion*") {
-			Add-LogContent "Replacing `$FullVersion in $($DetectionMethod.ExpectedValue)"
-			$DetectionMethod.ExpectedValue = ($DetectionMethod.ExpectedValue).Replace('$FullVersion', $AppFullVersion)
-		}
+		$DetectionMethod.ExpectedValue = ($DetectionMethod.ExpectedValue).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 		$detMethodCommand += " -ExpectedValue `"$($DetectionMethod.ExpectedValue)`""
 	}
 	If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.ExpressionOperator))) {
@@ -689,8 +681,8 @@ Function Add-DeploymentType {
 		$stDepTypeSlowNetworkDeploymentMode = $DeploymentType.OnSlowNetwork
 		
 		# Programs
-		$DepTypeInstallationProgram = $DeploymentType.InstallProgram
-		$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
+		$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version',$Version).replace('$FullVersion',$AppFullVersion)
+		$stDepTypeUninstallationProgram = ($DeploymentType.UninstallCmd).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 		$swDepTypeForce32Bit = [System.Convert]::ToBoolean($DeploymentType.Force32bit)
 		
 		# User Experience
@@ -767,7 +759,7 @@ Function Add-DeploymentType {
 						$CmdSwitches += " $CmdSwitch"
 					}
 					
-					$DepTypeScriptText = ($DeploymentType.DetectionMethod).Replace("REPLACEMEWITHTHEAPPVERSION", $($AssociatedDownload.Version)).replace("REPLACEMEWITHTHEAPPFULLVERSION", $($AssociatedDownload.FullVersion))
+					$DepTypeScriptText = ($DeploymentType.DetectionMethod).Replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 					If (-not ([string]::IsNullOrEmpty($DepTypeScriptText))) {
 						$CMDSwitch = "-ScriptText `'$DepTypeScriptText`'"
 						$CmdSwitches += " $CmdSwitch"

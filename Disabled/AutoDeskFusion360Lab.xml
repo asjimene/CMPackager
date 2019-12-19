@@ -37,7 +37,7 @@
             <DetectionMethodType>CustomScript</DetectionMethodType>
             <ScriptLanguage>PowerShell</ScriptLanguage>
             <DetectionMethod>[version]$InstalledVersion = ((Get-Content "C:\Program Files\AutoDesk\Fusion360.json" -EA SilentlyContinue) | ConvertFrom-Json -ea SilentlyContinue).manifest."build-version";
-if (($InstalledVersion -ge "REPLACEMEWITHTHEAPPVERSION") -and (get-item "C:\Program Files\Autodesk\webdeploy\production\*\Fusion360.exe" -EA SilentlyContinue)){Write-Output "Installed"}</DetectionMethod>
+if (($InstalledVersion -ge "$Version") -and (get-item "C:\Program Files\Autodesk\webdeploy\production\*\Fusion360.exe" -EA SilentlyContinue)){Write-Output "Installed"}</DetectionMethod>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
