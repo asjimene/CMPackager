@@ -682,7 +682,10 @@ Function Add-DeploymentType {
 		
 		# Programs
 		$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version',$Version).replace('$FullVersion',$AppFullVersion)
-		$stDepTypeUninstallationProgram = ($DeploymentType.UninstallCmd).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
+		$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
+		if (-not ([System.String]::IsNullOrEmpty($DeploymentType.UninstallCmd))) {
+				$stDepTypeUninstallationProgram = ($stDepTypeUninstallationProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
+		}
 		$swDepTypeForce32Bit = [System.Convert]::ToBoolean($DeploymentType.Force32bit)
 		
 		# User Experience
