@@ -3,6 +3,23 @@ $ModelQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").ModelName
 $SystemSKUQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").SystemSKU
 $ManufacturerQueries = "Microsoft Corporation"
 
+$BIOSProvScript = '$Make = (Get-WmiObject Win32_ComputerSystem).Manufacturer
+$Family = (Get-WmiObject Win32_ComputerSystem).Model
+$SMBIOS = "$((Get-WmiObject Win32_BIOS).SMBIOSMajorVersion).$((Get-WmiObject Win32_BIOS).SMBIOSMinorVersion)"
+$PowershellVersion = $PSVersionTable.PSVersion.Major
+
+if (($Make -like "Dell*") -and (($Family -like "*Optiplex*") -or ($Family -like "*Latitude*") -or ($Family -like "*XPS*") -or ($Family -like "*Venue*")) -and (($SMBIOS -ge 2.3) -and ($PowershellVersion -ge 3))){
+    Write-Output $true
+} else {
+    Write-Output $false
+}'
+
+$BIOSProvDescription = 'Determines if the Dell PowerShell Provider can be installed:
+Make = Dell
+Model = Latitude, Optiplex, Precision, Venue, XPS
+SMBIOS Version = Greater Than or Equal to 2.3
+PowerShell Version = Greater Than or Equal to 3.0'
+
 if (-not (Get-Module ConfigurationManager)) {
     try {
         Add-LogContent "Importing ConfigurationManager Module"
@@ -36,6 +53,10 @@ if (-not (Get-CMGlobalCondition -Name "AutoPackage - Computer SystemSKU")) {
 
 if (-not (Get-CMGlobalCondition -Name "AutoPackage - OSArchitecture x64")) {
     New-CMGlobalConditionWqlQuery -DataType String -Class Win32_OperatingSystem -Namespace root\cimv2 -Property OSArchitecture -WhereClause "OSArchitecture = `'64-bit`'" -Name "AutoPackage - OSArchitecture x64" -Description "Returns True if Win32_OperatingSystem is True. Use as existential rule for 64-bit operating system"
+}
+
+if (-not (Get-CMGlobalCondition -Name "AutoPackage - DellBIOSProvider Prereq Check")) {
+    New-CMGlobalConditionScript -DataType Boolean -ScriptLanguage PowerShell -ScriptText $BIOSProvScript -Name "AutoPackage - DellBIOSProvider Prereq Check" -Description $BIOSProvDescription
 }
 
 # Only add the Requirements if the Application Already Exists
@@ -108,6 +129,15 @@ if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
             $rule.Name = "AutoPackage - Computer SystemSKU OneOf {$SystemSKU}"
             Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
         }
+    }
+
+    # Add Dell BIOS Provider Prereq Check
+    Add-LogContent "Processing - DellBIOSProvider to Template"
+    if (-not ($ExistingRequirements -contains "AutoPackage - DellBIOSProvider Prereq Check Not Equal to 0")) {
+        Add-LogContent "DellBIOSProvider Prereq Check is being added"
+        $rule = Get-CMGlobalCondition -Name "AutoPackage - DellBIOSProvider Prereq Check" | New-CMRequirementRuleExistential -Existential $true 
+        $rule.Name = "Existential of AutoPackage - DellBIOSProvider Prereq Check Not Equal to 0"
+        Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
     }
 } Else {
     Add-LogContent "WARN: The Requirements Application is being created, please run the SCCMPackager again to finish prerequisite setup and begin packaging software."

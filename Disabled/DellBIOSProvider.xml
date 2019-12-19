@@ -1,0 +1,85 @@
+<ApplicationDef>
+    <Application>
+        <Name>Dell Command Powershell Provider</Name>
+        <Description>Dell Command | PowerShell Provider is a PowerShell module that provides BIOS configuration capability to Dell client Enterprise systems such as OptiPlex, Latitude, Venue 11 Pro, XPS Notebook, and Precision using Windows PowerShell Interface.Dell Command | PowerShell Provider can be installed as plug-in software registered within the Windows PowerShell environment. Dell Command | PowerShell Provider works for local and remote systems, and even in the Windows pre-installation environment. This module, with its native configuration capability, makes BIOS configuration most manageable for system administrators.</Description>
+        <Publisher>Dell Inc.</Publisher>
+        <AutoInstall>True</AutoInstall>
+        <UserDocumentation>https://www.dell.com/support/article/us/en/04/sln311262/dell-command-powershell-provider?lang=en</UserDocumentation>
+        <Icon>DellBIOSProvider.png</Icon>
+    </Application>
+    <Downloads>
+        <Download DeploymentType="DeploymentType1">
+            <PrefetchScript>$Version = (Find-Package DellBIOSProvider).Version
+            </PrefetchScript>
+            <URL></URL>
+            <DownloadFileName></DownloadFileName>
+            <Version></Version>
+            <FullVersion></FullVersion>
+            <DownloadVersionCheck>Add-LogContent "Version set as $Version"</DownloadVersionCheck>
+            <ExtraCopyFunctions></ExtraCopyFunctions>
+        </Download>
+        <Download DeploymentType="DeploymentType2">
+            <PrefetchScript>$Version = (Find-Package DellBIOSProviderx86).Version
+            </PrefetchScript>
+            <URL></URL>
+            <DownloadFileName></DownloadFileName>
+            <Version></Version>
+            <FullVersion></FullVersion>
+            <DownloadVersionCheck>Add-LogContent "Version set as $Version"</DownloadVersionCheck>
+            <ExtraCopyFunctions></ExtraCopyFunctions>
+        </Download>
+    </Downloads>
+    <DeploymentTypes>
+        <DeploymentType Name="DeploymentType1">
+            <DeploymentTypeName>Dell Command Powershell Provider 64-bit</DeploymentTypeName>
+            <InstallationType>Script</InstallationType>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallProgram>powershell -executionpolicy bypass -noninteractive -Command Uninstall-Module -Name DellBIOSProvider -AllVersions -Force; Install-Module -Name DellBIOSProvider -RequiredVersion $Version -Repository PSGallery -Force </InstallProgram>
+            <UninstallCmd>powershell -executionpolicy bypass -noninteractive -Command Uninstall-Module -Name DellBIOSProvider -RequiredVersion $Version -Repository PSGallery -Force</UninstallCmd>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <EstRuntimeMins>5</EstRuntimeMins>
+            <MaxRuntimeMins>30</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>CustomScript</DetectionMethodType>
+            <ScriptLanguage>PowerShell</ScriptLanguage>
+            <DetectionMethod>if ((get-module DellBIOSProvider -ListAvailable).Version -ge [version]"$Version"){write-Output "Installed"}</DetectionMethod>
+            <Requirements>
+                <RuleName>Existential of AutoPackage - OSArchitecture x64 Not Equal to 0</RuleName>
+                <RuleName>Existential of AutoPackage - DellBIOSProvider Prereq Check Not Equal to 0</RuleName>
+            </Requirements>
+        </DeploymentType>
+        <DeploymentType Name="DeploymentType2">
+            <DeploymentTypeName>Dell Command Powershell Provider 32-bit</DeploymentTypeName>
+            <InstallationType>Script</InstallationType>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallProgram>powershell -executionpolicy bypass -noninteractive -Command Uninstall-Module -Name DellBIOSProviderX86 -AllVersions -Force; Install-Module -Name DellBIOSProviderX86 -RequiredVersion $Version -Repository PSGallery -Force </InstallProgram>
+            <UninstallCmd>powershell -executionpolicy bypass -noninteractive -Command Uninstall-Module -Name DellBIOSProviderX86 -RequiredVersion $Version -Repository PSGallery -Force</UninstallCmd>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <EstRuntimeMins>5</EstRuntimeMins>
+            <MaxRuntimeMins>30</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>CustomScript</DetectionMethodType>
+            <ScriptLanguage>PowerShell</ScriptLanguage>
+            <DetectionMethod>if ((get-module DellBIOSProviderX86 -ListAvailable).Version -ge [version]"$Version"){write-Output "Installed"}</DetectionMethod>
+            <Requirements>
+                <RuleName>Existential of AutoPackage - DellBIOSProvider Prereq Check Not Equal to 0</RuleName>
+            </Requirements>
+        </DeploymentType>
+    </DeploymentTypes>
+    <Distribution>
+        <DistributeContent>True</DistributeContent>
+    </Distribution>
+    <Deployment>
+        <DeploySoftware>True</DeploySoftware>
+    </Deployment>
+</ApplicationDef>
