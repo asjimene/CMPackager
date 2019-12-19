@@ -9,8 +9,8 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://notepad-plus-plus.org/download) | Select-Object -ExpandProperty Links | Where-Object -Property OuterText -Like "*Notepad++ Installer 32-bit x86").href
-			$URL = "https://notepad-plus-plus.org$LinkPath"</PrefetchScript>
+			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*npp.*.Installer.exe").href
+			$URL = "https://github.com$LinkPath"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>NotePadppInstaller.exe</DownloadFileName>
 			<Version></Version>
