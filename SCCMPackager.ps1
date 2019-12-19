@@ -2,7 +2,7 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  11/19/2019
+	 Last Updated:  12/19/2019
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
 	===========================================================================
@@ -35,7 +35,7 @@ DynamicParam {
 }
 process {
 
-$Global:ScriptVersion = "19.11.19.0"
+$Global:ScriptVersion = "19.12.19.0"
 
 $Global:ScriptRoot = $PSScriptRoot
 
@@ -556,10 +556,14 @@ Function Copy-CMDeploymentTypeRule {
 	Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join ', ')"
     
     # get requirement rules from source application
-    $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { ($_.Name).TrimStart().TrimEnd() -eq $RuleName.TrimStart().TrimEnd() }
-    if (-not ([System.String]::IsNullOrEmpty($Requirements))) {
+    $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { (($_.Name).TrimStart().TrimEnd()) -eq (($RuleName).TrimStart().TrimEnd()) }
+    if ([System.String]::IsNullOrEmpty($Requirements)) {
         Add-LogContent "No Requirement rule was an exact match for $RuleName"
         $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { $_.Name -match $RuleName }
+    }
+    if ([System.String]::IsNullOrEmpty($Requirements)) {
+        Add-LogContent "No Requirement rule was matched, tring one more thing for $RuleName"
+        $Requirements = $SourceApplication.DeploymentTypes[0].Requirements | Where-Object { $_.Name -like $RuleName }
     }
     Add-LogContent "$($Requirements.Name) will be added"
 
