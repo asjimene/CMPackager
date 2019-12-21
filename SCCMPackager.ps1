@@ -274,7 +274,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 	}
 
-	Function Download-Application {
+	Function Start-ApplicationDownload {
 		Param (
 			$Recipe
 		)
@@ -301,6 +301,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "Downloading $ApplicationName from $URL"
 				$ProgressPreference = 'SilentlyContinue'
 				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
+				$request | Out-Null
 				Add-LogContent "Completed Downloading $ApplicationName"
 			}
 			else {
@@ -369,7 +370,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Return $NewApp
 	}
 
-	Function Create-Application {
+	Function Invoke-ApplicationCreation {
 		Param (
 			$Recipe
 		)
@@ -549,9 +550,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		} {
 			If ($_.Title -eq "$DestDeploymentTypeName") {
 				$DestDeploymentTypeIndex = $i
+				Write-Output $DestDeploymentTypeIndex | Out-Null
 			
 			}
-			$i++
+			$i = $i + 1
 		}
     
 		$Available = ($SourceApplication.DeploymentTypes[0].Requirements).Name
@@ -659,7 +661,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$DepTypeDeploymentTypeName = $DeploymentType.DeploymentTypeName
 			Add-LogContent "New DeploymentType - $DepTypeDeploymentTypeName"
 		
-			$AssociatedDownload = $Recipe.ApplicationDef.Downloads.Download | where DeploymentType -eq $DepTypeName
+			$AssociatedDownload = $Recipe.ApplicationDef.Downloads.Download | Where-Object DeploymentType -eq $DepTypeName
 			$ApplicationSWVersion = $AssociatedDownload.Version
 			$Version = $AssociatedDownload.Version
 			If (-not ([String]::IsNullOrEmpty($AssociatedDownload.FullVersion))) {
@@ -704,9 +706,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$stDepTypeMaximumRuntimeMins = $DeploymentType.MaxRuntimeMins
 			$stDepTypeRebootBehavior = $DeploymentType.RebootBehavior
 		
+			# Because I hate the yellow squiggly lines
+			Write-Output $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-null
+
 			$DepTypeDetectionMethodType = $DeploymentType.DetectionMethodType
 			Add-LogContent "Detection Method Type Set as $DepTypeDetectionMethodType"
-		
 			$DepTypeAddDetectionMethods = $false
 		
 			If (($DepTypeDetectionMethodType -eq "Custom") -and (-not ([System.String]::IsNullOrEmpty($DeploymentType.CustomDetectionMethods.ChildNodes)))) {
@@ -714,12 +718,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$DepTypeAddDetectionMethods = $true
 				$DepTypeDetectionClauseConnector = @()
 				Add-LogContent "Adding Detection Method Clauses"
-				ForEach ($DetectionMethod In $($DeploymentType.CustomDetectionMethods.ChildNodes | where Name -NE "DetectionClauseExpression")) {
+				ForEach ($DetectionMethod In $($DeploymentType.CustomDetectionMethods.ChildNodes | Where-Object Name -NE "DetectionClauseExpression")) {
 					Add-LogContent "New Detection Method Clause $Version $FullVersion"
 					$DepTypeDetectionMethods += Add-DetectionMethodClause -DetectionMethod $DetectionMethod -AppVersion $Version -AppFullVersion $FullVersion
 				}
-				if (-not [System.string]::IsNullOrEmpty($($DeploymentType.CustomDetectionMethods.ChildNodes | where Name -EQ "DetectionClauseExpression"))) {
-					$CustomDetectionMethodExpression = ($DeploymentType.CustomDetectionMethods.ChildNodes | where Name -EQ "DetectionClauseExpression").ChildNodes
+				if (-not [System.string]::IsNullOrEmpty($($DeploymentType.CustomDetectionMethods.ChildNodes | Where-Object Name -EQ "DetectionClauseExpression"))) {
+					$CustomDetectionMethodExpression = ($DeploymentType.CustomDetectionMethods.ChildNodes | Where-Object Name -EQ "DetectionClauseExpression").ChildNodes
 				}
 				ForEach ($DetectionMethodExpression In $CustomDetectionMethodExpression) {
 					if ($DetectionMethodExpression.Name -eq "DetectionClauseConnector") {
@@ -740,7 +744,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				
 					## Build the Rest of the command based on values in the xml
 					## Switch type Arguments
-					ForEach ($DepTypeVar In $(Get-Variable | where {
+					ForEach ($DepTypeVar In $(Get-Variable | Where-Object {
 								$_.Name -like "swDepType*"
 							})) {
 						If (([System.Convert]::ToBoolean($deptypevar.Value)) -and (-not ([System.String]::IsNullOrEmpty($DepTypeVar.Value)))) {
@@ -750,7 +754,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					}
 				
 					## String Type Arguments
-					ForEach ($DepTypeVar In $(Get-Variable | where {
+					ForEach ($DepTypeVar In $(Get-Variable | Where-Object {
 								$_.Name -like "stDepType*"
 							})) {
 						If (-not ([System.String]::IsNullOrEmpty($DepTypeVar.Value))) {
@@ -846,7 +850,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					$DepTypeCommand = "Add-CMMsiDeploymentType -ApplicationName `"$DepTypeApplicationName`" -ContentLocation `"$DepTypeContentLocation\$DepTypeInstallationMSI`" -DeploymentTypeName `"$DepTypeDeploymentTypeName`""
 					$CmdSwitches = ""
 					## Build the Rest of the command based on values in the xml
-					ForEach ($DepTypeVar In $(Get-Variable | where {
+					ForEach ($DepTypeVar In $(Get-Variable | Where-Object {
 								$_.Name -like "swDepType*"
 							})) {
 						If (([System.Convert]::ToBoolean($deptypevar.Value)) -and (-not ([System.String]::IsNullOrEmpty($DepTypeVar.Value)))) {
@@ -855,7 +859,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 						}
 					}
 				
-					ForEach ($DepTypeVar In $(Get-Variable | where {
+					ForEach ($DepTypeVar In $(Get-Variable | Where-Object {
 								$_.Name -like "stDepType*"
 							})) {
 						If (-not ([System.String]::IsNullOrEmpty($DepTypeVar.Value))) {
@@ -1003,7 +1007,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Return $DepTypeReturn
 	}
 
-	Function Distribute-Application {
+	Function Invoke-ApplicationDistribution {
 		Param (
 			$Recipe
 		)
@@ -1065,7 +1069,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Return $Success
 	}
 
-	Function Deploy-Application {
+	Function Invoke-ApplicationDeployment {
 		Param (
 			$Recipe
 		)
@@ -1186,11 +1190,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
 	
 		## Perform Packaging Tasks
-		$Download = Download-Application -Recipe $ApplicationRecipe
+		$Download = Start-ApplicationDownload -Recipe $ApplicationRecipe
 		Add-LogContent "Continue to Download: $Download"
 		If ($Download) {
 			Write-Output "Download"
-			$ApplicationCreation = Create-Application -Recipe $ApplicationRecipe
+			$ApplicationCreation = Invoke-ApplicationCreation -Recipe $ApplicationRecipe
 			Add-LogContent "Continue to ApplicationCreation: $ApplicationCreation"
 		}
 		If ($ApplicationCreation) {
@@ -1200,12 +1204,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 		If ($DeploymentTypeCreation) {
 			Write-Output "Application Distribution"
-			$ApplicationDistribution = Distribute-Application -Recipe $ApplicationRecipe
+			$ApplicationDistribution = Invoke-ApplicationDistribution -Recipe $ApplicationRecipe
 			Add-LogContent "Continue to ApplicationDistribution: $ApplicationDistribution"
 		}
 		If ($ApplicationDistribution) {
 			Write-Output "Application Deployment"
-			$ApplicationDeployment = Deploy-Application -Recipe $ApplicationRecipe
+			$ApplicationDeployment = Invoke-ApplicationDeployment -Recipe $ApplicationRecipe
 			Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
 		}
 		if ($Global:TemplateApplicationCreatedFlag -eq $true) {
@@ -1214,7 +1218,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 	}
 
-	If ($SendEmail -and $SendEmailPreference) {
+	If ($Global:SendEmail -and $SendEmailPreference) {
 		Send-EmailMessage
 	}
 
