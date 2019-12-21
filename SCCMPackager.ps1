@@ -597,6 +597,34 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Pop-Location
 	}
 
+	function Add-RequirementsRule {
+		[CmdletBinding()]
+		param (
+			[Parameter(Mandatory)]
+			[ValidateSet('Value', 'Existential', 'OperatingSystem')]
+			[String]
+			$ReqRuleType,
+			[Parameter()]
+			[ValidateSet('And', 'Or', 'Other', 'IsEquals', 'NotEquals', 'GreaterThan', 'LessThan', 'Between', 'NotBetween', 'GreaterEquals', 'LessEquals', 'BeginsWith', 'NotBeginsWith', 'EndsWith', 'NotEndsWith', 'Contains', 'NotContains', 'AllOf', 'OneOf', 'NoneOf', 'SetEquals', 'SubsetOf', 'ExcludesAll')]
+			$ReqRuleOperator,
+			[Parameter()]
+			[switch]
+			$Array,
+			[Parameter(Mandatory)]
+			[String]
+			$ReqRuleValue,
+			[Parameter(Mandatory)]
+			[String]
+			$ReqRuleGlobalConditionName
+		)
+
+
+		Add-LogContent "`"$ReqRuleType of $ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValue`" is being added"
+		$rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Manufacturer" | New-CMRequirementRuleCommonValue -Value1 "$Manufacturer"
+		$rule.Name = "AutoPackage - Computer Manufacturer Equals $Manufacturer"
+		Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
+	}
+
 	Function New-CMDeploymentTypeProcessRequirement {
 		# Creates a Deployment Type Process Requirement "Install Behavior tab in Deployment types" by copying an existing Process Requirement.
 		# A Process requirement needs to be Defined in the "Install Behavior" Tab of the "SourceApplicationName" Variable before this script will function properly
@@ -707,7 +735,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$stDepTypeRebootBehavior = $DeploymentType.RebootBehavior
 		
 			# Because I hate the yellow squiggly lines
-			Write-Output $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-null
+			Write-Output $ApplicationPublisher, $ApplicationDescription, $ApplicationDocURL, $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-null
 
 			$DepTypeDetectionMethodType = $DeploymentType.DetectionMethodType
 			Add-LogContent "Detection Method Type Set as $DepTypeDetectionMethodType"

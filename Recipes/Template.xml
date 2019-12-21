@@ -185,11 +185,19 @@
 					<DetectionClauseGrouping><!--Grouping is unavailable at this time--></DetectionClauseGrouping>
 				</DetectionClauseExpression>
 			</CustomDetectionMethods>
-			<!-- Requirements - Requirements can be added to all applications, you should set up an application that the requirements can be copied from in the preferences file-->
+			<!-- Requirements (LEGACY) - Requirements can be added to all applications, you should set up an application that the requirements can be copied from in the preferences file-->
 			<Requirements>
 			<!-- RuleName - [String] You can assign requirements to an application by using the rule name on the existing template application -->
 				<RuleName></RuleName>
 			</Requirements>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType></RequirementsRuleType>
+					<!--RequirementsRuleValue - The value/s for the requirements rule.-->
+					<RequirementsRuleValue Type="[Array/Value]"></RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition></RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
 			<InstallBehavior>
 			<!--InstallBehavior - Add Entries to the "Install Behavior" Tab in the Deployment Type. SCCM will check if these applications are running before starting the install process. NOTE: A single "Install Behavior" Entry must be defined in the "Requirements Template" Application before this process will work-->
 				<InstallBehaviorProcess DisplayName="[Application Display Name]">
