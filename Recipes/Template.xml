@@ -194,8 +194,10 @@
 				<RequirementsRule>
 					<RequirementsRuleType></RequirementsRuleType>
 					<!--RequirementsRuleValue - The value/s for the requirements rule.-->
-					<RequirementsRuleValue Type="[Array/Value]"></RequirementsRuleValue>
+					<RequirementsRuleValue></RequirementsRuleValue>
 					<RequirementsRuleGlobalCondition></RequirementsRuleGlobalCondition>
+					<RequirementsRuleOperator></RequirementsRuleOperator>
+					<RequirementsRuleValue2></RequirementsRuleValue2>
 				</RequirementsRule>
 			</RequirementsRules>
 			<InstallBehavior>

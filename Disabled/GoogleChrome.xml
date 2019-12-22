@@ -50,9 +50,13 @@
 			<MaxRuntimeMins>30</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
-			<Requirements>
-				<RuleName>Existential of AutoPackage - OSArchitecture x64 Not Equal to 0</RuleName>
-			</Requirements>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>True</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
 			<DeploymentTypeName>Google Chrome Silent Install x86</DeploymentTypeName>

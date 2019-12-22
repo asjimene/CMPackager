@@ -76,6 +76,8 @@ process {
 	$Global:SendEmail = $false
 	$Global:TemplateApplicationCreatedFlag = $false
 
+
+	$Global:OperatorsLookup = @{ And = 'And'; Or = 'Or'; Other = 'Other'; IsEquals = 'Equals'; NotEquals = 'Not equal to'; GreaterThan = 'Greater than'; LessThan = 'Less than'; Between = 'Between'; NotBetween = 'Not Between'; GreaterEquals = 'Greater than or equal to'; LessEquals = 'Less than or equal to'; BeginsWith = 'Begins with'; NotBeginsWith = 'Does not begin with'; EndsWith = 'Ends with'; NotEndsWith = 'Does not end with'; Contains = 'Contains'; NotContains = 'Does not contain'; AllOf = 'All of'; OneOf = 'OneOf'; NoneOf = 'NoneOf'; SetEquals = 'Set equals'; SubsetOf = 'Subset of'; ExcludesAll = 'Exludes all' }
 	## Functions
 	function Add-LogContent {
 		param
@@ -322,7 +324,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			if ((-not (Test-Path $DownloadFile)) -or ([System.String]::IsNullOrEmpty($ApplicationSWVersion))) {
 				Add-LogContent "ERROR: Failed to Download or find the Version for $ApplicationName"
 				if ($Global:NotifyOnDownloadFailure) {
-					$Global:SendEmail = $True
+					$Global:SendEmail = $true; $Global:SendEmail | Out-Null
 					$Global:EmailBody += "   - Failed to Download: $ApplicationName`n"
 				}
 			}
@@ -427,7 +429,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	
 		## Send an Email if an Application was successfully Created and record the Application Name and Version for the Email
 		If ($AppCreated) {
-			$Global:SendEmail = $true
+			$Global:SendEmail = $true; $Global:SendEmail | Out-Null
 			$Global:EmailBody += "   - $ApplicationName $ApplicationSWVersion`n"
 		}
 		Pop-Location
@@ -545,16 +547,17 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
 	
 		# Get DestDeploymentTypeIndex by finding the Title
-		$DestApplication.DeploymentTypes | ForEach-Object {
+		$DestApplication.DeploymentTypes.IndexOf($DestDeploymentTypeName)
+		<#$DestApplication.DeploymentTypes | ForEach-Object {
 			$i = 0
 		} {
 			If ($_.Title -eq "$DestDeploymentTypeName") {
 				$DestDeploymentTypeIndex = $i
-				Write-Output $DestDeploymentTypeIndex | Out-Null
+				Write-Output $DestDeploymentTypeIndex
 			
 			}
 			$i = $i + 1
-		}
+		}#>
     
 		$Available = ($SourceApplication.DeploymentTypes[0].Requirements).Name
 		Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join ', ')"
@@ -607,22 +610,72 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			[Parameter()]
 			[ValidateSet('And', 'Or', 'Other', 'IsEquals', 'NotEquals', 'GreaterThan', 'LessThan', 'Between', 'NotBetween', 'GreaterEquals', 'LessEquals', 'BeginsWith', 'NotBeginsWith', 'EndsWith', 'NotEndsWith', 'Contains', 'NotContains', 'AllOf', 'OneOf', 'NoneOf', 'SetEquals', 'SubsetOf', 'ExcludesAll')]
 			$ReqRuleOperator,
-			[Parameter()]
-			[switch]
-			$Array,
 			[Parameter(Mandatory)]
 			[String]
 			$ReqRuleValue,
+			[Parameter()]
+			[String]
+			$ReqRuleValue2,
 			[Parameter(Mandatory)]
 			[String]
-			$ReqRuleGlobalConditionName
+			$ReqRuleGlobalConditionName,
+			[Parameter(Mandatory)]
+			[String]
+			$ReqRuleApplicationName,
+			[Parameter(Mandatory)]
+			[String]
+			$ReqRuleApplicationDTName
 		)
 
+		Push-Location
+		Set-Location $Global:SCCMSite
+		Write-Output "`"$ReqRuleType of $ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValue`" is being added"
+		$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
 
-		Add-LogContent "`"$ReqRuleType of $ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValue`" is being added"
-		$rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Manufacturer" | New-CMRequirementRuleCommonValue -Value1 "$Manufacturer"
-		$rule.Name = "AutoPackage - Computer Manufacturer Equals $Manufacturer"
-		Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
+		$ReqRuleValueName = $ReqRuleValue
+		if (($ReqRuleOperator -eq 'Oneof') -or ($ReqRuleOperator -eq 'Noneof') -or ($ReqRuleOperator -eq 'Allof') -or ($ReqRuleOperator -eq 'Subsetof') -or ($ReqRuleOperator -eq 'ExcludesAll') -or ($ReqRuleType -eq 'OperatingSystem')) {
+			# These should be array values seperated by commas
+			$ReqRuleVal = @()
+			$ReqRuleVal = $ReqRuleValue.Split(", ")
+			$ReqRuleValueName = "{ $($ReqRuleVal -join ", ") }"
+		}
+		if ([system.string]::IsNullOrEmpty($ReqRuleVal)) {
+			$ReqRuleVal = $ReqRuleValue
+		}
+
+		switch ($ReqRuleType) {
+			Existential {
+				if ([System.Convert]::ToBoolean($ReqRuleValue)) {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($ReqRuleVal))
+					$rule.Name = "Existential of $ReqRuleGlobalConditionName Not equal to 0"
+				}
+				else {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($ReqRuleVal))
+					$rule.Name = "Existential of $ReqRuleGlobalConditionName Equals 0"
+				}
+			}
+			OperatingSystem {
+				# Only supporting Windows Operating Systems at this time
+				$GlobalCondition = Get-CMGlobalCondition -name "Operating System" | Where-Object PlatformType -eq 1
+				$rule = $GlobalCondition | New-CMRequirementRuleOperatingSystemValue -RuleOperator $ReqRuleOperator -PlatformStrings $ReqRuleVal
+				$rule.Name = "$ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValueName"
+			}
+			Default {
+				# DEFAULT TO VALUE
+				if ([System.String]::IsNullOrEmpty($ReqRuleValue2)) {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator
+					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName"
+				}
+				else {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator -Value2 $ReqRuleValue2
+					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName"
+				}
+			}
+		}
+
+		Add-LogContent "Adding Requirement to $ReqRuleApplicationName, $ReqRuleApplicationDTName"
+		Get-CMDeploymentType -ApplicationName $ReqRuleApplicationName -DeploymentTypeName $ReqRuleApplicationDTName | Set-CMDeploymentType -AddRequirement $rule
+		Pop-Location
 	}
 
 	Function New-CMDeploymentTypeProcessRequirement {
@@ -644,7 +697,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
 	
 		# Get DestDeploymentTypeIndex by finding the Title
-		$DestApplication.DeploymentTypes | ForEach-Object {
+		$DestApplication.DeploymentTypes.IndexOf($DestDeploymentTypeName)
+		<#$DestApplication.DeploymentTypes | ForEach-Object {
 			$i = 0
 		} {
 			If ($_.Title -eq "$DestDeploymentTypeName") {
@@ -652,7 +706,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			
 			}
 			$i++
-		}
+		}#>
     
 		# Get requirement rules from source application
 		$ProcessRequirementsList = $SourceApplication.DeploymentTypes[0].Installer.InstallProcessDetection.ProcessList[0]
@@ -874,6 +928,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					Pop-Location	
 				}
 				MSI {
+					Write-Host "MSI Deployment"
 					$DepTypeInstallationMSI = $DeploymentType.InstallationMSI
 					$DepTypeCommand = "Add-CMMsiDeploymentType -ApplicationName `"$DepTypeApplicationName`" -ContentLocation `"$DepTypeContentLocation\$DepTypeInstallationMSI`" -DeploymentTypeName `"$DepTypeDeploymentTypeName`""
 					$CmdSwitches = ""
@@ -982,18 +1037,47 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 						}
 					}
 					Pop-Location
+				}			
+				MSIX {
+					# SOON(TM)
 				}
 				Default {
 					$DepTypeReturn = $false
 				}
 			}
+
 		
-			## Add Requirements for Deployment Type if they exist
+			## Add LEGACY Requirements for Deployment Type if they exist
 			If (-not [System.String]::IsNullOrEmpty($DeploymentType.Requirements)) {
 				Add-LogContent "Adding Requirements to $DepTypeDeploymentTypeName"
 				$DepTypeRules = $DeploymentType.Requirements.RuleName
 				ForEach ($DepTypeRule In $DepTypeRules) {
 					Copy-CMDeploymentTypeRule -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -RuleName $DepTypeRule
+				}
+			}
+
+			## Add NEW Requirements for Deployment Type is Necessary
+			if (-not [System.String]::IsNullOrEmpty($DeploymentType.RequirementsRules)) {
+				Add-LogContent "Adding Requirements to $DepTypeDeploymentTypeName"
+				$DepTypeReqRules = $DeploymentType.RequirementsRules.RequirementsRule
+				ForEach ($DepTypeReqRule In $DepTypeReqRules) {
+					$addRequirementsRuleSplat = @{
+						ReqRuleApplicationName     = $DepTypeApplicationName
+						ReqRuleApplicationDTName   = $DepTypeDeploymentTypeName
+						ReqRuleValue               = $DepTypeReqRule.RequirementsRuleValue
+						ReqRuleType                = $DepTypeReqRule.RequirementsRuleType
+						ReqRuleGlobalConditionName = $DepTypeReqRule.RequirementsRuleGlobalCondition
+					}
+					
+					if ($DepTypeReqRule.RequirementsRuleOperator) {
+						$addRequirementsRuleSplat.Add("ReqRuleOperator", $DepTypeReqRule.RequirementsRuleOperator)
+					}
+
+					if ($DepTypeReqRule.RequirementsRuleValue2) {
+						$addRequirementsRuleSplat.Add("ReqRuleValue2", $DepTypeReqRule.ReqRuleValue2)
+					}
+
+					Add-RequirementsRule @addRequirementsRuleSplat
 				}
 			}
         
@@ -1002,7 +1086,14 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "Adding Install Behavior to $DepTypeDeploymentTypeName"
 				$DepTypeInstallBehaviorProcesses = $DeploymentType.InstallBehavior.InstallBehaviorProcess
 				ForEach ($DepTypeInstallBehavior In $DepTypeInstallBehaviorProcesses) {
-					New-CMDeploymentTypeProcessRequirement -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -ProcessRequirementDisplayName $DepTypeInstallBehavior.DisplayName -ProcessRequirementExecutable $DepTypeInstallBehavior.InstallBehaviorExe
+					$newCMDeploymentTypeProcessRequirementSplat = @{
+						ProcessRequirementDisplayName = $DepTypeInstallBehavior.DisplayName
+						DestApplicationName           = $DepTypeApplicationName
+						ProcessRequirementExecutable  = $DepTypeInstallBehavior.InstallBehaviorExe
+						DestDeploymentTypeName        = $DepTypeDeploymentTypeName
+						SourceApplicationName         = $RequirementsTemplateAppName
+					}
+					New-CMDeploymentTypeProcessRequirement @newCMDeploymentTypeProcessRequirementSplat
 				}
 			}
 		
