@@ -192,12 +192,22 @@
 			</Requirements>
 			<RequirementsRules>
 				<RequirementsRule>
+					<!-- RequirementsRuleType - [Existential/OperatingSystem/Value] - The type of Requirements rule for this application -->
 					<RequirementsRuleType></RequirementsRuleType>
-					<!--RequirementsRuleValue - The value/s for the requirements rule.-->
-					<RequirementsRuleValue></RequirementsRuleValue>
-					<RequirementsRuleGlobalCondition></RequirementsRuleGlobalCondition>
+					<!-- RequirementsRuleOperator - The Requirements Rule Operator, operators like OneOf will seperate values by "," -->
 					<RequirementsRuleOperator></RequirementsRuleOperator>
-					<RequirementsRuleValue2></RequirementsRuleValue2>
+					<!--RequirementsRuleValue - The value/s for the requirements rule, this includes the -->
+					<RequirementsRuleValue>
+						<RuleValue></RuleValue>
+						<RuleValue></RuleValue>
+						<RuleValue></RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleValue2>
+						<RuleValue></RuleValue>
+						<RuleValue></RuleValue>
+						<RuleValue></RuleValue>
+					</RequirementsRuleValue2>
+					<RequirementsRuleGlobalCondition></RequirementsRuleGlobalCondition>
 				</RequirementsRule>
 			</RequirementsRules>
 			<InstallBehavior>
@@ -330,3 +340,101 @@
 		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
 </ApplicationDef>
+
+
+
+<!-- LIST OF Available OSes for Requirements Rules
+Windows/All_x64_Windows_10_higher
+Windows/All_x86_Windows_10_higher
+Windows/All_Team_Windows_10_higher
+Windows/All_Holographic_Windows_10_higher
+Windows/All_Holographic_Enterprise_Windows_10_higher
+Windows/All_ARM64_Windows_10_higher
+Windows/All_Windows_Client_Server
+Windows/All_IA64_Windows_Server_2003_Non_R2
+Windows/All_IA64_Windows_Server_2008
+Windows/All_x64_Windows_Server_2016
+Windows/All_x64_Windows_Server_2016_and_higher
+Windows/All_x64_Windows_Server_2019_and_higher
+Windows/All_x64_Windows_7_Client
+Windows/All_x64_Windows_8_Client
+Windows/All_x64_Windows_8_and_higher_Client
+Windows/All_x64_Windows_8.1_Client
+Windows/All_x64_Windows_8.1_and_higher_Clients
+Windows/All_x64_Windows_8.1
+Windows/All_x64_Windows_10_and_higher_Clients
+Windows/All_x64_Windows_Server_2003_Non_R2
+Windows/All_x64_Windows_Server_2003_R2
+Windows/All_x64_Windows_Server_2008
+Windows/All_x64_Windows_Server_2008_R2
+Windows/All_x64_Windows_Server_8
+Windows/All_x64_Windows_Server_8_and_higher
+Windows/All_x64_Windows_Server_2012_R2
+Windows/All_x64_Windows_Server_2012_R2_and_higher
+Windows/All_Embedded_Windows_XP
+Windows/x64_Embedded_Windows_7
+Windows/x86_Embedded_Windows_7
+Windows/All_x86_Windows_Embedded_8_Standard
+Windows/All_x64_Windows_Embedded_8_Standard
+Windows/All_x86_Windows_Embedded_8_Industry
+Windows/All_x64_Windows_Embedded_8_Industry
+Windows/All_x86_Windows_Embedded_8.1_Industry
+Windows/All_x64_Windows_Embedded_8.1_Industry
+Windows/All_x64_Windows_Vista
+Windows/All_x64_Windows_XP_Professional
+Windows/All_x86_Windows_7_Client
+Windows/All_x86_Windows_8_Client
+Windows/All_x86_Windows_8_and_higher_Client
+Windows/All_x86_Windows_8.1_Client
+Windows/All_x86_Windows_8.1_and_higher_Clients
+Windows/All_x86_Windows_8.1
+Windows/All_x86_Windows_10_and_higher_Clients
+Windows/All_x86_Windows_Server_2003_Non_R2
+Windows/All_x86_Windows_Server_2003_R2
+Windows/All_x86_Windows_Server_2008
+Windows/All_x86_Windows_Vista
+Windows/All_x86_Windows_XP
+Windows/All_ARM_Windows_8_Client
+Windows/All_ARM_Windows_8.1_Client
+Windows/All_ARM_Windows_8.1
+Windows/All_Windows_RT
+Windows/IA64_Windows_Server_2003_SP1
+Windows/IA64_Windows_Server_2003_SP2
+Windows/IA64_Windows_Server_2008_original_release
+Windows/x64_Windows_Server_2003_R2_original_release_SP1
+Windows/x64_Windows_Server_2003_R2_SP2
+Windows/x64_Windows_Server_2003_SP1
+Windows/x64_Windows_Server_2003_SP2
+Windows/x64_Windows_Server_2008_original_release
+Windows/x64_Windows_Vista_Original_Release
+Windows/x64_Windows_Vista_SP1
+Windows/x64_Windows_XP_Professional_SP1
+Windows/x64_Windows_XP_Professional_SP2
+Windows/x86_Windows_Server_2003_R2_original_release_SP1
+Windows/x86_Windows_Server_2003_R2_SP2
+Windows/x86_Windows_Server_2003_SP1
+Windows/x86_Windows_Server_2003_SP2
+Windows/x86_Windows_Server_2008_original_release
+Windows/x86_Windows_Vista_Original_Release
+Windows/x86_Windows_Vista_SP1
+Windows/x86_Windows_XP_Professional_Service_Pack_2
+Windows/x86_Windows_XP_Professional_Service_Pack_3
+Windows/x86_Windows_7_Client
+Windows/x64_Windows_7_Client
+Windows/x86_Windows_7_SP1
+Windows/x64_Windows_7_SP1
+Windows/x64_Windows_Server_2008_R2
+Windows/x86_Windows_Vista_SP2
+Windows/x64_Windows_Vista_SP2
+Windows/x64_Windows_Server_2008_SP2
+Windows/x86_Windows_Server_2008_SP2
+Windows/IA64_Windows_Server_2008_SP2
+Windows/x64_Windows_Server_2008_R2_Core
+Windows/x64_Windows_Server_2008_R2_SP1
+Windows/x64_Windows_Server_2008_Core
+Windows/x86_Windows_Server_2008_Core
+Windows/All_x86_Windows_2000
+Windows/x86_Windows_2000_SP4
+Windows/x64_Windows_Server_2008_R2_SP1_Core
+Windows/x64_Windows_Server_2008_SP2_Core
+-->

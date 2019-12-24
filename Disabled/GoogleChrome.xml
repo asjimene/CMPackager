@@ -53,7 +53,9 @@
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
-					<RequirementsRuleValue>True</RequirementsRuleValue>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
 					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
 				</RequirementsRule>
 			</RequirementsRules>

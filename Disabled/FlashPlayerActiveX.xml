@@ -47,9 +47,16 @@ $ProductCode = $LatestFlash.ParentNode.MsiInstallerData.ProductCode</PrefetchScr
 			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
-			<Requirements>
-				<RuleName>Operating system None of</RuleName>
-			</Requirements>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>OperatingSystem</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>Windows/All_x64_Windows_10_and_higher_Clients</RuleValue>
+						<RuleValue>Windows/All_x86_Windows_10_and_higher_Clients</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleOperator>OneOf</RequirementsRuleOperator>
+				</RequirementsRule>
+			</RequirementsRules>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>

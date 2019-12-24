@@ -48,10 +48,22 @@
             <DetectionMethodType>CustomScript</DetectionMethodType>
             <ScriptLanguage>PowerShell</ScriptLanguage>
             <DetectionMethod>if ((get-module DellBIOSProvider -ListAvailable).Version -ge [version]"$Version"){write-Output "Installed"}</DetectionMethod>
-            <Requirements>
-                <RuleName>Existential of AutoPackage - OSArchitecture x64 Not Equal to 0</RuleName>
-                <RuleName>Existential of AutoPackage - DellBIOSProvider Prereq Check Not Equal to 0</RuleName>
-            </Requirements>
+            <RequirementsRules>
+                <RequirementsRule>
+                    <RequirementsRuleType>Existential</RequirementsRuleType>
+                    <RequirementsRuleValue>
+                        <RuleValue>True</RuleValue>
+                    </RequirementsRuleValue>
+                    <RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+                </RequirementsRule>
+                <RequirementsRule>
+                    <RequirementsRuleType>Existential</RequirementsRuleType>
+                    <RequirementsRuleValue>
+                        <RuleValue>True</RuleValue>
+                    </RequirementsRuleValue>
+                    <RequirementsRuleGlobalCondition>AutoPackage - DellBIOSProvider Prereq Check</RequirementsRuleGlobalCondition>
+                </RequirementsRule>
+            </RequirementsRules>
         </DeploymentType>
         <DeploymentType Name="DeploymentType2">
             <DeploymentTypeName>Dell Command Powershell Provider 32-bit</DeploymentTypeName>
@@ -71,9 +83,15 @@
             <DetectionMethodType>CustomScript</DetectionMethodType>
             <ScriptLanguage>PowerShell</ScriptLanguage>
             <DetectionMethod>if ((get-module DellBIOSProviderX86 -ListAvailable).Version -ge [version]"$Version"){write-Output "Installed"}</DetectionMethod>
-            <Requirements>
-                <RuleName>Existential of AutoPackage - DellBIOSProvider Prereq Check Not Equal to 0</RuleName>
-            </Requirements>
+            <RequirementsRules>
+                <RequirementsRule>
+                    <RequirementsRuleType>Existential</RequirementsRuleType>
+                    <RequirementsRuleValue>
+                        <RuleValue>True</RuleValue>
+                    </RequirementsRuleValue>
+                    <RequirementsRuleGlobalCondition>AutoPackage - DellBIOSProvider Prereq Check</RequirementsRuleGlobalCondition>
+                </RequirementsRule>
+            </RequirementsRules>
         </DeploymentType>
     </DeploymentTypes>
     <Distribution>

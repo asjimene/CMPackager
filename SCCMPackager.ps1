@@ -76,7 +76,6 @@ process {
 	$Global:SendEmail = $false
 	$Global:TemplateApplicationCreatedFlag = $false
 
-
 	$Global:OperatorsLookup = @{ And = 'And'; Or = 'Or'; Other = 'Other'; IsEquals = 'Equals'; NotEquals = 'Not equal to'; GreaterThan = 'Greater than'; LessThan = 'Less than'; Between = 'Between'; NotBetween = 'Not Between'; GreaterEquals = 'Greater than or equal to'; LessEquals = 'Less than or equal to'; BeginsWith = 'Begins with'; NotBeginsWith = 'Does not begin with'; EndsWith = 'Ends with'; NotEndsWith = 'Does not end with'; Contains = 'Contains'; NotContains = 'Does not contain'; AllOf = 'All of'; OneOf = 'OneOf'; NoneOf = 'NoneOf'; SetEquals = 'Set equals'; SubsetOf = 'Subset of'; ExcludesAll = 'Exludes all' }
 	## Functions
 	function Add-LogContent {
@@ -608,15 +607,15 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			[String]
 			$ReqRuleType,
 			[Parameter()]
-			[ValidateSet('And', 'Or', 'Other', 'IsEquals', 'NotEquals', 'GreaterThan', 'LessThan', 'Between', 'NotBetween', 'GreaterEquals', 'LessEquals', 'BeginsWith', 'NotBeginsWith', 'EndsWith', 'NotEndsWith', 'Contains', 'NotContains', 'AllOf', 'OneOf', 'NoneOf', 'SetEquals', 'SubsetOf', 'ExcludesAll')]
+			[ValidateSet( 'And', 'Or', 'Other', 'IsEquals', 'NotEquals', 'GreaterThan', 'LessThan', 'Between', 'NotBetween', 'GreaterEquals', 'LessEquals', 'BeginsWith', 'NotBeginsWith', 'EndsWith', 'NotEndsWith', 'Contains', 'NotContains', 'AllOf', 'OneOf', 'NoneOf', 'SetEquals', 'SubsetOf', 'ExcludesAll')]
 			$ReqRuleOperator,
 			[Parameter(Mandatory)]
-			[String]
+			[String[]]
 			$ReqRuleValue,
 			[Parameter()]
-			[String]
+			[String[]]
 			$ReqRuleValue2,
-			[Parameter(Mandatory)]
+			[Parameter()]
 			[String]
 			$ReqRuleGlobalConditionName,
 			[Parameter(Mandatory)]
@@ -626,49 +625,64 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			[String]
 			$ReqRuleApplicationDTName
 		)
-
+		
 		Push-Location
 		Set-Location $Global:SCCMSite
-		Write-Output "`"$ReqRuleType of $ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValue`" is being added"
-		$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
+		Write-Host "`"$ReqRuleType of $ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValue`" is being added"
 
-		$ReqRuleValueName = $ReqRuleValue
-		if (($ReqRuleOperator -eq 'Oneof') -or ($ReqRuleOperator -eq 'Noneof') -or ($ReqRuleOperator -eq 'Allof') -or ($ReqRuleOperator -eq 'Subsetof') -or ($ReqRuleOperator -eq 'ExcludesAll') -or ($ReqRuleType -eq 'OperatingSystem')) {
-			# These should be array values seperated by commas
-			$ReqRuleVal = @()
-			$ReqRuleVal = $ReqRuleValue.Split(", ")
-			$ReqRuleValueName = "{ $($ReqRuleVal -join ", ") }"
+		if (-not ([System.String]::IsNullOrEmpty($ReqRuleValue))) {
+			$ReqRuleValueName = $ReqRuleValue
+			#if (($ReqRuleOperator -eq 'Oneof') -or ($ReqRuleOperator -eq 'Noneof') -or ($ReqRuleOperator -eq 'Allof') -or ($ReqRuleOperator -eq 'Subsetof') -or ($ReqRuleOperator -eq 'ExcludesAll')) {
+			if ($ReqRuleValue[1]) {
+				$ReqRuleVal = $ReqRuleValue
+				$ReqRuleValueName = "{ $($ReqRuleVal -join ", ") }"
+			}
+			if ([system.string]::IsNullOrEmpty($ReqRuleVal)) {
+				$ReqRuleVal = $ReqRuleValue[0]
+			}
 		}
-		if ([system.string]::IsNullOrEmpty($ReqRuleVal)) {
-			$ReqRuleVal = $ReqRuleValue
+		
+		if (-not ([System.String]::IsNullOrEmpty($ReqRuleValue2))) {
+			if ($ReqRuleValue2[1]) {
+				$ReqRuleVal2 = $ReqRuleValue2
+				$ReqRuleValue2Name = "{ $($ReqRuleVal2 -join ", ") }"
+			}
+			if ([system.string]::IsNullOrEmpty($ReqRuleVal)) {
+				$ReqRuleVal2 = $ReqRuleValue2[0]
+			}
 		}
 
 		switch ($ReqRuleType) {
 			Existential {
-				if ([System.Convert]::ToBoolean($ReqRuleValue)) {
-					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($ReqRuleVal))
+				Add-LogContent "Existential Rule $ReqRuleVal"
+				$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
+				if ([System.Convert]::ToBoolean($ReqRuleVal)) {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($($ReqRuleVal | Select-object -first 1)))
 					$rule.Name = "Existential of $ReqRuleGlobalConditionName Not equal to 0"
 				}
 				else {
-					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($ReqRuleVal))
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($($ReqRuleVal | Select-Object -first 1)))
 					$rule.Name = "Existential of $ReqRuleGlobalConditionName Equals 0"
 				}
 			}
 			OperatingSystem {
+				Add-LogContent "Operating System $ReqRuleOperator `"$ReqruleVal`""
 				# Only supporting Windows Operating Systems at this time
 				$GlobalCondition = Get-CMGlobalCondition -name "Operating System" | Where-Object PlatformType -eq 1
 				$rule = $GlobalCondition | New-CMRequirementRuleOperatingSystemValue -RuleOperator $ReqRuleOperator -PlatformStrings $ReqRuleVal
-				$rule.Name = "$ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValueName"
+				$rule.Name = "Operating System $Global:OperatorsLookup $ReqRuleValueName"
 			}
 			Default {
 				# DEFAULT TO VALUE
+				Add-LogContent "Value $ReqRuleOperator `"$ReqRuleVal`""
+				$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
 				if ([System.String]::IsNullOrEmpty($ReqRuleValue2)) {
 					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator
 					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName"
 				}
 				else {
-					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator -Value2 $ReqRuleValue2
-					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName"
+					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator -Value2 $ReqRuleVal2
+					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName $ReqRuleValue2Name"
 				}
 			}
 		}
@@ -772,8 +786,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$stDepTypeSlowNetworkDeploymentMode = $DeploymentType.OnSlowNetwork
 		
 			# Programs
-			$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
-			$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
+			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.InstallProgram))) {
+				$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
+			}
+			#$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.UninstallCmd))) {
 				$stDepTypeUninstallationProgram = ($stDepTypeUninstallationProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			}
@@ -1062,21 +1078,24 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$DepTypeReqRules = $DeploymentType.RequirementsRules.RequirementsRule
 				ForEach ($DepTypeReqRule In $DepTypeReqRules) {
 					$addRequirementsRuleSplat = @{
-						ReqRuleApplicationName     = $DepTypeApplicationName
-						ReqRuleApplicationDTName   = $DepTypeDeploymentTypeName
-						ReqRuleValue               = $DepTypeReqRule.RequirementsRuleValue
-						ReqRuleType                = $DepTypeReqRule.RequirementsRuleType
-						ReqRuleGlobalConditionName = $DepTypeReqRule.RequirementsRuleGlobalCondition
+						ReqRuleApplicationName   = $DepTypeApplicationName
+						ReqRuleApplicationDTName = $DepTypeDeploymentTypeName
+						ReqRuleValue             = @($DepTypeReqRule.RequirementsRuleValue.RuleValue)
+						ReqRuleType              = $DepTypeReqRule.RequirementsRuleType
 					}
 					
-					if ($DepTypeReqRule.RequirementsRuleOperator) {
+					if (-not ([system.string]::IsNullOrEmpty($DepTypeReqRule.RequirementsRuleGlobalCondition))) {
+						$addRequirementsRuleSplat.Add("ReqRuleGlobalConditionName", $DepTypeReqRule.RequirementsRuleGlobalCondition)
+					}
+
+					if (-not ([system.string]::IsNullOrEmpty($DepTypeReqRule.RequirementsRuleOperator))) {
 						$addRequirementsRuleSplat.Add("ReqRuleOperator", $DepTypeReqRule.RequirementsRuleOperator)
 					}
 
-					if ($DepTypeReqRule.RequirementsRuleValue2) {
-						$addRequirementsRuleSplat.Add("ReqRuleValue2", $DepTypeReqRule.ReqRuleValue2)
+					if (-not ([system.string]::IsNullOrEmpty($DepTypeReqRule.RequirementsRuleValue2))) {
+						$addRequirementsRuleSplat.Add("ReqRuleValue2", $DepTypeReqRule.ReqRuleValue2.RuleValue)
 					}
-
+					Write-Output "Add-RequirementsRule $addRequirementsRuleSplat"
 					Add-RequirementsRule @addRequirementsRuleSplat
 				}
 			}
