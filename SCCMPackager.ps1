@@ -275,6 +275,32 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 	}
 
+	function Invoke-VersionCheck {
+				## Contact SCCM and determine if the Application Version is New
+				[CmdletBinding()]
+				param (
+					[Parameter()]
+					[String]
+					$ApplciationName,
+					[Parameter()]
+					[String]
+					$ApplciationSWVersion
+				)
+
+				Push-Location
+				Set-Location $Global:SCCMSite
+				If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
+					$newApp = $true			
+					Add-LogContent "$ApplicationSWVersion is a new Version"
+				}
+				Else {
+					$newApp = $false
+					Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
+				}
+				Pop-Location
+				Write-Output $newApp
+	}
+
 	Function Start-ApplicationDownload {
 		Param (
 			$Recipe
@@ -296,9 +322,14 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			If (-not ([String]::IsNullOrEmpty($PrefetchScript))) {
 				Invoke-Expression $PrefetchScript | Out-Null
 			}
-		
+
+			if (-not ([System.String]::IsNullOrEmpty($Version))) {
+				## Version Check after prefetch script (skip download if possible)
+				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
+			}
+
 			## Download the Application
-			If (-not ([String]::IsNullOrEmpty($URL))) {
+			If ((-not ([String]::IsNullOrEmpty($URL))) -and (-not $newapp)) {
 				Add-LogContent "Downloading $ApplicationName from $URL"
 				$ProgressPreference = 'SilentlyContinue'
 				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
@@ -306,7 +337,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "Completed Downloading $ApplicationName"
 			}
 			else {
-				Add-LogContent "URL Not Specified, Skipping Download"
+				if (-not $newApp) {
+					Add-LogContent "$Version was not found in ConfigMgr, must be a new version"
+				} else {
+					Add-LogContent "URL Not Specified, Skipping Download"
+				}
 			}
 
 		
@@ -328,7 +363,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				}
 			}
 		
-			## Contact SCCM and determine if the Application Version is New
+			$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion $ApplicationSWVersion
+			<### Contact SCCM and determine if the Application Version is New
 			Push-Location
 			Set-Location $Global:SCCMSite
 			If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
@@ -340,7 +376,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
 			}
 			Pop-Location
-		
+		#>
 		
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
@@ -546,17 +582,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
 	
 		# Get DestDeploymentTypeIndex by finding the Title
-		$DestApplication.DeploymentTypes.IndexOf($DestDeploymentTypeName)
-		<#$DestApplication.DeploymentTypes | ForEach-Object {
-			$i = 0
-		} {
-			If ($_.Title -eq "$DestDeploymentTypeName") {
-				$DestDeploymentTypeIndex = $i
-				Write-Output $DestDeploymentTypeIndex
-			
-			}
-			$i = $i + 1
-		}#>
+		$DestDeploymentTypeIndex = $DestApplication.DeploymentTypes.Title.IndexOf($DestDeploymentTypeName)
     
 		$Available = ($SourceApplication.DeploymentTypes[0].Requirements).Name
 		Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join ', ')"
@@ -692,15 +718,46 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Pop-Location
 	}
 
+
+	Function Add-CMDeploymentTypeProcessDetection {
+		# Creates a Deployment Type Process Detection "Install Behavior tab in Deployment types".
+		Param (
+			[System.String]$DestApplicationName,
+			[System.String]$DestDeploymentTypeName,
+			[System.String]$ProcessDetectionDisplayName,
+			[System.String]$ProcessDetectionExecutable
+		)
+		Push-Location
+		Set-Location $SCCMSite
+		$DestDeploymentTypeIndex = 0
+ 
+		# get the applications
+		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
+	
+		# Get DestDeploymentTypeIndex by finding the Title
+		$DestDeploymentTypeIndex = $DestApplication.DeploymentTypes.Title.IndexOf($DestDeploymentTypeName)
+    
+		# Create Process Detection and set variables
+		$ProcessInfo = [Microsoft.ConfigurationManagement.ApplicationManagement.ProcessInformation]::new()
+		$ProcessInfo.DisplayInfo.Add(@{"DisplayName" = $ProcessDetectionDisplayName; Language = $NULL })
+		$ProcessInfo.Name = $ProcessDetectionExecutable
+ 
+		# push changes
+		$DestApplication.DeploymentTypes[$DestDeploymentTypeIndex].Installer.InstallProcessDetection.ProcessList.Add($ProcessInfo)
+		$CMApplication = ConvertFrom-CMApplication -Application $DestApplication
+		$CMApplication.Put()
+		Pop-Location
+	}
+
 	Function New-CMDeploymentTypeProcessRequirement {
 		# Creates a Deployment Type Process Requirement "Install Behavior tab in Deployment types" by copying an existing Process Requirement.
-		# A Process requirement needs to be Defined in the "Install Behavior" Tab of the "SourceApplicationName" Variable before this script will function properly
+		#>
 		Param (
 			[System.String]$SourceApplicationName,
 			[System.String]$DestApplicationName,
 			[System.String]$DestDeploymentTypeName,
-			[System.String]$ProcessRequirementDisplayName,
-			[System.String]$ProcessRequirementExecutable
+			[System.String]$ProcessDetectionDisplayName,
+			[System.String]$ProcessDetectionExecutable
 		)
 		Push-Location
 		Set-Location $SCCMSite
@@ -711,23 +768,14 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
 	
 		# Get DestDeploymentTypeIndex by finding the Title
-		$DestApplication.DeploymentTypes.IndexOf($DestDeploymentTypeName)
-		<#$DestApplication.DeploymentTypes | ForEach-Object {
-			$i = 0
-		} {
-			If ($_.Title -eq "$DestDeploymentTypeName") {
-				$DestDeploymentTypeIndex = $i
-			
-			}
-			$i++
-		}#>
+		$DestDeploymentTypeIndex = $DestApplication.DeploymentTypes.Title.IndexOf($DestDeploymentTypeName)
     
 		# Get requirement rules from source application
 		$ProcessRequirementsList = $SourceApplication.DeploymentTypes[0].Installer.InstallProcessDetection.ProcessList[0]
 		$ProcessRequirementsList
 		if (-not ([System.String]::IsNullOrEmpty($ProcessRequirementsList))) {
-			$ProcessRequirementsList.Name = $ProcessRequirementExecutable
-			$ProcessRequirementsList.DisplayInfo[0].DisplayName = $ProcessRequirementDisplayName
+			$ProcessRequirementsList.Name = $ProcessDetectionExecutable
+			$ProcessRequirementsList.DisplayInfo[0].DisplayName = $ProcessDetectionDisplayName
 			$ProcessRequirementsList
 			$DestApplication.DeploymentTypes[$DestDeploymentTypeIndex].Installer.InstallProcessDetection.ProcessList.Add($ProcessRequirementsList)
 		}
@@ -1106,13 +1154,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$DepTypeInstallBehaviorProcesses = $DeploymentType.InstallBehavior.InstallBehaviorProcess
 				ForEach ($DepTypeInstallBehavior In $DepTypeInstallBehaviorProcesses) {
 					$newCMDeploymentTypeProcessRequirementSplat = @{
-						ProcessRequirementDisplayName = $DepTypeInstallBehavior.DisplayName
+						ProcessDetectionDisplayName = $DepTypeInstallBehavior.DisplayName
 						DestApplicationName           = $DepTypeApplicationName
-						ProcessRequirementExecutable  = $DepTypeInstallBehavior.InstallBehaviorExe
+						ProcessDetectionExecutable  = $DepTypeInstallBehavior.InstallBehaviorExe
 						DestDeploymentTypeName        = $DepTypeDeploymentTypeName
-						SourceApplicationName         = $RequirementsTemplateAppName
 					}
-					New-CMDeploymentTypeProcessRequirement @newCMDeploymentTypeProcessRequirementSplat
+					Add-CMDeploymentTypeProcessDetection @newCMDeploymentTypeProcessRequirementSplat
 				}
 			}
 		
