@@ -191,16 +191,19 @@ foreach ($Values in ($Plist.Products.Values | where { $_.ServerMetadataURL -like
         $BootCampInstallers += $AppleBootCampInstaller
     }
 }
-Add-LogContent "There are $($BootCampInstallers.Count) Boot Camp Installers that need to be packaged"
-$BootCampInstallers = $BootCampInstallers | sort-object -Property PostDate,SupportedModels -Descending
-$BootCampDate =$BootCampInstallers[0].PostDate.ToString("yyyyMMdd")
+$BootCampInstallers = $BootCampInstallers | sort-object -Property PostDate, SupportedModels -Descending
+$ReqBootCampInstallers = @()
+foreach ($RequestedModel in $QueryResults) {
+    $ReqBootCampInstallers += $BootCampInstallers | Where-Object -Property SupportedModels -Contains $RequestedModel | Select-Object -First 1
+}
+$ReqBootCampInstallers = $ReqBootCampInstallers | Sort-Object -Property PostDate, SupportedModels -Descending
+Add-LogContent "There are $($ReqBootCampInstallers.Count) Boot Camp Installers that need to be packaged"
+Add-Logcontent "Packaging: $($ReqBootCampInstallers -join ", ")"
 
-
-$AppTemplate = (Get-Content "$PSScriptRoot\AppleDriverRecipeTemplate.txt")
-[xml]$AppRecipe = $AppTemplate
+$BootCampDate = $ReqBootCampInstallers[0].PostDate.ToString("yyyyMMdd")
 
 ## Generate the Recipe
-foreach ($Installer in $BootCampInstallers) {
+foreach ($Installer in $ReqBootCampInstallers) {
     Write-Output "Processing Drivers for $($Installer.BootCampIdentifier))"
     # Clone New Download Node with appropriate Windows Version
     $NewDownload = $AppRecipe.ApplicationDef.Downloads.FirstChild.Clone()
@@ -208,7 +211,7 @@ foreach ($Installer in $BootCampInstallers) {
     $NewDownload.URL = ($NewDownload.URL).Replace('%DOWNLOADLINK%', $Installer.OriginalDownloadLocation)
     $NewDownload.DownloadFileName = ($NewDownload.DownloadFileName).Replace('%BCIDENTIFIER%', $Installer.BootCampIdentifier)
     $NewDownload.DownloadVersionCheck = ($NewDownload.DownloadVersionCheck).Replace('%LATESTBCDATE%',$BootCampDate)
-    if ($BootCampInstallers.IndexOf($Installer) -ne 0) {
+    if ($ReqBootCampInstallers.IndexOf($Installer) -ne 0) {
         $NewDownload.DownloadVersionCheck = "#No Version Check for older Versions"
     }
     $NewDownload.AppRepoFolder = ($NewDownload.AppRepoFolder).Replace('%BCIDENTIFIER%', $Installer.BootCampIdentifier)
@@ -220,13 +223,17 @@ foreach ($Installer in $BootCampInstallers) {
     $NewDeploymentType.Name = $Installer.BootCampIdentifier
     $NewDeploymentType.DeploymentTypeName = $Installer.BootCampIdentifier
     $NewDeploymentType.Comments = ($NewDeploymentType.Comments).Replace('%BCIDENTIFIER%', $Installer.BootCampIdentifier).Replace('%SUPPORTEDMODELS%', $($Installer.SupportedModels -join ", "))
-    #$NewDeploymentType.InstallProgram = ($NewDeploymentType.InstallProgram).Replace('%WINVER%', $WindowsVersion)
-    #$NewDeploymentType.InstallationMSI = ($NewDeploymentType.InstallationMSI).Replace('%WINVER%', $WindowsVersion)
-    $NewDeploymentType.Requirements.LastChild."#text" = ($NewDeploymentType.Requirements.LastChild."#text").Replace('%MODELS%', $($Installer.SupportedModels -join ", "))
+    
+    foreach ($Value in $Installer.SupportedModels) {
+        $NewValue = $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.FirstChild.clone()
+        $NewValue.'#text' = $Value
+        $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.AppendChild($NewValue) | Out-Null
+    }
+    $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.RemoveChild($NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.FirstChild)
     $AppRecipe.ApplicationDef.DeploymentTypes.AppendChild($NewDeploymentType) | Out-Null
         
 
-
+    <# Updating the Template app is no longer required :)
     Push-Location
     Set-Location $Global:SCCMSite
     if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
@@ -242,7 +249,7 @@ foreach ($Installer in $BootCampInstallers) {
         }
     }
     Pop-Location
-
+#>
 }
 
 # Remove the Template Nodes and Save the Final Result
@@ -253,4 +260,3 @@ $AppRecipe.ApplicationDef.DeploymentTypes.RemoveChild($AppRecipe.ApplicationDef.
 Start-Sleep 1
 Add-LogContent "Saving AppleBootCampDrivers.xml"
 $AppRecipe.Save("$ScriptRoot\Recipes\AppleBootCampDrivers.xml")
-Pause
