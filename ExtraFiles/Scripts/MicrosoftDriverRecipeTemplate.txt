@@ -29,7 +29,6 @@
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>msiexec /i `"%MODELSHORTNAME%_%WINVER%.msi`" /qn /norestart</InstallProgram>
 			<InstallationMSI>%MODELSHORTNAME%_%WINVER%.msi</InstallationMSI>
-			<UninstallCmd></UninstallCmd>
 			<Force32bit>False</Force32bit>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -39,11 +38,32 @@
 			<MaxRuntimeMins>45</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
-			<Requirements>
-				<RuleName>AutoPackage - Computer Manufacturer Equals Microsoft Corporation</RuleName>
-				<RuleName>AutoPackage - Computer Model Equals %MODEL%</RuleName>
-				<RuleName>AutoPackage - Windows 10 Build Number Integer Greater than or equal to %WINVER%</RuleName>
-			</Requirements>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleGlobalCondition></RequirementsRuleGlobalCondition>
+					<RequirementsRuleType>Value</RequirementsRuleType>
+					<RequirementsRuleOperator>OneOf</RequirementsRuleOperator>
+					<RequirementsRuleValue>
+						<RuleValue>%MODEL%</RuleValue>
+					</RequirementsRuleValue>
+				</RequirementsRule>
+				<RequirementsRule>
+					<RequirementsRuleGlobalCondition>AutoPackage - Computer Manufacturer</RequirementsRuleGlobalCondition>
+					<RequirementsRuleType>Value</RequirementsRuleType>
+					<RequirementsRuleOperator>IsEquals</RequirementsRuleOperator>
+					<RequirementsRuleValue>
+						<RuleValue>Microsoft Corporation</RuleValue>
+					</RequirementsRuleValue>
+				</RequirementsRule>
+				<RequirementsRule>
+					<RequirementsRuleGlobalCondition>AutoPackage - Windows 10 Build Number Integer</RequirementsRuleGlobalCondition>
+					<RequirementsRuleType>Value</RequirementsRuleType>
+					<RequirementsRuleOperator>GreaterEquals</RequirementsRuleOperator>
+					<RequirementsRuleValue>
+						<RuleValue>%WINVER%</RuleValue>
+					</RequirementsRuleValue>
+				</RequirementsRule>
+			</RequirementsRules>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
