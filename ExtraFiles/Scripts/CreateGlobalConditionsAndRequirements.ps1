@@ -1,8 +1,3 @@
-$Windows10Versions = "10586","14393","15063","16299","17134","17763","18362"
-$ModelQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").ModelName
-$SystemSKUQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").SystemSKU
-$ManufacturerQueries = "Microsoft Corporation"
-
 $BIOSProvScript = '$Make = (Get-WmiObject Win32_ComputerSystem).Manufacturer
 $Family = (Get-WmiObject Win32_ComputerSystem).Model
 $SMBIOS = "$((Get-WmiObject Win32_BIOS).SMBIOSMajorVersion).$((Get-WmiObject Win32_BIOS).SMBIOSMinorVersion)"
@@ -58,6 +53,14 @@ if (-not (Get-CMGlobalCondition -Name "AutoPackage - OSArchitecture x64")) {
 if (-not (Get-CMGlobalCondition -Name "AutoPackage - DellBIOSProvider Prereq Check")) {
     New-CMGlobalConditionScript -DataType Boolean -ScriptLanguage PowerShell -ScriptText $BIOSProvScript -Name "AutoPackage - DellBIOSProvider Prereq Check" -Description $BIOSProvDescription
 }
+
+
+<# THE APPLICTIONS REQUIREMENTS TEMPLATE IS NO LONGER NEEDED, CODE IS DISABLED
+
+#$Windows10Versions = "10586","14393","15063","16299","17134","17763","18362"
+#$ModelQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").ModelName
+#$SystemSKUQueries = (Import-CSV "$PSScriptRoot\MicrosoftDrivers.csv").SystemSKU
+#$ManufacturerQueries = "Microsoft Corporation"
 
 # Only add the Requirements if the Application Already Exists
 if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
@@ -142,6 +145,6 @@ if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
 } Else {
     Add-LogContent "WARN: The Requirements Application is being created, please run the SCCMPackager again to finish prerequisite setup and begin packaging software."
     $Global:TemplateApplicationCreatedFlag = $true
-}
+}#>
 
 Pop-Location
