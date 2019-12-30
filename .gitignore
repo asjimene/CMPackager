@@ -1,2 +1,8 @@
 
 ExtraFiles/Scripts/AppleSUCatalog.sucatalog
+
+# Ignore Recipes Folder
+Recipes/*
+
+# Except for the Template.xml
+!Recipes/Template.xml
