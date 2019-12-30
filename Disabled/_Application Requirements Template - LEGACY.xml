@@ -1,7 +1,7 @@
 <ApplicationDef>
 	<Application>
 		<Name>Application Requirements Template</Name>
-		<Description>Template Used for SCCM Application Packager, Used as a template for Requirements Rules, Rules are Copied from this Application, the Application does nothing</Description>
+		<Description>LEGACY - Template Used for SCCM Application Packager, Used as a template for Requirements Rules, Rules are Copied from this Application, the Application does nothing</Description>
 		<Publisher></Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://github.com/asjimene/SCCM-Application-Packager</UserDocumentation>

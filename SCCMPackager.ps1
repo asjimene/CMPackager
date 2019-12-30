@@ -2,7 +2,7 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  12/19/2019
+	 Last Updated:  12/31/2019
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	SCCMPackager.ps1
 	===========================================================================
@@ -35,7 +35,7 @@ DynamicParam {
 }
 process {
 
-	$Global:ScriptVersion = "19.12.19.0"
+	$Global:ScriptVersion = "19.12.31.0"
 
 	$Global:ScriptRoot = $PSScriptRoot
 
@@ -276,29 +276,29 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	}
 
 	function Invoke-VersionCheck {
-				## Contact SCCM and determine if the Application Version is New
-				[CmdletBinding()]
-				param (
-					[Parameter()]
-					[String]
-					$ApplciationName,
-					[Parameter()]
-					[String]
-					$ApplciationSWVersion
-				)
+		## Contact SCCM and determine if the Application Version is New
+		[CmdletBinding()]
+		param (
+			[Parameter()]
+			[String]
+			$ApplciationName,
+			[Parameter()]
+			[String]
+			$ApplciationSWVersion
+		)
 
-				Push-Location
-				Set-Location $Global:SCCMSite
-				If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
-					$newApp = $true			
-					Add-LogContent "$ApplicationSWVersion is a new Version"
-				}
-				Else {
-					$newApp = $false
-					Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
-				}
-				Pop-Location
-				Write-Output $newApp
+		Push-Location
+		Set-Location $Global:SCCMSite
+		If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
+			$newApp = $true			
+			Add-LogContent "$ApplicationSWVersion is a new Version"
+		}
+		Else {
+			$newApp = $false
+			Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
+		}
+		Pop-Location
+		Write-Output $newApp
 	}
 
 	Function Start-ApplicationDownload {
@@ -339,7 +339,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			else {
 				if (-not $newApp) {
 					Add-LogContent "$Version was not found in ConfigMgr, must be a new version"
-				} else {
+				}
+				else {
 					Add-LogContent "URL Not Specified, Skipping Download"
 				}
 			}
@@ -751,7 +752,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 
 	Function New-CMDeploymentTypeProcessRequirement {
 		# Creates a Deployment Type Process Requirement "Install Behavior tab in Deployment types" by copying an existing Process Requirement.
-		#>
+		# LEGACY
 		Param (
 			[System.String]$SourceApplicationName,
 			[System.String]$DestApplicationName,
@@ -1155,9 +1156,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				ForEach ($DepTypeInstallBehavior In $DepTypeInstallBehaviorProcesses) {
 					$newCMDeploymentTypeProcessRequirementSplat = @{
 						ProcessDetectionDisplayName = $DepTypeInstallBehavior.DisplayName
-						DestApplicationName           = $DepTypeApplicationName
+						DestApplicationName         = $DepTypeApplicationName
 						ProcessDetectionExecutable  = $DepTypeInstallBehavior.InstallBehaviorExe
-						DestDeploymentTypeName        = $DepTypeDeploymentTypeName
+						DestDeploymentTypeName      = $DepTypeDeploymentTypeName
 					}
 					Add-CMDeploymentTypeProcessDetection @newCMDeploymentTypeProcessRequirementSplat
 				}
@@ -1316,7 +1317,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	}
 
 
-
 	################################### MAIN ########################################
 	## Startup
 	Add-LogContent "--- Starting SCCM AutoPackager Version $($Global:ScriptVersion) ---" -Load
@@ -1353,6 +1353,33 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	## Allow all Cookies to download (Prevents Script from Freezing)
 	Add-LogContent "Allowing All Cookies to Download (This prevents the script from freezing on a download)"
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /t REG_DWORD /v 1A10 /f /d 0
+
+	## Create Global Conditions as defined in GlobalConditions.xml
+	$GlobalConditionsXML = (([xml](Get-Content "$ScriptRoot\GlobalConditions.xml")).GlobalConditions.GlobalCondition | Where-Object Name -NE "Template" )
+	Foreach ($GlobalCondition in $GlobalConditionsXML) {
+		$NewGCArguments = @{ }
+		$GlobalCondition.ChildNodes | ForEach-Object { if ($_.Name -ne "GCType") { $NewGCArguments[$_.Name] = $_.'#text' } }
+		Push-Location
+		Set-Location $Global:SCCMSite
+		if (-not (Get-CMGlobalCondition -Name $GlobalCondition.Name)) {
+			switch ($GlobalCondition.GCType) {	
+				WqlQuery { 
+					Add-LogContent "Creating New WQL Global Condition"
+					Add-LogContent "New-CMGlobalConditionWqlQuery $NewGCArguments"
+					New-CMGlobalConditionWqlQuery @NewGCArguments
+				}
+				Script { 
+					Add-LogContent "Creating New Script Global Condition"
+					Add-LogContent "New-CMGlobalConditionScript $NewGCArguments"
+					New-CMGlobalConditionScript @NewGCArguments
+				}
+				Default {
+					Add-LogContent "ERROR: Please specify a valid Global Condition Type of either WqlQuery or Script"
+				}
+			}
+		}
+		Pop-Location
+	}
 
 	## Get the Recipes
 	$RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
@@ -1398,7 +1425,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
 		}
 		if ($Global:TemplateApplicationCreatedFlag -eq $true) {
-			Add-LogContent "WARN: The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the SCCMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
+			Add-LogContent "WARN (LEGACY): The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the SCCMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
+			Add-LogContent "THE REQUIREMENTS TEMPLATE APPLICTION IS NO LONGER NEEDED"
 			Exit 0
 		}
 	}
