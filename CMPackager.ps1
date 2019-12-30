@@ -296,7 +296,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Else {
 			$newApp = $false
 			Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
-		}
+        }
+        
+        # If SkipPackaging is specified, return that the app is up-to-date.
+        if ($ApplicationSWVersion -eq "SkipPackaging") {
+            $newApp = $false
+        }
+
 		Pop-Location
 		Write-Output $newApp
 	}
