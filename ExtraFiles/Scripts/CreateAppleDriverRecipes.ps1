@@ -191,19 +191,22 @@ foreach ($Values in ($Plist.Products.Values | Where-Object { $_.ServerMetadataUR
         $BootCampInstallers += $AppleBootCampInstaller
     }
 }
-$BootCampInstallers = $BootCampInstallers | sort-object -Property PostDate, SupportedModels -Descending
-$ReqBootCampInstallers = @()
-foreach ($RequestedModel in $QueryResults) {
-    $ReqBootCampInstallers += $BootCampInstallers | Where-Object -Property SupportedModels -Contains $RequestedModel | Select-Object -First 1
-}
-$ReqBootCampInstallers = $ReqBootCampInstallers | Sort-Object -Property PostDate, SupportedModels -Descending
-Add-LogContent "There are $($ReqBootCampInstallers.Count) Boot Camp Installers that need to be packaged"
-Add-Logcontent "Packaging: $($ReqBootCampInstallers -join ", ")"
+$BootCampInstallers = $BootCampInstallers | sort-object -Property PostDate, SupportedModels -Descending -Unique
+#$ReqBootCampInstallers = @()
+#foreach ($RequestedModel in $QueryResults) {
+#    $ReqBootCampInstallers += $BootCampInstaller | Where-Object -Property SupportedModels -Contains $RequestedModel | Select-Object -First 1
+#}
+#$ReqBootCampInstallers = $BootCampInstallers |Sort-Object -Property PostDate, SupportedModels -Descending -Unique
+Add-LogContent "There are $($BootCampInstallers.Count) Boot Camp Installers that need to be packaged"
+Add-Logcontent "Packaging: $($BootCampInstallers.BootCampIdentifier -join ", ")"
 
-$BootCampDate = $ReqBootCampInstallers[0].PostDate.ToString("yyyyMMdd")
+$BootCampDate = $BootCampInstallers[0].PostDate.ToString("yyyyMMdd")
+
+$AppTemplate = (Get-Content "$PSScriptRoot\AppleDriverRecipeTemplate.txt")
+[xml]$AppRecipe = $AppTemplate
 
 ## Generate the Recipe
-foreach ($Installer in $ReqBootCampInstallers) {
+foreach ($Installer in $BootCampInstallers) {
     Write-Output "Processing Drivers for $($Installer.BootCampIdentifier))"
     # Clone New Download Node with appropriate Windows Version
     $NewDownload = $AppRecipe.ApplicationDef.Downloads.FirstChild.Clone()
@@ -211,7 +214,7 @@ foreach ($Installer in $ReqBootCampInstallers) {
     $NewDownload.URL = ($NewDownload.URL).Replace('%DOWNLOADLINK%', $Installer.OriginalDownloadLocation)
     $NewDownload.DownloadFileName = ($NewDownload.DownloadFileName).Replace('%BCIDENTIFIER%', $Installer.BootCampIdentifier)
     $NewDownload.DownloadVersionCheck = ($NewDownload.DownloadVersionCheck).Replace('%LATESTBCDATE%',$BootCampDate)
-    if ($ReqBootCampInstallers.IndexOf($Installer) -ne 0) {
+    if ($BootCampInstallers.IndexOf($Installer) -ne 0) {
         $NewDownload.DownloadVersionCheck = "#No Version Check for older Versions"
     }
     $NewDownload.AppRepoFolder = ($NewDownload.AppRepoFolder).Replace('%BCIDENTIFIER%', $Installer.BootCampIdentifier)
