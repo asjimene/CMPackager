@@ -330,8 +330,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			}
 
 			if (-not ([System.String]::IsNullOrEmpty($Version))) {
-				## Version Check after prefetch script (skip download if possible)
-				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
+                ## Version Check after prefetch script (skip download if possible)
+                ## This was not working well. Will revisit later
+                #$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
+                $newApp = $true
 			} else {
 				$newApp = $true
 			}
@@ -375,19 +377,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			}
 		
 			$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion $ApplicationSWVersion
-			<### Contact CM and determine if the Application Version is New
-			Push-Location
-			Set-Location $Global:CMSite
-			If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
-				$newApp = $true			
-				Add-LogContent "$ApplicationSWVersion is a new Version"
-			}
-			Else {
-				$newApp = $false
-				Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
-			}
-			Pop-Location
-		#>
 		
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
