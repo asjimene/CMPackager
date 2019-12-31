@@ -322,9 +322,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$DownloadFile = "$TempDir\$DownloadFileName"
 			$AppRepoFolder = $Download.AppRepoFolder
 			$ExtraCopyFunctions = $Download.ExtraCopyFunctions
-			
-			# Reset the version so that multiple DeploymentTypes may be downloaded
-			$Version = $null
 
 			## Run the prefetch script if it exists
 			$PrefetchScript = $Download.PrefetchScript
@@ -335,10 +332,14 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			if (-not ([System.String]::IsNullOrEmpty($Version))) {
 				## Version Check after prefetch script (skip download if possible)
 				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
+			} else {
+				$newApp = $true
 			}
+			
+			Add-LogContent "Version Check after prefetch script is $newapp"
 
 			## Download the Application
-			If ((-not ([String]::IsNullOrEmpty($URL))) -and (-not $newapp)) {
+			If ((-not ([String]::IsNullOrEmpty($URL))) -and ($newapp)) {
 				Add-LogContent "Downloading $ApplicationName from $URL"
 				$ProgressPreference = 'SilentlyContinue'
 				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
@@ -347,9 +348,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			}
 			else {
 				if (-not $newApp) {
-					Add-LogContent "$Version was not found in ConfigMgr, must be a new version"
+					Add-LogContent "$Version was found in ConfigMgr, Skipping Download"
 				}
-				else {
+				if ([String]::IsNullOrEmpty($URL)) {
 					Add-LogContent "URL Not Specified, Skipping Download"
 				}
 			}
