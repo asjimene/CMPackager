@@ -322,7 +322,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$DownloadFile = "$TempDir\$DownloadFileName"
 			$AppRepoFolder = $Download.AppRepoFolder
 			$ExtraCopyFunctions = $Download.ExtraCopyFunctions
-		
+			
+			# Reset the version so that multiple DeploymentTypes may be downloaded
+			$Version = $null
+
 			## Run the prefetch script if it exists
 			$PrefetchScript = $Download.PrefetchScript
 			If (-not ([String]::IsNullOrEmpty($PrefetchScript))) {
