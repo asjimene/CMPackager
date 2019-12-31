@@ -848,8 +848,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.InstallProgram))) {
 				$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			}
-			#$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
+			
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.UninstallCmd))) {
+				$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
 				$stDepTypeUninstallationProgram = ($stDepTypeUninstallationProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			}
 			$swDepTypeForce32Bit = [System.Convert]::ToBoolean($DeploymentType.Force32bit)
