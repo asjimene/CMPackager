@@ -35,6 +35,15 @@
 		<Property>Manufacturer</Property>
 	</GlobalCondition>
 	<GlobalCondition>
+		<Name>AutoPackage - Computer Model</Name>
+		<GCType>WqlQuery</GCType>
+		<DataType>String</DataType>
+		<Description>Returns the Model from ComputerSystem\Model</Description>
+		<Class>Win32_ComputerSystem</Class>
+		<Namespace>root\cimv2</Namespace>
+		<Property>Model</Property>
+	</GlobalCondition>
+	<GlobalCondition>
 	<Name>AutoPackage - OSArchitecture x64</Name>
 		<GCType>WqlQuery</GCType>
 		<DataType>String</DataType>
