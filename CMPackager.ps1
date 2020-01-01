@@ -418,6 +418,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationDescription = $Recipe.ApplicationDef.Application.Description
 		$ApplicationDocURL = $Recipe.ApplicationDef.Application.UserDocumentation
 		$ApplicationIcon = "$Global:IconRepo\$($Recipe.ApplicationDef.Application.Icon)"
+		if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
+			$ApplicationIcon = "$ScriptRoot\ExtraFiles\Icons\$($Recipe.ApplicationDef.Application.Icon)"
+			if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
+				$ApplicationIcon = $null
+			}
+		}
 		$ApplicationAutoInstall = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.AutoInstall)
 		$AppCreated = $true
 	
@@ -441,7 +447,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 
 		Try {
-			If ($ApplicationIcon -ne "$Global:IconRepo\") {
+			If (-not ([System.String]::IsNullOrEmpty($ApplicationIcon))) {
 				Add-LogContent "Command: New-CMApplication -Name $ApplicationName $ApplicationSWVersion -Description $ApplicationDescription -Publisher $ApplicationPublisher -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName $ApplicationDisplayName -LocalizedDescription $ApplicationDescription -UserDocumentation $ApplicationDocURL -IconLocationFile $ApplicationIcon"
 				New-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Description "$ApplicationDescription" -Publisher "$ApplicationPublisher" -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName "$ApplicationDisplayName" -LocalizedDescription "$ApplicationDescription" -UserDocumentation $ApplicationDocURL -IconLocationFile "$ApplicationIcon"
 			}
