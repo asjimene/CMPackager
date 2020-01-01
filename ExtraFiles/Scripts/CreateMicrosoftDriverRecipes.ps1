@@ -8,11 +8,6 @@ Foreach ($ModeltoProcess in $ModelList) {
     $DownloadLink = "https://www.microsoft.com/en-us/download/confirmation.aspx?id=$Downloadid"
     $DocumentationLink = "https://www.microsoft.com/en-us/download/details.aspx?id=$Downloadid"
 
-    # Special Processing for Models with the Same Model Query but Unique SystemSKU (SystemSKUs variable will determines if this is the case)
-    #if ($Model -match "Surface Laptop 3"){
-    #    $Model = "Surface Laptop 3"
-    #}
-
     $AvailableDrivers = ((Invoke-WebRequest "$DownloadLink" -UseBasicParsing).Links | Where-Object href -like "*.msi" | Select-Object href -Unique).href
     $DriverNames = Split-Path $AvailableDrivers -Leaf | Sort-Object -Descending
     $AvailableWinVersions = @()
@@ -27,14 +22,6 @@ Foreach ($ModeltoProcess in $ModelList) {
     }
 
     $AppTemplate = (Get-Content "$PSScriptRoot\MicrosoftDriverRecipeTemplate.txt").Replace('%MODELSHORTNAME%', $ModelShortName).Replace('%DOCUMENTATIONLINK%', $DocumentationLink).Replace('%DOWNLOADLINK%', $DownloadLink)
-    
-    # Special Processing for Models with the Same Model Query but Unique SystemSKU
-    if (-not ([System.String]::IsNullOrEmpty($SystemSKU))) {
-        Add-LogContent "$Model requires SKUs instead of Model Queries - $SystemSKUs"
-        $TextToReplace = "<RuleName>AutoPackage - Computer Model Equals %MODEL%</RuleName>"
-        $TextToAdd = "<RuleName>AutoPackage - Computer SystemSKU OneOf {$SystemSKU}</RuleName>"
-        $AppTemplate = $AppTemplate.Replace($TextToReplace, $TextToAdd)
-    }
 
     $AppTemplate = $AppTemplate.Replace('%MODEL%', $Model)
     [xml]$AppRecipe = $AppTemplate
@@ -56,21 +43,34 @@ Foreach ($ModeltoProcess in $ModelList) {
             $NewDownload.DownloadVersionCheck = "#No Version Check for older Versions"
         }
         $AppRecipe.ApplicationDef.Downloads.AppendChild($NewDownload) | Out-Null
-        # Clone New DeploymentType Node with appropriate Windows Version
         
+        # Clone New DeploymentType Node with appropriate Windows Version
         $NewDeploymentType = $AppRecipe.ApplicationDef.DeploymentTypes.FirstChild.Clone()
         $NewDeploymentType.Name = [System.String]$WindowsVersion
         $NewDeploymentType.DeploymentTypeName = [System.String]$WindowsVersion
         $NewDeploymentType.Comments = ($NewDeploymentType.Comments).Replace('%WINVER%', $WindowsVersion)
         $NewDeploymentType.InstallProgram = ($NewDeploymentType.InstallProgram).Replace('%WINVER%', $WindowsVersion)
         $NewDeploymentType.InstallationMSI = ($NewDeploymentType.InstallationMSI).Replace('%WINVER%', $WindowsVersion)
-        $NewDeploymentType.Requirements.LastChild."#text" = ($NewDeploymentType.Requirements.LastChild."#text").Replace('%WINVER%', $WindowsVersion)
+        $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.LastChild."#text" = ($NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.LastChild."#text").Replace('%WINVER%', $WindowsVersion)
+        if (-not ([System.String]::IsNullOrEmpty($SystemSKU))) {
+            $NewDeploymentType.RequirementsRules.FirstChild.RequirementsRuleGlobalCondition = "AutoPackage - Computer SystemSKU"
+            foreach ($Value in $($SystemSKU.Replace(', ',',').Split(','))) {
+                $NewValue = $NewDeploymentType.RequirementsRules.FirstChild.RequirementsRuleValue.FirstChild.clone()
+                $NewValue.'#text' = $Value
+                $NewDeploymentType.RequirementsRules.FirstChild.RequirementsRuleValue.AppendChild($NewValue) | Out-Null
+            }
+            $NewDeploymentType.RequirementsRules.FirstChild.RequirementsRuleValue.RemoveChild($NewDeploymentType.RequirementsRules.FirstChild.RequirementsRuleValue.FirstChild) | Out-Null
+        } else {
+            $NewDeploymentType.RequirementsRules.FirstChild.RequirementsRuleGlobalCondition = "AutoPackage - Computer Model"
+        }
         $AppRecipe.ApplicationDef.DeploymentTypes.AppendChild($NewDeploymentType) | Out-Null
-
     }
 
     # Remove the Template Nodes and Save the Final Result
     $AppRecipe.ApplicationDef.Downloads.RemoveChild($AppRecipe.ApplicationDef.Downloads.FirstChild) | Out-Null
     $AppRecipe.ApplicationDef.DeploymentTypes.RemoveChild($AppRecipe.ApplicationDef.DeploymentTypes.FirstChild) | Out-Null
+    # For Testing (running the script without the packager launching it), just save in this folder
+    #$AppRecipe.Save(".\Microsoft$($ModelShortName)Drivers.xml")
+    # For Prod, save in the recipes folder
     $AppRecipe.Save("$ScriptRoot\Recipes\Microsoft$($ModelShortName)Drivers.xml")
 }

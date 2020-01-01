@@ -1,0 +1,57 @@
+<ApplicationDef>
+    <Application>
+        <Name>Java 11 - Amazon Corretto JDK</Name>
+        <Description>Amazon Corretto is a no-cost, multiplatform, production-ready distribution of the Open Java Development Kit (OpenJDK). Corretto comes with long-term support that will include performance enhancements and security fixes.</Description>
+        <Publisher>Amazon Inc</Publisher>
+        <AutoInstall>True</AutoInstall>
+        <UserDocumentation>https://aws.amazon.com/corretto/</UserDocumentation>
+        <Icon>java.ico</Icon>
+    </Application>
+    <Downloads>
+        <Download DeploymentType="DeploymentType1">
+            <URL>https://corretto.aws/downloads/latest/amazon-corretto-11-x64-windows-jdk.msi</URL>
+            <DownloadFileName>AmazonCorretto11x64.msi</DownloadFileName>
+            <Version></Version>
+            <FullVersion></FullVersion>
+            <DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+            <ExtraCopyFunctions></ExtraCopyFunctions>
+        </Download>
+    </Downloads>
+    <DeploymentTypes>
+        <DeploymentType Name="DeploymentType1">
+            <DeploymentTypeName>Amazon Corretto 11 x64</DeploymentTypeName>
+            <InstallationType>MSI</InstallationType>
+            <Comments>Silent Installer for Amazon Corretto 11 x64</Comments>
+            <Language>English</Language>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallationMSI>AmazonCorretto11x64.msi</InstallationMSI>
+            <Force32bit>False</Force32bit>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <ReqUserInteraction>False</ReqUserInteraction>
+            <EstRuntimeMins>10</EstRuntimeMins>
+            <MaxRuntimeMins>30</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>MSI</DetectionMethodType>
+            <RequirementsRules>
+                <RequirementsRule>
+                    <RequirementsRuleType>Existential</RequirementsRuleType>
+                    <RequirementsRuleValue>
+                        <RuleValue>True</RuleValue>
+                    </RequirementsRuleValue>
+                    <RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+                </RequirementsRule>
+            </RequirementsRules>
+        </DeploymentType>
+    </DeploymentTypes>
+    <Distribution>
+        <DistributeContent>True</DistributeContent>
+    </Distribution>
+    <Deployment>
+        <DeploySoftware>True</DeploySoftware>
+    </Deployment>
+</ApplicationDef>

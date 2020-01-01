@@ -1,18 +1,18 @@
 ## CreateAppleDriverRecipes.ps1
 ##
-## This script is meant to be run as part of the SCCMPackager Process, this script generates a recipe to package Apple BootCamp Software and Drivers
-## for all Apple models found in SCCM. The process is as follows:
-## 1. This script runs a query on the SCCM server to determine what Apple Models are present
-## 2. This script downloads the apple software catalog and parses it, finding all the bootcampesd packages and determining what models each one supports
-## 3. This script then culls unneeded driver package information, and orders the drivers by PostDate (Newest to oldest)
-## 4. The script then generates an xml recipe file using the data it has gathered and the "AppleDriverRecipeTemplate.txt file", the recipe is saved to the "Recipes" folder for processing by the SCCMPackager
-## 5. The next time the SCCMPackager tool is run (if this is the first time running this script), the recipe will instruct the SCCMPackager tool to create the following:
-##   a. 1 SCCM Application
+## This script is meant to be run as part of the CMPackager Process, this script generates a recipe to package Apple BootCamp Software and Drivers
+## for all Apple models found in CM. The process is as follows:
+## 1. The script runs a query on the CM server to determine what Apple Models are present
+## 2. The script downloads the Apple software catalog and parses it, finding all the bootcampesd packages and determining what models each one supports
+## 3. The script culls unneeded driver package information, and orders the drivers by PostDate (Newest to oldest)
+## 4. The script generates an xml recipe file using the data it has gathered and the "AppleDriverRecipeTemplate.txt file", the recipe is saved to the "Recipes" folder for processing by CMPackager
+## 5. The next time CMPackager is run (if this is the first time running this script), the recipe will instruct the CMPackager tool to create the following:
+##   a. 1 CM Application
 ##   b. The version on the Apple BootCamp Software Application will be the PostDate of the latest firmware packaged
 ##   c. There will be multiple deployment types, each deployment type cooresponds with a BootCampESD package
 ##   d. Each deployment type will require the Manufacturer to equal "Apple Inc." and a Model being "one of" those supported by that BootCampESD package
 ##
-## Note: Because some of the bootcamp files are So old, I have included in the ExtraFiles\AppleBootCamp\Install.ps1 file, instructions on replacing the BootCamp Executable + other files with the versions from
+## Note: Because some of the bootcamp files are so old, I have included in the ExtraFiles\AppleBootCamp\Install.ps1 file, instructions on replacing the BootCamp Executable + other files with the versions from
 ##   the latest BootCamp version available. Doing so allows the BootPicker to actually work in newer versions of MacOS (with APFS formatting). I leave the task of getting the latest installer and executable up to
 ##   the end user so I don't distribute Apple binaries. I plan on scripting that process in the future.
 ##
@@ -153,9 +153,9 @@ function ConvertFrom-Plist {
 }
 
 
-## Gather Apple Models currently in SCCM
+## Gather Apple Models currently in CM
 Push-Location
-Set-Location $Global:SCCMSite
+Set-Location $Global:CMSite
 $WMI = @"
 select distinct SMS_G_System_COMPUTER_SYSTEM.Model from  SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Apple Inc." order by SMS_G_System_COMPUTER_SYSTEM.Model
 "@
@@ -168,7 +168,7 @@ $BootCampInstallers = @()
 $AppleSUCatalog = "https://swscan.apple.com/content/catalogs/others/index-10.15-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog"
 Invoke-WebRequest -URI $AppleSUCatalog -OutFile "$PSScriptRoot\AppleSUCatalog.sucatalog"
 $Plist = ConvertFrom-Plist -plist $([xml](Get-Content "$PSScriptRoot\AppleSUCatalog.sucatalog"))
-foreach ($Values in ($Plist.Products.Values | where { $_.ServerMetadataURL -like "*BootCamp*" } | where {$_.Distributions.English -ne $null})){
+foreach ($Values in ($Plist.Products.Values | Where-Object { $_.ServerMetadataURL -like "*BootCamp*" } | Where-Object {$_.Distributions.English -ne $null})){
     $DistPackage = $(Invoke-Webrequest $Values.Distributions.English).Content
     (([xml]$DistPackage).ChildNodes.Script[2]).ToString() > .\temp.txt
     Start-Sleep 1
@@ -181,7 +181,7 @@ foreach ($Values in ($Plist.Products.Values | where { $_.ServerMetadataURL -like
     if ($Comparison){
         
         $BootCampIdentifier = ($Values.Distributions.English.Split('/')[-1]).Replace('.English.dist','')
-        Add-Logcontent "$BootCampIdentifier contains these models found in SCCM: $($Comparison -join ", ")"
+        Add-Logcontent "$BootCampIdentifier contains these models found in CM: $($Comparison -join ", ")"
         $AppleBootCampInstaller = New-Object -TypeName System.Management.Automation.PSObject
         $AppleBootCampInstaller | Add-Member -MemberType NoteProperty -Name "OriginalDownloadLocation" -Value $Values.Packages.URL
         $AppleBootCampInstaller | Add-Member -MemberType NoteProperty -Name "BootCampIdentifier" -Value $BootCampIdentifier
@@ -191,10 +191,16 @@ foreach ($Values in ($Plist.Products.Values | where { $_.ServerMetadataURL -like
         $BootCampInstallers += $AppleBootCampInstaller
     }
 }
+$BootCampInstallers = $BootCampInstallers | sort-object -Property PostDate, SupportedModels -Descending -Unique
+#$ReqBootCampInstallers = @()
+#foreach ($RequestedModel in $QueryResults) {
+#    $ReqBootCampInstallers += $BootCampInstaller | Where-Object -Property SupportedModels -Contains $RequestedModel | Select-Object -First 1
+#}
+#$ReqBootCampInstallers = $BootCampInstallers |Sort-Object -Property PostDate, SupportedModels -Descending -Unique
 Add-LogContent "There are $($BootCampInstallers.Count) Boot Camp Installers that need to be packaged"
-$BootCampInstallers = $BootCampInstallers | sort-object -Property PostDate,SupportedModels -Descending
-$BootCampDate =$BootCampInstallers[0].PostDate.ToString("yyyyMMdd")
+Add-Logcontent "Packaging: $($BootCampInstallers.BootCampIdentifier -join ", ")"
 
+$BootCampDate = $BootCampInstallers[0].PostDate.ToString("yyyyMMdd")
 
 $AppTemplate = (Get-Content "$PSScriptRoot\AppleDriverRecipeTemplate.txt")
 [xml]$AppRecipe = $AppTemplate
@@ -220,29 +226,14 @@ foreach ($Installer in $BootCampInstallers) {
     $NewDeploymentType.Name = $Installer.BootCampIdentifier
     $NewDeploymentType.DeploymentTypeName = $Installer.BootCampIdentifier
     $NewDeploymentType.Comments = ($NewDeploymentType.Comments).Replace('%BCIDENTIFIER%', $Installer.BootCampIdentifier).Replace('%SUPPORTEDMODELS%', $($Installer.SupportedModels -join ", "))
-    #$NewDeploymentType.InstallProgram = ($NewDeploymentType.InstallProgram).Replace('%WINVER%', $WindowsVersion)
-    #$NewDeploymentType.InstallationMSI = ($NewDeploymentType.InstallationMSI).Replace('%WINVER%', $WindowsVersion)
-    $NewDeploymentType.Requirements.LastChild."#text" = ($NewDeploymentType.Requirements.LastChild."#text").Replace('%MODELS%', $($Installer.SupportedModels -join ", "))
-    $AppRecipe.ApplicationDef.DeploymentTypes.AppendChild($NewDeploymentType) | Out-Null
-        
-
-
-    Push-Location
-    Set-Location $Global:SCCMSite
-    if (Get-CMApplication -Name $Global:RequirementsTemplateAppName -Fast) {
-        $ApplicationTemplateDTName = (Get-CMApplication -name $Global:RequirementsTemplateAppName | ConvertTo-CMApplication).DeploymentTypes[0].Title
-        $ExistingRequirements = (Get-CMApplication -Name $Global:RequirementsTemplateAppName | ConvertTo-CMApplication).DeploymentTypes[0].Requirements.Name
-        # Add Model Queries to Template
-        #Add-LogContent "Processing - Add Models for $($Installer.BootCampIdentifier) to Template (If Required)" 
-        if (-not ($ExistingRequirements -contains "AutoPackage - Computer Model OneOf {$($Installer.SupportedModels -join ", ")}")) {
-            Add-LogContent "$($Installer.SupportedModels -join ", ") are being added"
-            $rule = Get-CMGlobalCondition -Name "AutoPackage - Computer Model" | New-CMRequirementRuleCommonValue -Value1 $($Installer.SupportedModels) -RuleOperator OneOf 
-            $rule.Name = "AutoPackage - Computer Model OneOf {$($Installer.SupportedModels -join ", ")}"
-            Set-CMScriptDeploymentType -ApplicationName $Global:RequirementsTemplateAppName -DeploymentTypeName $ApplicationTemplateDTName -AddRequirement $rule
-        }
+    
+    foreach ($Value in $Installer.SupportedModels) {
+        $NewValue = $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.FirstChild.clone()
+        $NewValue.'#text' = $Value
+        $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.AppendChild($NewValue) | Out-Null
     }
-    Pop-Location
-
+    $NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.RemoveChild($NewDeploymentType.RequirementsRules.LastChild.RequirementsRuleValue.FirstChild)
+    $AppRecipe.ApplicationDef.DeploymentTypes.AppendChild($NewDeploymentType) | Out-Null
 }
 
 # Remove the Template Nodes and Save the Final Result
@@ -253,4 +244,3 @@ $AppRecipe.ApplicationDef.DeploymentTypes.RemoveChild($AppRecipe.ApplicationDef.
 Start-Sleep 1
 Add-LogContent "Saving AppleBootCampDrivers.xml"
 $AppRecipe.Save("$ScriptRoot\Recipes\AppleBootCampDrivers.xml")
-Pause

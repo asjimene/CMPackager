@@ -12,7 +12,7 @@
 			<URL>https://dl.appstreaming.autodesk.com/production/installers/Fusion%20360%20Admin%20Install.exe</URL>
 			<DownloadFileName>Fusion 360 Admin Install.exe</DownloadFileName>
 			<DownloadVersionCheck>
-            $Version = ((Invoke-WebRequest -Uri https://dl.appstreaming.autodesk.com/production/67316f5e79bc48318aa5f7b6bb58243d/73e72ada57b7480280f7a6f4a289729f/full.json).Content | Convertfrom-Json).'build-version'
+            $Version = ((Invoke-WebRequest -Uri https://dl.appstreaming.autodesk.com/production/67316f5e79bc48318aa5f7b6bb58243d/73e72ada57b7480280f7a6f4a289729f/full.json).Content | Convertfrom-Json).'major-update-version'
 			</DownloadVersionCheck>
 			<FullVersion></FullVersion>
 			<Version></Version>
@@ -36,7 +36,7 @@
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
             <DetectionMethodType>CustomScript</DetectionMethodType>
             <ScriptLanguage>PowerShell</ScriptLanguage>
-            <DetectionMethod>[version]$InstalledVersion = ((Get-Content "C:\Program Files\AutoDesk\Fusion360.json" -EA SilentlyContinue) | ConvertFrom-Json -ea SilentlyContinue).manifest."build-version";
+            <DetectionMethod>[version]$InstalledVersion = ((Get-Content "C:\Program Files\AutoDesk\Fusion360.json" -EA SilentlyContinue) | ConvertFrom-Json -ea SilentlyContinue).manifest."major-update-version";
 if (($InstalledVersion -ge "$Version") -and (get-item "C:\Program Files\Autodesk\webdeploy\production\*\Fusion360.exe" -EA SilentlyContinue)){Write-Output "Installed"}</DetectionMethod>
 		</DeploymentType>
 	</DeploymentTypes>

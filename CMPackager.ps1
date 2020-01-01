@@ -2,12 +2,12 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  12/19/2019
+	 Last Updated:  12/31/2019
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
-	 Filename:     	SCCMPackager.ps1
+	 Filename:     	CMPackager.ps1
 	===========================================================================
 	.DESCRIPTION
-		Packages Applications for SCCM using XML Based Recipe Files
+		Packages Applications for ConfigMgr using XML Based Recipe Files
 
 	Uses Scripts and Functions Sourced from the Following:
 		Copy-CMDeploymentTypeRule - https://janikvonrotz.ch/2017/10/20/configuration-manager-configure-requirement-rules-for-deployment-types-with-powershell/
@@ -35,13 +35,13 @@ DynamicParam {
 }
 process {
 
-	$Global:ScriptVersion = "19.12.19.0"
+	$Global:ScriptVersion = "19.12.31.0"
 
 	$Global:ScriptRoot = $PSScriptRoot
 
 	## Global Variables
 	# Import the Prefs file
-	[xml]$PackagerPrefs = Get-Content $ScriptRoot\SCCMPackager.prefs
+	[xml]$PackagerPrefs = Get-Content $ScriptRoot\CMPackager.prefs
 
 	# Packager Vars
 	$Global:TempDir = $PackagerPrefs.PackagerPrefs.TempDir
@@ -52,9 +52,9 @@ process {
 	$Global:ContentLocationRoot = $PackagerPrefs.PackagerPrefs.ContentLocationRoot
 	$Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
 
-	# SCCM Vars
-	$Global:SCCMSite = $PackagerPrefs.PackagerPrefs.SCCMSite
-	$Global:SiteCode = ($Global:SCCMSite).Replace(':', '')
+	# CM Vars
+	$Global:CMSite = $PackagerPrefs.PackagerPrefs.CMSite
+	$Global:SiteCode = ($Global:CMSite).Replace(':', '')
 	$Global:SiteServer = $PackagerPrefs.PackagerPrefs.SiteServer
 	$Global:RequirementsTemplateAppName = $PackagerPrefs.PackagerPrefs.RequirementsTemplateAppName
 	$Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
@@ -69,13 +69,14 @@ process {
 	$Global:SendEmailPreference = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.SendEmailPreference)
 	$Global:NotifyOnDownloadFailure = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NotifyOnDownloadFailure)
 
-	$Global:EmailSubject = "SCCM Application Packager Report - $(Get-date -format d)"
+	$Global:EmailSubject = "CMPackager Report - $(Get-date -format d)"
 	$Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n`n"
 
 	#This gets switched to True if Applications are Packaged
 	$Global:SendEmail = $false
 	$Global:TemplateApplicationCreatedFlag = $false
 
+	$Global:OperatorsLookup = @{ And = 'And'; Or = 'Or'; Other = 'Other'; IsEquals = 'Equals'; NotEquals = 'Not equal to'; GreaterThan = 'Greater than'; LessThan = 'Less than'; Between = 'Between'; NotBetween = 'Not Between'; GreaterEquals = 'Greater than or equal to'; LessEquals = 'Less than or equal to'; BeginsWith = 'Begins with'; NotBeginsWith = 'Does not begin with'; EndsWith = 'Ends with'; NotEndsWith = 'Does not end with'; Contains = 'Contains'; NotContains = 'Does not contain'; AllOf = 'All of'; OneOf = 'OneOf'; NoneOf = 'NoneOf'; SetEquals = 'Set equals'; SubsetOf = 'Subset of'; ExcludesAll = 'Exludes all' }
 	## Functions
 	function Add-LogContent {
 		param
@@ -274,6 +275,38 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 	}
 
+	function Invoke-VersionCheck {
+		## Contact CM and determine if the Application Version is New
+		[CmdletBinding()]
+		param (
+			[Parameter()]
+			[String]
+			$ApplciationName,
+			[Parameter()]
+			[String]
+			$ApplciationSWVersion
+		)
+
+		Push-Location
+		Set-Location $Global:CMSite
+		If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
+			$newApp = $true			
+			Add-LogContent "$ApplicationSWVersion is a new Version"
+		}
+		Else {
+			$newApp = $false
+			Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
+        }
+        
+        # If SkipPackaging is specified, return that the app is up-to-date.
+        if ($ApplicationSWVersion -eq "SkipPackaging") {
+            $newApp = $false
+        }
+
+		Pop-Location
+		Write-Output $newApp
+	}
+
 	Function Start-ApplicationDownload {
 		Param (
 			$Recipe
@@ -289,15 +322,26 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$DownloadFile = "$TempDir\$DownloadFileName"
 			$AppRepoFolder = $Download.AppRepoFolder
 			$ExtraCopyFunctions = $Download.ExtraCopyFunctions
-		
+
 			## Run the prefetch script if it exists
 			$PrefetchScript = $Download.PrefetchScript
 			If (-not ([String]::IsNullOrEmpty($PrefetchScript))) {
 				Invoke-Expression $PrefetchScript | Out-Null
 			}
-		
+
+			if (-not ([System.String]::IsNullOrEmpty($Version))) {
+                ## Version Check after prefetch script (skip download if possible)
+                ## This was not working well. Will revisit later
+                #$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
+                $newApp = $true
+			} else {
+				$newApp = $true
+			}
+			
+			Add-LogContent "Version Check after prefetch script is $newapp"
+
 			## Download the Application
-			If (-not ([String]::IsNullOrEmpty($URL))) {
+			If ((-not ([String]::IsNullOrEmpty($URL))) -and ($newapp)) {
 				Add-LogContent "Downloading $ApplicationName from $URL"
 				$ProgressPreference = 'SilentlyContinue'
 				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
@@ -305,7 +349,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "Completed Downloading $ApplicationName"
 			}
 			else {
-				Add-LogContent "URL Not Specified, Skipping Download"
+				if (-not $newApp) {
+					Add-LogContent "$Version was found in ConfigMgr, Skipping Download"
+				}
+				if ([String]::IsNullOrEmpty($URL)) {
+					Add-LogContent "URL Not Specified, Skipping Download"
+				}
 			}
 
 		
@@ -322,24 +371,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			if ((-not (Test-Path $DownloadFile)) -or ([System.String]::IsNullOrEmpty($ApplicationSWVersion))) {
 				Add-LogContent "ERROR: Failed to Download or find the Version for $ApplicationName"
 				if ($Global:NotifyOnDownloadFailure) {
-					$Global:SendEmail = $True
+					$Global:SendEmail = $true; $Global:SendEmail | Out-Null
 					$Global:EmailBody += "   - Failed to Download: $ApplicationName`n"
 				}
 			}
 		
-			## Contact SCCM and determine if the Application Version is New
-			Push-Location
-			Set-Location $Global:SCCMSite
-			If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
-				$newApp = $true			
-				Add-LogContent "$ApplicationSWVersion is a new Version"
-			}
-			Else {
-				$newApp = $false
-				Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
-			}
-			Pop-Location
-		
+			$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion $ApplicationSWVersion
 		
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
@@ -381,6 +418,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationDescription = $Recipe.ApplicationDef.Application.Description
 		$ApplicationDocURL = $Recipe.ApplicationDef.Application.UserDocumentation
 		$ApplicationIcon = "$Global:IconRepo\$($Recipe.ApplicationDef.Application.Icon)"
+		if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
+			$ApplicationIcon = "$ScriptRoot\ExtraFiles\Icons\$($Recipe.ApplicationDef.Application.Icon)"
+			if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
+				$ApplicationIcon = $null
+			}
+		}
 		$ApplicationAutoInstall = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.AutoInstall)
 		$AppCreated = $true
 	
@@ -392,7 +435,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	
 		## Create the Application
 		Push-Location
-		Set-Location $Global:SCCMSite
+		Set-Location $Global:CMSite
 		Add-LogContent "Creating Application: $ApplicationName $ApplicationSWVersion"
 
 		# Change the SW Center Display Name based on Setting
@@ -404,7 +447,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 
 		Try {
-			If ($ApplicationIcon -ne "$Global:IconRepo\") {
+			If (-not ([System.String]::IsNullOrEmpty($ApplicationIcon))) {
 				Add-LogContent "Command: New-CMApplication -Name $ApplicationName $ApplicationSWVersion -Description $ApplicationDescription -Publisher $ApplicationPublisher -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName $ApplicationDisplayName -LocalizedDescription $ApplicationDescription -UserDocumentation $ApplicationDocURL -IconLocationFile $ApplicationIcon"
 				New-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Description "$ApplicationDescription" -Publisher "$ApplicationPublisher" -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName "$ApplicationDisplayName" -LocalizedDescription "$ApplicationDescription" -UserDocumentation $ApplicationDocURL -IconLocationFile "$ApplicationIcon"
 			}
@@ -423,11 +466,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
 		}
 	
-	
-	
 		## Send an Email if an Application was successfully Created and record the Application Name and Version for the Email
 		If ($AppCreated) {
-			$Global:SendEmail = $true
+			$Global:SendEmail = $true; $Global:SendEmail | Out-Null
 			$Global:EmailBody += "   - $ApplicationName $ApplicationSWVersion`n"
 		}
 		Pop-Location
@@ -508,7 +549,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		## Run the Detection Method Command as Created by the Logic Above
 	
 		Push-Location
-		Set-Location $SCCMSite
+		Set-Location $CMSite
 		Try {
 			$DepTypeDetectionMethod += Invoke-Expression $detMethodCommand
 		}
@@ -537,7 +578,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			[System.String]$RuleName
 		)
 		Push-Location
-		Set-Location $SCCMSite
+		Set-Location $CMSite
 		$DestDeploymentTypeIndex = 0
  
 		# get the applications
@@ -545,16 +586,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
 	
 		# Get DestDeploymentTypeIndex by finding the Title
-		$DestApplication.DeploymentTypes | ForEach-Object {
-			$i = 0
-		} {
-			If ($_.Title -eq "$DestDeploymentTypeName") {
-				$DestDeploymentTypeIndex = $i
-				Write-Output $DestDeploymentTypeIndex | Out-Null
-			
-			}
-			$i = $i + 1
-		}
+		$DestDeploymentTypeIndex = $DestApplication.DeploymentTypes.Title.IndexOf($DestDeploymentTypeName)
     
 		$Available = ($SourceApplication.DeploymentTypes[0].Requirements).Name
 		Add-LogContent "Available Requirements to chose from:`r`n $($Available -Join ', ')"
@@ -597,18 +629,142 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Pop-Location
 	}
 
+	function Add-RequirementsRule {
+		[CmdletBinding()]
+		param (
+			[Parameter(Mandatory)]
+			[ValidateSet('Value', 'Existential', 'OperatingSystem')]
+			[String]
+			$ReqRuleType,
+			[Parameter()]
+			[ValidateSet( 'And', 'Or', 'Other', 'IsEquals', 'NotEquals', 'GreaterThan', 'LessThan', 'Between', 'NotBetween', 'GreaterEquals', 'LessEquals', 'BeginsWith', 'NotBeginsWith', 'EndsWith', 'NotEndsWith', 'Contains', 'NotContains', 'AllOf', 'OneOf', 'NoneOf', 'SetEquals', 'SubsetOf', 'ExcludesAll')]
+			$ReqRuleOperator,
+			[Parameter(Mandatory)]
+			[String[]]
+			$ReqRuleValue,
+			[Parameter()]
+			[String[]]
+			$ReqRuleValue2,
+			[Parameter()]
+			[String]
+			$ReqRuleGlobalConditionName,
+			[Parameter(Mandatory)]
+			[String]
+			$ReqRuleApplicationName,
+			[Parameter(Mandatory)]
+			[String]
+			$ReqRuleApplicationDTName
+		)
+		
+		Push-Location
+		Set-Location $Global:CMSite
+		Write-Host "`"$ReqRuleType of $ReqRuleGlobalConditionName $ReqRuleOperator $ReqRuleValue`" is being added"
+
+		if (-not ([System.String]::IsNullOrEmpty($ReqRuleValue))) {
+			$ReqRuleValueName = $ReqRuleValue
+			#if (($ReqRuleOperator -eq 'Oneof') -or ($ReqRuleOperator -eq 'Noneof') -or ($ReqRuleOperator -eq 'Allof') -or ($ReqRuleOperator -eq 'Subsetof') -or ($ReqRuleOperator -eq 'ExcludesAll')) {
+			if ($ReqRuleValue[1]) {
+				$ReqRuleVal = $ReqRuleValue
+				$ReqRuleValueName = "{ $($ReqRuleVal -join ", ") }"
+			}
+			if ([system.string]::IsNullOrEmpty($ReqRuleVal)) {
+				$ReqRuleVal = $ReqRuleValue[0]
+			}
+		}
+		
+		if (-not ([System.String]::IsNullOrEmpty($ReqRuleValue2))) {
+			if ($ReqRuleValue2[1]) {
+				$ReqRuleVal2 = $ReqRuleValue2
+				$ReqRuleValue2Name = "{ $($ReqRuleVal2 -join ", ") }"
+			}
+			if ([system.string]::IsNullOrEmpty($ReqRuleVal)) {
+				$ReqRuleVal2 = $ReqRuleValue2[0]
+			}
+		}
+
+		switch ($ReqRuleType) {
+			Existential {
+				Add-LogContent "Existential Rule $ReqRuleVal"
+				$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
+				if ([System.Convert]::ToBoolean($ReqRuleVal)) {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($($ReqRuleVal | Select-object -first 1)))
+					$rule.Name = "Existential of $ReqRuleGlobalConditionName Not equal to 0"
+				}
+				else {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($($ReqRuleVal | Select-Object -first 1)))
+					$rule.Name = "Existential of $ReqRuleGlobalConditionName Equals 0"
+				}
+			}
+			OperatingSystem {
+				Add-LogContent "Operating System $ReqRuleOperator `"$ReqruleVal`""
+				# Only supporting Windows Operating Systems at this time
+				$GlobalCondition = Get-CMGlobalCondition -name "Operating System" | Where-Object PlatformType -eq 1
+				$rule = $GlobalCondition | New-CMRequirementRuleOperatingSystemValue -RuleOperator $ReqRuleOperator -PlatformStrings $ReqRuleVal
+				$rule.Name = "Operating System $Global:OperatorsLookup $ReqRuleValueName"
+			}
+			Default {
+				# DEFAULT TO VALUE
+				Add-LogContent "Value $ReqRuleOperator `"$ReqRuleVal`""
+				$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
+				if ([System.String]::IsNullOrEmpty($ReqRuleValue2)) {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator
+					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName"
+				}
+				else {
+					$rule = $CMGlobalCondition | New-CMRequirementRuleCommonValue -Value1 $ReqRuleVal -RuleOperator $ReqRuleOperator -Value2 $ReqRuleVal2
+					$rule.Name = "$ReqRuleGlobalConditionName $Global:OperatorsLookup $ReqRuleValueName $ReqRuleValue2Name"
+				}
+			}
+		}
+
+		Add-LogContent "Adding Requirement to $ReqRuleApplicationName, $ReqRuleApplicationDTName"
+		Get-CMDeploymentType -ApplicationName $ReqRuleApplicationName -DeploymentTypeName $ReqRuleApplicationDTName | Set-CMDeploymentType -AddRequirement $rule
+		Pop-Location
+	}
+
+
+	Function Add-CMDeploymentTypeProcessDetection {
+		# Creates a Deployment Type Process Detection "Install Behavior tab in Deployment types".
+		Param (
+			[System.String]$DestApplicationName,
+			[System.String]$DestDeploymentTypeName,
+			[System.String]$ProcessDetectionDisplayName,
+			[System.String]$ProcessDetectionExecutable
+		)
+		Push-Location
+		Set-Location $CMSite
+		$DestDeploymentTypeIndex = 0
+ 
+		# get the applications
+		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
+	
+		# Get DestDeploymentTypeIndex by finding the Title
+		$DestDeploymentTypeIndex = $DestApplication.DeploymentTypes.Title.IndexOf($DestDeploymentTypeName)
+    
+		# Create Process Detection and set variables
+		$ProcessInfo = [Microsoft.ConfigurationManagement.ApplicationManagement.ProcessInformation]::new()
+		$ProcessInfo.DisplayInfo.Add(@{"DisplayName" = $ProcessDetectionDisplayName; Language = $NULL })
+		$ProcessInfo.Name = $ProcessDetectionExecutable
+ 
+		# push changes
+		$DestApplication.DeploymentTypes[$DestDeploymentTypeIndex].Installer.InstallProcessDetection.ProcessList.Add($ProcessInfo)
+		$CMApplication = ConvertFrom-CMApplication -Application $DestApplication
+		$CMApplication.Put()
+		Pop-Location
+	}
+
 	Function New-CMDeploymentTypeProcessRequirement {
 		# Creates a Deployment Type Process Requirement "Install Behavior tab in Deployment types" by copying an existing Process Requirement.
-		# A Process requirement needs to be Defined in the "Install Behavior" Tab of the "SourceApplicationName" Variable before this script will function properly
+		# LEGACY
 		Param (
 			[System.String]$SourceApplicationName,
 			[System.String]$DestApplicationName,
 			[System.String]$DestDeploymentTypeName,
-			[System.String]$ProcessRequirementDisplayName,
-			[System.String]$ProcessRequirementExecutable
+			[System.String]$ProcessDetectionDisplayName,
+			[System.String]$ProcessDetectionExecutable
 		)
 		Push-Location
-		Set-Location $SCCMSite
+		Set-Location $CMSite
 		$DestDeploymentTypeIndex = 0
  
 		# get the applications
@@ -616,22 +772,14 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DestApplication = Get-CMApplication -Name $DestApplicationName | ConvertTo-CMApplication
 	
 		# Get DestDeploymentTypeIndex by finding the Title
-		$DestApplication.DeploymentTypes | ForEach-Object {
-			$i = 0
-		} {
-			If ($_.Title -eq "$DestDeploymentTypeName") {
-				$DestDeploymentTypeIndex = $i
-			
-			}
-			$i++
-		}
+		$DestDeploymentTypeIndex = $DestApplication.DeploymentTypes.Title.IndexOf($DestDeploymentTypeName)
     
 		# Get requirement rules from source application
 		$ProcessRequirementsList = $SourceApplication.DeploymentTypes[0].Installer.InstallProcessDetection.ProcessList[0]
 		$ProcessRequirementsList
 		if (-not ([System.String]::IsNullOrEmpty($ProcessRequirementsList))) {
-			$ProcessRequirementsList.Name = $ProcessRequirementExecutable
-			$ProcessRequirementsList.DisplayInfo[0].DisplayName = $ProcessRequirementDisplayName
+			$ProcessRequirementsList.Name = $ProcessDetectionExecutable
+			$ProcessRequirementsList.DisplayInfo[0].DisplayName = $ProcessDetectionDisplayName
 			$ProcessRequirementsList
 			$DestApplication.DeploymentTypes[$DestDeploymentTypeIndex].Installer.InstallProcessDetection.ProcessList.Add($ProcessRequirementsList)
 		}
@@ -690,9 +838,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$stDepTypeSlowNetworkDeploymentMode = $DeploymentType.OnSlowNetwork
 		
 			# Programs
-			$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
-			$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
+			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.InstallProgram))) {
+				$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
+			}
+			
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.UninstallCmd))) {
+				$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
 				$stDepTypeUninstallationProgram = ($stDepTypeUninstallationProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			}
 			$swDepTypeForce32Bit = [System.Convert]::ToBoolean($DeploymentType.Force32bit)
@@ -707,7 +858,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$stDepTypeRebootBehavior = $DeploymentType.RebootBehavior
 		
 			# Because I hate the yellow squiggly lines
-			Write-Output $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-null
+			Write-Output $ApplicationPublisher, $ApplicationDescription, $ApplicationDocURL, $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-null
 
 			$DepTypeDetectionMethodType = $DeploymentType.DetectionMethodType
 			Add-LogContent "Detection Method Type Set as $DepTypeDetectionMethodType"
@@ -793,7 +944,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					Add-LogContent "Creating DeploymentType"
 					Add-LogContent "Command: $DeploymentTypeCommand"
 					Push-Location
-					Set-Location $SCCMSite
+					Set-Location $CMSite
 					Try {
 						Invoke-Expression $DeploymentTypeCommand | Out-Null
 					}
@@ -846,6 +997,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					Pop-Location	
 				}
 				MSI {
+					Write-Host "MSI Deployment"
 					$DepTypeInstallationMSI = $DeploymentType.InstallationMSI
 					$DepTypeCommand = "Add-CMMsiDeploymentType -ApplicationName `"$DepTypeApplicationName`" -ContentLocation `"$DepTypeContentLocation\$DepTypeInstallationMSI`" -DeploymentTypeName `"$DepTypeDeploymentTypeName`""
 					$CmdSwitches = ""
@@ -905,7 +1057,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				
 					## Run the Add-CMApplicationDeployment Command
 					Push-Location
-					Set-Location $SCCMSite
+					Set-Location $CMSite
 					$DeploymentTypeCommand = "$DepTypeCommand$CmdSwitches -Force"
 					Add-LogContent "Creating DeploymentType"
 					Add-LogContent "Command: $DeploymentTypeCommand"
@@ -954,18 +1106,50 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 						}
 					}
 					Pop-Location
+				}			
+				MSIX {
+					# SOON(TM)
 				}
 				Default {
 					$DepTypeReturn = $false
 				}
 			}
+
 		
-			## Add Requirements for Deployment Type if they exist
+			## Add LEGACY Requirements for Deployment Type if they exist
 			If (-not [System.String]::IsNullOrEmpty($DeploymentType.Requirements)) {
 				Add-LogContent "Adding Requirements to $DepTypeDeploymentTypeName"
 				$DepTypeRules = $DeploymentType.Requirements.RuleName
 				ForEach ($DepTypeRule In $DepTypeRules) {
 					Copy-CMDeploymentTypeRule -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -RuleName $DepTypeRule
+				}
+			}
+
+			## Add NEW Requirements for Deployment Type is Necessary
+			if (-not [System.String]::IsNullOrEmpty($DeploymentType.RequirementsRules)) {
+				Add-LogContent "Adding Requirements to $DepTypeDeploymentTypeName"
+				$DepTypeReqRules = $DeploymentType.RequirementsRules.RequirementsRule
+				ForEach ($DepTypeReqRule In $DepTypeReqRules) {
+					$addRequirementsRuleSplat = @{
+						ReqRuleApplicationName   = $DepTypeApplicationName
+						ReqRuleApplicationDTName = $DepTypeDeploymentTypeName
+						ReqRuleValue             = @($DepTypeReqRule.RequirementsRuleValue.RuleValue)
+						ReqRuleType              = $DepTypeReqRule.RequirementsRuleType
+					}
+					
+					if (-not ([system.string]::IsNullOrEmpty($DepTypeReqRule.RequirementsRuleGlobalCondition))) {
+						$addRequirementsRuleSplat.Add("ReqRuleGlobalConditionName", $DepTypeReqRule.RequirementsRuleGlobalCondition)
+					}
+
+					if (-not ([system.string]::IsNullOrEmpty($DepTypeReqRule.RequirementsRuleOperator))) {
+						$addRequirementsRuleSplat.Add("ReqRuleOperator", $DepTypeReqRule.RequirementsRuleOperator)
+					}
+
+					if (-not ([system.string]::IsNullOrEmpty($DepTypeReqRule.RequirementsRuleValue2))) {
+						$addRequirementsRuleSplat.Add("ReqRuleValue2", $DepTypeReqRule.ReqRuleValue2.RuleValue)
+					}
+					Write-Output "Add-RequirementsRule $addRequirementsRuleSplat"
+					Add-RequirementsRule @addRequirementsRuleSplat
 				}
 			}
         
@@ -974,7 +1158,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "Adding Install Behavior to $DepTypeDeploymentTypeName"
 				$DepTypeInstallBehaviorProcesses = $DeploymentType.InstallBehavior.InstallBehaviorProcess
 				ForEach ($DepTypeInstallBehavior In $DepTypeInstallBehaviorProcesses) {
-					New-CMDeploymentTypeProcessRequirement -SourceApplicationName $RequirementsTemplateAppName -DestApplicationName $DepTypeApplicationName -DestDeploymentTypeName $DepTypeDeploymentTypeName -ProcessRequirementDisplayName $DepTypeInstallBehavior.DisplayName -ProcessRequirementExecutable $DepTypeInstallBehavior.InstallBehaviorExe
+					$newCMDeploymentTypeProcessRequirementSplat = @{
+						ProcessDetectionDisplayName = $DepTypeInstallBehavior.DisplayName
+						DestApplicationName         = $DepTypeApplicationName
+						ProcessDetectionExecutable  = $DepTypeInstallBehavior.InstallBehaviorExe
+						DestDeploymentTypeName      = $DepTypeDeploymentTypeName
+					}
+					Add-CMDeploymentTypeProcessDetection @newCMDeploymentTypeProcessRequirementSplat
 				}
 			}
 		
@@ -985,7 +1175,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				foreach ($DepTypeDependencyGroup in $DepTypeDependencyGroups) {
 					Add-LogContent "Creating Dependency Group $($DepTypeDependencyGroup.GroupName) on $DepTypeDeploymentTypeName"
 					Push-Location
-					Set-Location $SCCMSite
+					Set-Location $CMSite
 					$DependencyGroup = Get-CMDeploymentType -ApplicationName $DepTypeApplicationName -DeploymentTypeName $DepTypeDeploymentTypeName | New-CMDeploymentTypeDependencyGroup -GroupName $DepTypeDependencyGroup.GroupName
 					$DepTypeDependencyGroupApps = $DepTypeDependencyGroup.DependencyGroupApp
 					foreach ($DepTypeDependencyGroupApp in $DepTypeDependencyGroupApps) {
@@ -1020,7 +1210,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$Success = $true
 		## Distributes the Content for the Created Application based on the Information in the Recipe XML under the Distribution Node
 		Push-Location
-		Set-Location $SCCMSite
+		Set-Location $CMSite
 		$DistContent = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Distribution.DistributeContent)
 		If ($DistContent) {
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToGroup))) {
@@ -1084,7 +1274,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	
 		## Deploys the Created application based on the Information in the Recipe XML under the Deployment Node
 		Push-Location
-		Set-Location $SCCMSite
+		Set-Location $CMSite
 		If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
 				Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
@@ -1131,10 +1321,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	}
 
 
-
 	################################### MAIN ########################################
 	## Startup
-	Add-LogContent "--- Starting SCCM AutoPackager Version $($Global:ScriptVersion) ---" -Load
+	Add-LogContent "--- Starting CMPackager Version $($Global:ScriptVersion) ---" -Load
 	if (-not (Get-Module ConfigurationManager)) {
 		try {
 			Add-LogContent "Importing ConfigurationManager Module"
@@ -1153,14 +1342,14 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			New-PSDrive -Name $Global:SiteCode -PSProvider "AdminUI.PS.Provider\CMSite" -Root $Global:SiteServer
 		}
 		catch {
-			Add-LogContent "ERROR - The SCCM PSDrive could not be loaded. Exiting..."
+			Add-LogContent "ERROR - The CM PSDrive could not be loaded. Exiting..."
 			Add-LogContent "ERROR: $ErrorMessage"
 			Exit 1
 		}
 	}
 
 	## Create the Temp Folder if needed
-	Add-LogContent "Creating SCCMPackager Folder"
+	Add-LogContent "Creating CMPackager Temp Folder"
 	if (-not (Test-Path $Global:TempDir)) {
 		New-Item -ItemType Container -Path "$Global:TempDir" -Force -ErrorAction SilentlyContinue
 	}
@@ -1168,6 +1357,33 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	## Allow all Cookies to download (Prevents Script from Freezing)
 	Add-LogContent "Allowing All Cookies to Download (This prevents the script from freezing on a download)"
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /t REG_DWORD /v 1A10 /f /d 0
+
+	## Create Global Conditions as defined in GlobalConditions.xml
+	$GlobalConditionsXML = (([xml](Get-Content "$ScriptRoot\GlobalConditions.xml")).GlobalConditions.GlobalCondition | Where-Object Name -NE "Template" )
+	Foreach ($GlobalCondition in $GlobalConditionsXML) {
+		$NewGCArguments = @{ }
+		$GlobalCondition.ChildNodes | ForEach-Object { if ($_.Name -ne "GCType") { $NewGCArguments[$_.Name] = $_.'#text' } }
+		Push-Location
+		Set-Location $Global:CMSite
+		if (-not (Get-CMGlobalCondition -Name $GlobalCondition.Name)) {
+			switch ($GlobalCondition.GCType) {	
+				WqlQuery { 
+					Add-LogContent "Creating New WQL Global Condition"
+					Add-LogContent "New-CMGlobalConditionWqlQuery $NewGCArguments"
+					New-CMGlobalConditionWqlQuery @NewGCArguments
+				}
+				Script { 
+					Add-LogContent "Creating New Script Global Condition"
+					Add-LogContent "New-CMGlobalConditionScript $NewGCArguments"
+					New-CMGlobalConditionScript @NewGCArguments
+				}
+				Default {
+					Add-LogContent "ERROR: Please specify a valid Global Condition Type of either WqlQuery or Script"
+				}
+			}
+		}
+		Pop-Location
+	}
 
 	## Get the Recipes
 	$RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
@@ -1213,7 +1429,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
 		}
 		if ($Global:TemplateApplicationCreatedFlag -eq $true) {
-			Add-LogContent "WARN: The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the SCCMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
+			Add-LogContent "WARN (LEGACY): The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the CMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
+			Add-LogContent "THE REQUIREMENTS TEMPLATE APPLICTION IS NO LONGER NEEDED"
 			Exit 0
 		}
 	}
@@ -1229,5 +1446,5 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	Add-LogContent "Clearing All Cookies Download Setting"
 	reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /v 1A10 /f
 
-	Add-LogContent "--- End Of SCCM AutoPackager ---"
+	Add-LogContent "--- End Of CMPackager ---"
 }

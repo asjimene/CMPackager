@@ -69,10 +69,24 @@
 			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>MSI</DetectionMethodType>
-			<Requirements>
-				<RuleName>AutoPackage - Computer Manufacturer Equals Apple Inc.</RuleName>
-				<RuleName>AutoPackage - Computer Model OneOf {%MODELS%}</RuleName>
-			</Requirements>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Value</RequirementsRuleType>
+					<RequirementsRuleOperator>IsEquals</RequirementsRuleOperator>
+					<RequirementsRuleValue>
+						<RuleValue>Apple Inc.</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - Computer Manufacturer</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+				<RequirementsRule>
+					<RequirementsRuleType>Value</RequirementsRuleType>
+					<RequirementsRuleOperator>OneOf</RequirementsRuleOperator>
+					<RequirementsRuleGlobalCondition>AutoPackage - Computer Model</RequirementsRuleGlobalCondition>
+					<RequirementsRuleValue>
+						<RuleValue>%MODEL%</RuleValue>
+					</RequirementsRuleValue>
+				</RequirementsRule>
+			</RequirementsRules>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>

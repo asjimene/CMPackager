@@ -1,6 +1,6 @@
 <ApplicationDef>
 	<Application>
-		<Name>Mozilla Firefox Quantum Developer Edition</Name>
+		<Name>Mozilla Firefox Developer Edition</Name>
 		<Description>The Firefox Developer Edition is a version of Firefox that's tailored for web developers. It includes: the latest Firefox features: Firefox Developer Edition replaces the old Aurora channel. Each new release includes features which have been stabilized via nightly builds. Free Software.</Description>
 		<Publisher>Mozilla</Publisher>
 		<AutoInstall>True</AutoInstall>

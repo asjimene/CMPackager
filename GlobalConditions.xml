@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalConditions>
+	<GlobalCondition>
+		<Name>Template</Name>
+		<GCType>[WqlQuery/Script](Required)</GCType>
+		<DataType>[Boolean/DateTime/FloatingPoint/Integer/IntegerArray,String/String/StringArray/Version](Required)</DataType>
+		<Description>[String]</Description>
+		<!-- wqlQuery Type Variables -->
+		<Class>[String]</Class>
+		<Namespace>[String]</Namespace>
+		<Property>[String]</Property>
+		<WhereClause>[String]</WhereClause>
+		<!-- Script Type Variables -->
+		<ScriptLanguage>[JScript/PowerShell/VBScript]</ScriptLanguage>
+		<ScriptText>[String]</ScriptText>
+		<Use32BitHost>[Boolean]</Use32BitHost>
+		<UseLoggedOnUserCredential>[Boolean]</UseLoggedOnUserCredential>
+	</GlobalCondition>
+	<GlobalCondition>
+	<Name>AutoPackage - Windows 10 Build Number Integer</Name>
+		<GCType>WqlQuery</GCType>
+		<DataType>Integer</DataType>
+		<Description>Returns the Windows 10 Build Number as an Integer (Good for determining if a build is greater than or less than a current build)</Description>
+		<Class>Win32_OperatingSystem</Class>
+		<Namespace>root\cimv2</Namespace>
+		<Property>BuildNumber</Property>
+	</GlobalCondition>
+	<GlobalCondition>
+	<Name>AutoPackage - Computer Manufacturer</Name>
+		<GCType>WqlQuery</GCType>
+		<DataType>String</DataType>
+		<Description>Returns the Manufacturer from ComputerSystem\Manufacturer</Description>
+		<Class>Win32_ComputerSystem</Class>
+		<Namespace>root\cimv2</Namespace>
+		<Property>Manufacturer</Property>
+	</GlobalCondition>
+	<GlobalCondition>
+		<Name>AutoPackage - Computer Model</Name>
+		<GCType>WqlQuery</GCType>
+		<DataType>String</DataType>
+		<Description>Returns the Model from ComputerSystem\Model</Description>
+		<Class>Win32_ComputerSystem</Class>
+		<Namespace>root\cimv2</Namespace>
+		<Property>Model</Property>
+	</GlobalCondition>
+	<GlobalCondition>
+	<Name>AutoPackage - OSArchitecture x64</Name>
+		<GCType>WqlQuery</GCType>
+		<DataType>String</DataType>
+		<Description>Returns True if Win32_OperatingSystem is True. Use as existential rule for 64-bit operating system</Description>
+		<Class>Win32_OperatingSystem</Class>
+		<Namespace>root\cimv2</Namespace>
+		<Property>OSArchitecture</Property>
+		<WhereClause>OSArchitecture = "64-bit"</WhereClause>
+	</GlobalCondition>
+	<GlobalCondition>
+	<Name>AutoPackage - DellBIOSProvider Prereq Check</Name>
+		<GCType>Script</GCType>
+		<DataType>Boolean</DataType>
+		<Description>Determines if the Dell PowerShell Provider can be installed:
+Make = Dell
+Model = Latitude, Optiplex, Precision, Venue, XPS
+SMBIOS Version = Greater Than or Equal to 2.3
+PowerShell Version = Greater Than or Equal to 3.0</Description>
+		<ScriptLanguage>PowerShell</ScriptLanguage>
+		<ScriptText>$Make = (Get-WmiObject Win32_ComputerSystem).Manufacturer
+$Family = (Get-WmiObject Win32_ComputerSystem).Model
+$SMBIOS = "$((Get-WmiObject Win32_BIOS).SMBIOSMajorVersion).$((Get-WmiObject Win32_BIOS).SMBIOSMinorVersion)"
+$PowershellVersion = $PSVersionTable.PSVersion.Major
+
+if (($Make -like "Dell*") -and (($Family -like "*Optiplex*") -or ($Family -like "*Latitude*") -or ($Family -like "*XPS*") -or ($Family -like "*Venue*")) -and (($SMBIOS -ge 2.3) -and ($PowershellVersion -ge 3))){
+    Write-Output $true
+} else {
+    Write-Output $false
+}</ScriptText>
+	</GlobalCondition>
+</GlobalConditions>
