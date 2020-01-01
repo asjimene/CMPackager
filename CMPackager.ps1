@@ -466,8 +466,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
 		}
 	
-	
-	
 		## Send an Email if an Application was successfully Created and record the Application Name and Version for the Email
 		If ($AppCreated) {
 			$Global:SendEmail = $true; $Global:SendEmail | Out-Null
