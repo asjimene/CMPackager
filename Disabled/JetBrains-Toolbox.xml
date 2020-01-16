@@ -57,7 +57,7 @@
 		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
+		<DeploySoftware>True</DeploySoftware>
 		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
 </ApplicationDef>

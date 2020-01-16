@@ -50,11 +50,11 @@ $ProductCode = $LatestFlash.ParentNode.MsiInstallerData.ProductCode</PrefetchScr
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
+		<DistributeContent>True</DistributeContent>
 		<DistributeToGroup></DistributeToGroup>
 	</Distribution>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
+		<DeploySoftware>True</DeploySoftware>
 		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
 </ApplicationDef>

@@ -36,7 +36,7 @@
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
 			<DetectionMethodType>CustomScript</DetectionMethodType>
 			<ScriptLanguage>PowerShell</ScriptLanguage>
-			<DetectionMethod>if ("$Version" -eq ((Get-Content "$env:ProgramFiles\MakerBot\MakerbotPrint\version.json"  | ConvertFrom-Json).PlatformVersion)){Write-Output "Installed"}</DetectionMethod>
+			<DetectionMethod>if ("$Version" -eq ((Get-Content "$env:ProgramFiles\MakerBot\MakerbotPrint\version.json" -ErrorAction SilentlyContinue  | ConvertFrom-Json -ErrorAction SilentlyContinue).PlatformVersion)){Write-Output "Installed"}</DetectionMethod>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>

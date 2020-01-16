@@ -1,89 +1,99 @@
 <ApplicationDef>
-	<Application>
-		<Name>Microsoft Power BI Desktop</Name>
-		<Description>Power BI is a suite of business analytics tools that deliver insights throughout your organization. Connect to hundreds of data sources, simplify data prep, and drive ad hoc analysis. Produce beautiful reports, then publish them for your organization to consume on the web and across mobile devices. Everyone can create personalized dashboards with a unique, 360-degree view of their business. And scale across the enterprise, with governance and security built-in.</Description>
-		<Publisher>Microsoft</Publisher>
-		<AutoInstall>True</AutoInstall>
-		<UserDocumentation>https://www.microsoft.com/en-us/download/details.aspx?id=45331</UserDocumentation>
-		<Icon>PowerBIDesktop.ico</Icon>
-	</Application>
-	<Downloads>
-		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=45331" -UseBasicParsing).Links | Where-Object href -like "*PBIDesktop_x64.msi")[0].href</PrefetchScript>
-			<URL></URL>
-			<DownloadFileName>PBIDesktop_x64.msi</DownloadFileName>
-			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
-			<FullVersion></FullVersion>
-			<Version></Version>
-		</Download>
-		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=45331" -UseBasicParsing).Links | Where-Object href -like "*PBIDesktop.msi")[0].href</PrefetchScript>
-			<URL></URL>
-			<DownloadFileName>PBIDesktop.msi</DownloadFileName>
-			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
-			<FullVersion></FullVersion>
-			<Version></Version>
-		</Download>
-	</Downloads>
-	<DeploymentTypes>
-		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>Silent Installer for Microsoft PowerBI Desktop x64</DeploymentTypeName>
-			<InstallationType>MSI</InstallationType>
-			<Comments>Silent Installer for Microsoft PowerBI Desktop x64</Comments>
-			<Language>English</Language>
-			<CacheContent>False</CacheContent>
-			<BranchCache>True</BranchCache>
-			<ContentFallback>True</ContentFallback>
-			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>msiexec /i PBIDesktop_x64.msi /qn /norestart ACCEPT_EULA=1</InstallProgram>
-			<InstallationMSI>PBIDesktop_x64.msi</InstallationMSI>
-			<UninstallCmd></UninstallCmd>
-			<Force32bit>False</Force32bit>
-			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
-			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
-			<UserInteractionMode>Hidden</UserInteractionMode>
-			<ReqUserInteraction>False</ReqUserInteraction>
-			<EstRuntimeMins>15</EstRuntimeMins>
-			<MaxRuntimeMins>45</MaxRuntimeMins>
-			<RebootBehavior>BasedOnExitCode</RebootBehavior>
-			<DetectionMethodType>MSI</DetectionMethodType>
-			<RequirementsRules>
-				<RequirementsRule>
-					<RequirementsRuleType>Existential</RequirementsRuleType>
-					<RequirementsRuleValue>
-						<RuleValue>True</RuleValue>
-					</RequirementsRuleValue>
-					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
-				</RequirementsRule>
-			</RequirementsRules>
-		</DeploymentType>
-		<DeploymentType Name="DeploymentType2">
-			<DeploymentTypeName>Silent Installer for Microsoft PowerBI Desktop x86</DeploymentTypeName>
-			<InstallationType>MSI</InstallationType>
-			<Comments>Silent Installer for Microsoft PowerBI Desktop x86</Comments>
-			<Language>English</Language>
-			<CacheContent>False</CacheContent>
-			<BranchCache>True</BranchCache>
-			<ContentFallback>True</ContentFallback>
-			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>msiexec /i PBIDesktop.msi /qn /norestart ACCEPT_EULA=1</InstallProgram>
-			<InstallationMSI>PBIDesktop.msi</InstallationMSI>
-			<UninstallCmd></UninstallCmd>
-			<Force32bit>False</Force32bit>
-			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
-			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
-			<UserInteractionMode>Hidden</UserInteractionMode>
-			<ReqUserInteraction>False</ReqUserInteraction>
-			<EstRuntimeMins>15</EstRuntimeMins>
-			<MaxRuntimeMins>45</MaxRuntimeMins>
-			<RebootBehavior>BasedOnExitCode</RebootBehavior>
-			<DetectionMethodType>MSI</DetectionMethodType>
-		</DeploymentType>
-	</DeploymentTypes>
-	<Distribution>
-		<DistributeContent>True</DistributeContent>
-	</Distribution>
-	<Deployment>
-		<DeploySoftware>True</DeploySoftware>
-	</Deployment>
+    <Application>
+        <Name>Microsoft Power BI Desktop</Name>
+        <Description>Power BI is a suite of business analytics tools that deliver insights throughout your organization. Connect to hundreds of data sources, simplify data prep, and drive ad hoc analysis. Produce beautiful reports, then publish them for your organization to consume on the web and across mobile devices. Everyone can create personalized dashboards with a unique, 360-degree view of their business. And scale across the enterprise, with governance and security built-in.</Description>
+        <Publisher>Microsoft</Publisher>
+        <AutoInstall>True</AutoInstall>
+        <UserDocumentation>https://www.microsoft.com/en-us/download/details.aspx?id=58494</UserDocumentation>
+        <Icon>PowerBIDesktop.ico</Icon>
+    </Application>
+    <Downloads>
+        <Download DeploymentType="DeploymentType1">
+            <PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=58494" -UseBasicParsing).Links | Where-Object href -like "*PBIDesktopSetup_x64.exe")[0].href</PrefetchScript>
+            <URL></URL>
+            <DownloadFileName>PBIDesktopSetup_x64.exe</DownloadFileName>
+            <DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+            <FullVersion></FullVersion>
+            <Version></Version>
+        </Download>
+        <Download DeploymentType="DeploymentType2">
+            <PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=58494" -UseBasicParsing).Links | Where-Object href -like "*PBIDesktopSetup.exe")[0].href</PrefetchScript>
+            <URL></URL>
+            <DownloadFileName>PBIDesktopSetup.exe</DownloadFileName>
+            <DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+            <FullVersion></FullVersion>
+            <Version></Version>
+        </Download>
+    </Downloads>
+    <DeploymentTypes>
+        <DeploymentType Name="DeploymentType1">
+            <DeploymentTypeName>Silent Installer for Microsoft PowerBI Desktop x64</DeploymentTypeName>
+            <InstallationType>Script</InstallationType>
+            <Comments>Silent Installer for Microsoft PowerBI Desktop x64</Comments>
+            <Language>English</Language>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallProgram>PBIDesktopSetup_x64.exe -s -norestart ACCEPT_EULA=1 INSTALLDESKTOPSHORTCUT=0</InstallProgram>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <ReqUserInteraction>False</ReqUserInteraction>
+            <EstRuntimeMins>15</EstRuntimeMins>
+            <MaxRuntimeMins>45</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>CustomScript</DetectionMethodType>
+            <ScriptLanguage>PowerShell</ScriptLanguage>
+            <DetectionMethod>$InstalledItem = (Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" -ErrorAction SilentlyContinue | where-object {$_.GetValue("DisplayName") -eq "Microsoft Power BI Desktop (x64)"})
+if (-not ([System.String]::IsNullorEmpty($InstalledItem))){
+    if ([Version]$($InstalledItem.GetValue("DisplayVersion")) -ge [Version]"$Version"){
+        write-Output "Installed"
+    }
+}
+            </DetectionMethod>
+            <RequirementsRules>
+                <RequirementsRule>
+                    <RequirementsRuleType>Existential</RequirementsRuleType>
+                    <RequirementsRuleValue>
+                        <RuleValue>True</RuleValue>
+                    </RequirementsRuleValue>
+                    <RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+                </RequirementsRule>
+            </RequirementsRules>
+        </DeploymentType>
+        <DeploymentType Name="DeploymentType2">
+            <DeploymentTypeName>Silent Installer for Microsoft PowerBI Desktop x86</DeploymentTypeName>
+            <InstallationType>Script</InstallationType>
+            <Comments>Silent Installer for Microsoft PowerBI Desktop x86</Comments>
+            <Language>English</Language>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallProgram>PBIDesktopSetup.exe -s -norestart ACCEPT_EULA=1 INSTALLDESKTOPSHORTCUT=0</InstallProgram>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <ReqUserInteraction>False</ReqUserInteraction>
+            <EstRuntimeMins>15</EstRuntimeMins>
+            <MaxRuntimeMins>45</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+<DetectionMethodType>CustomScript</DetectionMethodType>
+<ScriptLanguage>PowerShell</ScriptLanguage>
+<DetectionMethod>$InstalledItem = (Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" -ErrorAction SilentlyContinue | where-object {$_.GetValue("DisplayName") -eq "Microsoft Power BI Desktop"})
+if (-not ([System.String]::IsNullorEmpty($InstalledItem))){
+    if ([Version]$($InstalledItem.GetValue("DisplayVersion")) -ge [Version]"$Version"){
+        write-Output "Installed"
+    }
+}
+</DetectionMethod>
+        </DeploymentType>
+    </DeploymentTypes>
+    <Distribution>
+        <DistributeContent>True</DistributeContent>
+    </Distribution>
+    <Deployment>
+        <DeploySoftware>True</DeploySoftware>
+    </Deployment>
 </ApplicationDef>

@@ -1,0 +1,68 @@
+<ApplicationDef>
+    <Application>
+        <Name>Spectral Analysis</Name>
+        <Description>Vernier Spectral Analysis is a tool for science students to collect and analyze data from Vernier spectrophotometers.</Description>
+        <Publisher>Vernier</Publisher>
+        <AutoInstall>True</AutoInstall>
+        <UserDocumentation>https://www.vernier.com/product/spectral-analysis/</UserDocumentation>
+        <Icon>SpectralAnalysis.ico</Icon>
+    </Application>
+    <Downloads>
+        <Download DeploymentType="DeploymentType1">
+            <PrefetchScript>$URL = ((Invoke-WebRequest "https://www.vernier.com/product/spectral-analysis/" -UseBasicParsing).Links | Where-Object href -like "*Spectral-Analysis*.exe")[0].href</PrefetchScript>
+            <URL></URL>
+            <DownloadFileName>SpectralAnalysis.exe</DownloadFileName>
+            <DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.ProductVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+            <FullVersion></FullVersion>
+            <Version></Version>
+        </Download>
+    </Downloads>
+    <DeploymentTypes>
+        <DeploymentType Name="DeploymentType1">
+            <DeploymentTypeName>Silent Installer for Spectral Analysis</DeploymentTypeName>
+            <InstallationType>Script</InstallationType>
+            <Comments>Silent Installer for Spectral Analysis</Comments>
+            <Language>English</Language>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallProgram>SpectralAnalysis.exe /Allusers /S /norestart /V/qn</InstallProgram>
+            <Uninstallcmd>`"C:\Program Files (x86)\Vernier Spectral Analysis\Uninstall Vernier Spectral Analysis.exe`" /allusers /S</Uninstallcmd>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <ReqUserInteraction>False</ReqUserInteraction>
+            <EstRuntimeMins>15</EstRuntimeMins>
+            <MaxRuntimeMins>45</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>CustomScript</DetectionMethodType>
+            <ScriptLanguage>PowerShell</ScriptLanguage>
+            <DetectionMethod>
+$ApptoSearch = "Vernier Spectral Analysis*"
+$installed = $false
+$InstalledItem = (Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" -ErrorAction SilentlyContinue | where-object {$_.GetValue("DisplayName") -like $ApptoSearch})
+if (-not ([System.String]::IsNullorEmpty($InstalledItem))){
+    if ($($InstalledItem.GetValue("DisplayVersion")) -eq "$Version"){
+        $installed = $true
+    }
+}
+$InstalledItem = (Get-ChildItem -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall" -ErrorAction SilentlyContinue | where-object {$_.GetValue("DisplayName") -like $ApptoSearch})
+if (-not ([System.String]::IsNullorEmpty($InstalledItem))){
+    if ($($InstalledItem.GetValue("DisplayVersion")) -eq "$Version"){
+        $installed = $true
+    }
+}
+if ($Installed){
+    Write-Output "Installed"
+}
+            </DetectionMethod>
+        </DeploymentType>
+    </DeploymentTypes>
+    <Distribution>
+        <DistributeContent>True</DistributeContent>
+    </Distribution>
+    <Deployment>
+        <DeploySoftware>True</DeploySoftware>
+    </Deployment>
+</ApplicationDef>
