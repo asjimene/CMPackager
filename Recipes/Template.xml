@@ -13,6 +13,8 @@
 		<UserDocumentation></UserDocumentation>
 		<!-- Icon - [String] Icon File Name in Icon Repository (Repository is set in the Preferences File) -->
 		<Icon></Icon>
+		<!-- FolderPath - [String] The folder path folder path in ConfigMgr where the Application should be created. Default location on the "Software Libary" node is the root under "Overview -> Application Management -> Applications". -->
+		<FolderPath></FolderPath>
 	</Application>
 	<!-- Downloads - Sets the Definition for the downloads required for the Application -->
 	<Downloads>
