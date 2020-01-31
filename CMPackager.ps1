@@ -418,6 +418,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationDescription = $Recipe.ApplicationDef.Application.Description
 		$ApplicationDocURL = $Recipe.ApplicationDef.Application.UserDocumentation
 		$ApplicationIcon = "$Global:IconRepo\$($Recipe.ApplicationDef.Application.Icon)"
+		$ApplicationFolderPath = $Recipe.ApplicationDef.Application.FolderPath
 		if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
 			$ApplicationIcon = "$ScriptRoot\ExtraFiles\Icons\$($Recipe.ApplicationDef.Application.Icon)"
 			if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
@@ -465,7 +466,24 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "ERROR: $FullyQualified"
 			Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
 		}
-	
+
+		# Move the Application to folder path if supplied
+		Try {
+			If (-not ([System.String]::IsNullOrEmpty($ApplicationFolderPath))) {
+				Add-LogContent "Command: Move-CMObject -InputObject (Get-CMApplication -Name ""$ApplicationName $ApplicationSWVersion"") -FolderPath "".\Application\$ApplicationFolderPath"""
+				Move-CMObject -InputObject (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion") -FolderPath ".\Application\$ApplicationFolderPath"
+			}
+		}
+		Catch { 
+			$AppCreated = $false
+			$ErrorMessage = $_.Exception.Message
+			$FullyQualified = $_.FullyQualifiedErrorID
+			Add-LogContent "ERROR: Application Move Failed!"
+			Add-LogContent "ERROR: $ErrorMessage"
+			Add-LogContent "ERROR: $FullyQualified"
+			Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
+		}
+
 		## Send an Email if an Application was successfully Created and record the Application Name and Version for the Email
 		If ($AppCreated) {
 			$Global:SendEmail = $true; $Global:SendEmail | Out-Null
