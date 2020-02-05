@@ -9,8 +9,10 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*npp.*.Installer.exe").href
-			$URL = "https://github.com$LinkPath"</PrefetchScript>
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+				$LinkPath = ((Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*npp.*.Installer.exe").href
+				$URL = "https://github.com$LinkPath"
+			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>NotePadppInstaller.exe</DownloadFileName>
 			<Version></Version>
