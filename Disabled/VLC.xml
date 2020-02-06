@@ -9,6 +9,15 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = "http://download.videolan.org/pub/videolan/vlc/last/win64/$(((Invoke-WebRequest 'http://download.videolan.org/pub/videolan/vlc/last/win64/' -UseBasicParsing).Links | Where {$_.href -like "*.msi"} | Select-Object -First 1).href)"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>VLCwin64.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
 			<PrefetchScript>$URL = "http://download.videolan.org/pub/videolan/vlc/last/win32/$(((Invoke-WebRequest 'http://download.videolan.org/pub/videolan/vlc/last/win32/' -UseBasicParsing).Links | Where {$_.href -like "*.msi"} | Select-Object -First 1).href)"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>VLCwin32.msi</DownloadFileName>
@@ -19,8 +28,34 @@
 		</Download>
 	</Downloads>
 	<DeploymentTypes>
-		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>VLC Silent Install</DeploymentTypeName>
+	<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>VLC Silent Install x64</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>VLCwin64.msi</InstallationMSI>
+			<InstallProgram>msiexec.exe /i `"VLCwin64.msi`" /norestart</InstallProgram>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>VLC Silent Install x86</DeploymentTypeName>
 			<InstallationType>MSI</InstallationType>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
