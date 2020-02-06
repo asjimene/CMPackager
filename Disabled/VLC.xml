@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = "http://download.videolan.org/pub/videolan/vlc/last/win64/$(((Invoke-WebRequest 'http://download.videolan.org/pub/videolan/vlc/last/win64/' -UseBasicParsing).Links | Where {$_.href -like "*.msi"} | Select-Object -First 1).href)"</PrefetchScript>
+			<PrefetchScript>$URL = "https://download.videolan.org/pub/videolan/vlc/last/win64/$(((Invoke-WebRequest 'https://download.videolan.org/pub/videolan/vlc/last/win64/' -UseBasicParsing).Links | Where {$_.href -like "*.msi"} | Select-Object -First 1).href)"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>VLCwin64.msi</DownloadFileName>
 			<Version></Version>
@@ -18,7 +18,7 @@
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$URL = "http://download.videolan.org/pub/videolan/vlc/last/win32/$(((Invoke-WebRequest 'http://download.videolan.org/pub/videolan/vlc/last/win32/' -UseBasicParsing).Links | Where {$_.href -like "*.msi"} | Select-Object -First 1).href)"</PrefetchScript>
+			<PrefetchScript>$URL = "https://download.videolan.org/pub/videolan/vlc/last/win32/$(((Invoke-WebRequest 'https://download.videolan.org/pub/videolan/vlc/last/win32/' -UseBasicParsing).Links | Where {$_.href -like "*.msi"} | Select-Object -First 1).href)"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>VLCwin32.msi</DownloadFileName>
 			<Version></Version>
@@ -36,7 +36,7 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallationMSI>VLCwin64.msi</InstallationMSI>
-			<InstallProgram>msiexec.exe /i `"VLCwin64.msi`" /norestart</InstallProgram>
+			<InstallProgram>msiexec.exe /i `"VLCwin64.msi`" /qn /norestart</InstallProgram>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -62,7 +62,7 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallationMSI>VLCwin32.msi</InstallationMSI>
-			<InstallProgram>msiexec.exe /i `"VLCwin32.msi`" /norestart</InstallProgram>
+			<InstallProgram>msiexec.exe /i `"VLCwin32.msi`" /qn /norestart</InstallProgram>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
