@@ -9,11 +9,20 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-				$URL = ((Invoke-WebRequest "https://api.github.com/repos/notepad-plus-plus/notepad-plus-plus/releases/latest" | ConvertFrom-Json)[0].assets | where { $_.name -Like "*npp.*.Installer.exe" }[0]).browser_download_url
-			</PrefetchScript>
+			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*npp.*.Installer.x64.exe").href
+			$URL = "https://github.com$LinkPath"</PrefetchScript>
 			<URL></URL>
-			<DownloadFileName>NotePadppInstaller.exe</DownloadFileName>
+			<DownloadFileName>NotePadppInstallerx64.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = (Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*npp.*.Installer.exe").href
+			$URL = "https://github.com$LinkPath"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>NotePadppInstallerx86.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = (Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion</DownloadVersionCheck>
@@ -22,13 +31,50 @@
 	</Downloads>
 	<DeploymentTypes>
 		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>NotePad++ Silent Installer</DeploymentTypeName>
+			<DeploymentTypeName>NotePad++ Silent Installer x64</DeploymentTypeName>
 			<InstallationType>Script</InstallationType>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>NotePadppInstaller.exe /noUpdater /S</InstallProgram>
+			<InstallProgram>NotePadppInstallerx64.exe /noUpdater /S</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\Notepad++\uninstall.exe`" /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>notepad++.exe</Name>
+					<Path>%ProgramFiles%\Notepad++\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>NotePad++ Silent Installer x86</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>NotePadppInstallerx86.exe /noUpdater /S</InstallProgram>
 			<UninstallCmd>`"%ProgramFiles(x86)%\Notepad++\uninstall.exe`" /S</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -48,6 +94,15 @@
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>False</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
