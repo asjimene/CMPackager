@@ -26,10 +26,10 @@
 	<DeploymentTypes>
 		<DeploymentType Name="DeploymentType1">
 			<DeploymentTypeName>Firefox ESR x64 Silent Install</DeploymentTypeName>
-			<InstallationType>MSI</InstallationType>
+			<InstallationType>Script</InstallationType>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallationMSI>FirefoxESRx64.msi</InstallationMSI>
+			<InstallProgram>msiexec.exe /i FirefoxESRx64.msi /qn /norestart</InstallProgram>
 			<UninstallCmd>`"%ProgramFiles%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -62,10 +62,10 @@
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
 			<DeploymentTypeName>Firefox ESR x86 Silent Install</DeploymentTypeName>
-			<InstallationType>MSI</InstallationType>
+			<InstallationType>Script</InstallationType>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-            <InstallationMSI>FirefoxESRx86.msi</InstallationMSI>
+			<InstallProgram>msiexec.exe /i FirefoxESRx86.msi /qn /norestart</InstallProgram>
 			<UninstallCmd>`"%ProgramFiles(x86)%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
