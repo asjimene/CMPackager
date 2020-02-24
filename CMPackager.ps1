@@ -19,7 +19,9 @@
 #>
 
 [CmdletBinding()]
-param ()
+param (
+	[switch]$Setup = $false
+)
 DynamicParam {  
 	$ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
 	$ParamAttrib.Mandatory = $false
@@ -35,46 +37,74 @@ DynamicParam {
 }
 process {
 
-	$Global:ScriptVersion = "19.12.31.0"
+	$Global:ScriptVersion = "20.02.23.0"
 
 	$Global:ScriptRoot = $PSScriptRoot
 
-	## Global Variables
+	if (-not (Test-Path "$ScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue)){
+		$Setup = $true
+	}
+	## Global Variables (Only load if not setup)
 	# Import the Prefs file
-	[xml]$PackagerPrefs = Get-Content $ScriptRoot\CMPackager.prefs
+	if (-not ($Setup)) {
+		[xml]$PackagerPrefs = Get-Content $ScriptRoot\CMPackager.prefs
 
-	# Packager Vars
-	$Global:TempDir = $PackagerPrefs.PackagerPrefs.TempDir
-	$Global:LogPath = $PackagerPrefs.PackagerPrefs.LogPath
-	$Global:MaxLogSize = 1000kb
+		# Packager Vars
+		$Global:TempDir = $PackagerPrefs.PackagerPrefs.TempDir
+		$Global:LogPath = $PackagerPrefs.PackagerPrefs.LogPath
+		$Global:MaxLogSize = 1000kb
 
-	# Package Location Vars
-	$Global:ContentLocationRoot = $PackagerPrefs.PackagerPrefs.ContentLocationRoot
-	$Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
+		# Package Location Vars
+		$Global:ContentLocationRoot = $PackagerPrefs.PackagerPrefs.ContentLocationRoot
+		$Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
 
-	# CM Vars
-	$Global:CMSite = $PackagerPrefs.PackagerPrefs.CMSite
-	$Global:SiteCode = ($Global:CMSite).Replace(':', '')
-	$Global:SiteServer = $PackagerPrefs.PackagerPrefs.SiteServer
-	$Global:RequirementsTemplateAppName = $PackagerPrefs.PackagerPrefs.RequirementsTemplateAppName
-	$Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
-	$Global:PreferredDeployCollection = $PackagerPrefs.PackagerPrefs.PreferredDeployCollection
-	$Global:NoVersionInSWCenter = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NoVersionInSWCenter)
+		# CM Vars
+		$Global:CMSite = $PackagerPrefs.PackagerPrefs.CMSite
+		$Global:SiteCode = ($Global:CMSite).Replace(':', '')
+		$Global:SiteServer = $PackagerPrefs.PackagerPrefs.SiteServer
+		$Global:RequirementsTemplateAppName = $PackagerPrefs.PackagerPrefs.RequirementsTemplateAppName
+		$Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
+		$Global:PreferredDeployCollection = $PackagerPrefs.PackagerPrefs.PreferredDeployCollection
+		$Global:NoVersionInSWCenter = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NoVersionInSWCenter)
 
 
-	# Email Vars
-	[string[]]$Global:EmailTo = [string[]]$PackagerPrefs.PackagerPrefs.EmailTo
-	$Global:EmailFrom = $PackagerPrefs.PackagerPrefs.EmailFrom
-	$Global:EmailServer = $PackagerPrefs.PackagerPrefs.EmailServer
-	$Global:SendEmailPreference = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.SendEmailPreference)
-	$Global:NotifyOnDownloadFailure = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NotifyOnDownloadFailure)
+		# Email Vars
+		[string[]]$Global:EmailTo = [string[]]$PackagerPrefs.PackagerPrefs.EmailTo
+		$Global:EmailFrom = $PackagerPrefs.PackagerPrefs.EmailFrom
+		$Global:EmailServer = $PackagerPrefs.PackagerPrefs.EmailServer
+		$Global:SendEmailPreference = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.SendEmailPreference)
+		$Global:NotifyOnDownloadFailure = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NotifyOnDownloadFailure)
 
-	$Global:EmailSubject = "CMPackager Report - $(Get-date -format d)"
-	$Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n`n"
+		$Global:EmailSubject = "CMPackager Report - $(Get-Date -format d)"
+		$Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n`n"
 
-	#This gets switched to True if Applications are Packaged
-	$Global:SendEmail = $false
-	$Global:TemplateApplicationCreatedFlag = $false
+		#This gets switched to True if Applications are Packaged
+		$Global:SendEmail = $false
+		$Global:TemplateApplicationCreatedFlag = $false
+	}
+
+	$Global:ConfigMgrConnection = $false
+	$Global:XMLtoDisplayHash = @{"TempDir" = "WPFtextBoxWorkingDir";
+		"ContentLocationRoot"                 = "WPFtextBoxContentRoot";
+		"IconRepo"                            = "WPFtextBoxIconRepository";
+		"CMSite"                              = "WPFtextBoxSiteCode";
+		"SiteServer"                          = "WPFtextBoxSiteServer";
+		"NoVersionInSWCenter"                 = "WPFtoggleButtonNoDisplayAppVer";
+		"EmailTo"                             = "WPFtextBoxEmailTo";
+		"EmailFrom"                           = "WPFtextBoxEmailFrom";
+		"EmailServer"                         = "WPFtextBoxEmailServer";
+		"SendEmailPreference"                 = "WPFtoggleButtonSendEmail";
+		"NotifyOnDownloadFailure"             = "WPFtoggleButtonNotifyOnFailure";
+		"PreferredDistributionLoc"            = "WPFcomboBoxPreferredDistPoint";
+		"PreferredDeployCollection"           = "WPFcomboBoxPreferredDeployColl"
+	}
+		 
+	if (Test-Path "$PSScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue) {
+		$CMPackagerXML = [XML](Get-Content "$PSScriptRoot\CMPackager.prefs")
+	}
+	else {
+		$CMPackagerXML = [XML](Get-Content "$PSScriptRoot\CMPackager.prefs.template")
+	}
 
 	$Global:OperatorsLookup = @{ And = 'And'; Or = 'Or'; Other = 'Other'; IsEquals = 'Equals'; NotEquals = 'Not equal to'; GreaterThan = 'Greater than'; LessThan = 'Less than'; Between = 'Between'; NotBetween = 'Not Between'; GreaterEquals = 'Greater than or equal to'; LessEquals = 'Less than or equal to'; BeginsWith = 'Begins with'; NotBeginsWith = 'Does not begin with'; EndsWith = 'Ends with'; NotEndsWith = 'Does not end with'; Contains = 'Contains'; NotContains = 'Does not contain'; AllOf = 'All of'; OneOf = 'OneOf'; NoneOf = 'NoneOf'; SetEquals = 'Set equals'; SubsetOf = 'Subset of'; ExcludesAll = 'Exludes all' }
 	## Functions
@@ -167,7 +197,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			[string[]]$FullName
 		)
 		DynamicParam {
-			$Attributes = new-object System.Management.Automation.ParameterAttribute
+			$Attributes = New-Object System.Management.Automation.ParameterAttribute
 			$Attributes.ParameterSetName = "__AllParameterSets"
 			$Attributes.Mandatory = $false
 			$AttributeCollection = New-Object -Type System.Collections.ObjectModel.Collection[System.Attribute]
@@ -296,12 +326,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Else {
 			$newApp = $false
 			Add-LogContent "$ApplicationSWVersion is not a new Version - Moving to next application"
-        }
+		}
         
-        # If SkipPackaging is specified, return that the app is up-to-date.
-        if ($ApplicationSWVersion -eq "SkipPackaging") {
-            $newApp = $false
-        }
+		# If SkipPackaging is specified, return that the app is up-to-date.
+		if ($ApplicationSWVersion -eq "SkipPackaging") {
+			$newApp = $false
+		}
 
 		Pop-Location
 		Write-Output $newApp
@@ -330,11 +360,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			}
 
 			if (-not ([System.String]::IsNullOrEmpty($Version))) {
-                ## Version Check after prefetch script (skip download if possible)
-                ## This was not working well. Will revisit later
-                #$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
-                $newApp = $true
-			} else {
+				## Version Check after prefetch script (skip download if possible)
+				## This was not working well. Will revisit later
+				#$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Version)
+				$newApp = $true
+			}
+			else {
 				$newApp = $true
 			}
 			
@@ -705,7 +736,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Add-LogContent "Existential Rule $ReqRuleVal"
 				$CMGlobalCondition = Get-CMGlobalCondition -Name $ReqRuleGlobalConditionName
 				if ([System.Convert]::ToBoolean($ReqRuleVal)) {
-					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($($ReqRuleVal | Select-object -first 1)))
+					$rule = $CMGlobalCondition | New-CMRequirementRuleExistential -Existential $([System.Convert]::ToBoolean($($ReqRuleVal | Select-Object -first 1)))
 					$rule.Name = "Existential of $ReqRuleGlobalConditionName Not equal to 0"
 				}
 				else {
@@ -876,7 +907,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$stDepTypeRebootBehavior = $DeploymentType.RebootBehavior
 		
 			# Because I hate the yellow squiggly lines
-			Write-Output $ApplicationPublisher, $ApplicationDescription, $ApplicationDocURL, $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-null
+			Write-Output $ApplicationPublisher, $ApplicationDescription, $ApplicationDocURL, $DepTypeLanguage, $stDepTypeComment, $swDepTypeCacheContent, $swDepTypeEnableBranchCache, $swDepTypeContentFallback, $stDepTypeSlowNetworkDeploymentMode, $swDepTypeForce32Bit, $stDepTypeInstallationBehaviorType, $stDepTypeLogonRequirementType, $stDepTypeUserInteractionMode$swDepTypeRequireUserInteraction, $stDepTypeEstimatedRuntimeMins, $stDepTypeMaximumRuntimeMins, $stDepTypeRebootBehavior | Out-Null
 
 			$DepTypeDetectionMethodType = $DeploymentType.DetectionMethodType
 			Add-LogContent "Detection Method Type Set as $DepTypeDetectionMethodType"
@@ -987,7 +1018,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 								Set-CMScriptDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
 							}
 							Catch {
-								Write-host $_
+								Write-Host $_
 								$ErrorMessage = $_.Exception.Message
 								$FullyQualified = $_.Exeption.FullyQualifiedErrorID
 								Add-LogContent "ERROR: Adding Detection Method Failed!"
@@ -1002,7 +1033,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 								Set-CMScriptDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods -DetectionClauseConnector $DepTypeDetectionClauseConnector
 							}
 							Catch {
-								Write-host $_
+								Write-Host $_
 								$ErrorMessage = $_.Exception.Message
 								$FullyQualified = $_.Exeption.FullyQualifiedErrorID
 								Add-LogContent "ERROR: Adding Detection Method Failed!"
@@ -1338,33 +1369,275 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 	}
 
+	Function Connect-ConfigMgr {
+		$Global:ConfigMgrConnection = $true
+		$Global:ConfigMgrConnection | Out-Null
+		if (-not (Get-Module ConfigurationManager)) {
+			try {
+				Add-LogContent "Importing ConfigurationManager Module"
+				Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+			} 
+			catch {
+				$ErrorMessage = $_.Exception.Message
+				Add-LogContent "ERROR: Importing ConfigurationManager Module Failed!"
+				Add-LogContent "ERROR: $ErrorMessage"
+				if (-not $Setup) {
+					Exit 1
+				}
+				else {
+					$Global:ConfigMgrConnection = $false
+				}
+			}
+		}
+	
+		if ($null -eq (Get-PSDrive -Name $Global:SiteCode -ErrorAction SilentlyContinue)) {
+			try {
+				New-PSDrive -Name $Global:SiteCode -PSProvider "AdminUI.PS.Provider\CMSite" -Root $Global:SiteServer
+			}
+			catch {
+				Add-LogContent "ERROR - The CM PSDrive could not be loaded. Exiting..."
+				Add-LogContent "ERROR: $ErrorMessage"
+				if (-not $Setup) {
+					Exit 1
+				}
+				else {
+					$Global:ConfigMgrConnection = $false
+				}
+			}
+		}
+	}
+
+	Function Start-OpenFolderDialog {
+		[CmdletBinding()]
+		param (
+			[Parameter()]
+			[String]
+			$OpenFolderWindowTitle,
+			[Parameter()]
+			[String]
+			$InitialDirectory
+		)
+		# Code from https://gist.github.com/IMJLA/1d570aa2bb5c30215c222e7a5e5078fd
+		$AssemblyFullName = 'System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+		$Assembly = [System.Reflection.Assembly]::Load($AssemblyFullName)
+		$OpenFileDialog = [System.Windows.Forms.OpenFileDialog]::new()
+		$OpenFileDialog.AddExtension = $false
+		$OpenFileDialog.CheckFileExists = $false
+		$OpenFileDialog.DereferenceLinks = $true
+		if ((-not ([System.String]::IsNullOrEmpty($InitialDirectory))) -and (Test-Path $InitialDirectory -IsValid -ErrorAction SilentlyContinue)) {
+			$OpenFileDialog.InitialDirectory = $InitialDirectory
+		}
+		$OpenFileDialog.Filter = "Folders|`n"
+		$OpenFileDialog.Multiselect = $false
+		if ([System.String]::IsNullOrEmpty($OpenFolderWindowTitle)) {
+			$OpenFileDialog.Title = "Select folder"
+		}
+		else {
+			$OpenFileDialog.Title = $OpenFolderWindowTitle
+		}
+		$OpenFileDialogType = $OpenFileDialog.GetType()
+		$FileDialogInterfaceType = $Assembly.GetType('System.Windows.Forms.FileDialogNative+IFileDialog')
+		$IFileDialog = $OpenFileDialogType.GetMethod('CreateVistaDialog', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($OpenFileDialog, $null)
+		$null = $OpenFileDialogType.GetMethod('OnBeforeVistaDialog', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($OpenFileDialog, $IFileDialog)
+		[uint32]$PickFoldersOption = $Assembly.GetType('System.Windows.Forms.FileDialogNative+FOS').GetField('FOS_PICKFOLDERS').GetValue($null)
+		$FolderOptions = $OpenFileDialogType.GetMethod('get_Options', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($OpenFileDialog, $null) -bor $PickFoldersOption
+		$null = $FileDialogInterfaceType.GetMethod('SetOptions', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($IFileDialog, $FolderOptions)
+		$VistaDialogEvent = [System.Activator]::CreateInstance($AssemblyFullName, 'System.Windows.Forms.FileDialog+VistaDialogEvents', $false, 0, $null, $OpenFileDialog, $null, $null).Unwrap()
+		[uint32]$AdviceCookie = 0
+		$AdvisoryParameters = @($VistaDialogEvent, $AdviceCookie)
+		$AdviseResult = $FileDialogInterfaceType.GetMethod('Advise', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($IFileDialog, $AdvisoryParameters)
+		$AdviceCookie = $AdvisoryParameters[1]
+		$Result = $FileDialogInterfaceType.GetMethod('Show', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($IFileDialog, [System.IntPtr]::Zero)
+		$null = $FileDialogInterfaceType.GetMethod('Unadvise', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($IFileDialog, $AdviceCookie)
+		if ($Result -eq [System.Windows.Forms.DialogResult]::OK) {
+			$FileDialogInterfaceType.GetMethod('GetResult', @('NonPublic', 'Public', 'Static', 'Instance')).Invoke($IFileDialog, $null)
+		}
+		Write-Output $OpenFileDialog.FileName
+	}
+	Function Test-GUItestConnectButton {
+		if ((($WPFtextBoxSiteCode.Text -like "???") -or ($WPFtextBoxSiteCode.Text -like "???:")) -and (-not ([System.String]::IsNullOrEmpty($WPFtextBoxSiteServer.Text)))) {
+			$WPFbuttonConnect.IsEnabled = $true
+		}
+		else {
+			$WPFbuttonConnect.IsEnabled = $false
+		}	
+	}
+
+	Function Test-SendEmailtoggleButton {
+		$EmailValue = [bool]($WPFtoggleButtonSendEmail.IsChecked)
+		$WPFtoggleButtonNotifyOnFailure.IsEnabled = $EmailValue
+		$WPFlabelEmailFrom.IsEnabled = $EmailValue
+		$WPFlabelEmailTo.IsEnabled = $EmailValue
+		$WPFlabelEmailServer.IsEnabled = $EmailValue
+		$WPFtextBoxEmailTo.IsEnabled = $EmailValue
+		$WPFtextBoxEmailFrom.IsEnabled = $EmailValue
+		$WPFtextBoxEmailServer.IsEnabled = $EmailValue
+	}
+
+	Function Update-GUI {
+		# Connection
+		if ((($WPFtextBoxSiteCode.Text -like "???") -or ($WPFtextBoxSiteCode.Text -like "???:")) -and (-not ([System.String]::IsNullOrEmpty($WPFtextBoxSiteServer.Text)))) {
+			$WPFbuttonConnect.IsEnabled = $true
+		}
+		else {
+			$WPFbuttonConnect.IsEnabled = $false
+		}	
+
+		# Collection Query
+		if ($WPFButtonConnect.IsEnabled -and $Global:ConfigMgrConnection) {
+			$WPFbuttonQueryCols.IsEnabled = $true
+		}
+		else {
+			$WPFbuttonQueryCols.IsEnabled = $false
+		}
+
+		# Email Toggle
+		$EmailValue = [bool]($WPFtoggleButtonSendEmail.IsChecked)
+		$WPFtoggleButtonNotifyOnFailure.IsEnabled = $EmailValue
+		$WPFlabelEmailFrom.IsEnabled = $EmailValue
+		$WPFlabelEmailTo.IsEnabled = $EmailValue
+		$WPFlabelEmailServer.IsEnabled = $EmailValue
+		$WPFtextBoxEmailTo.IsEnabled = $EmailValue
+		$WPFtextBoxEmailFrom.IsEnabled = $EmailValue
+		$WPFtextBoxEmailServer.IsEnabled = $EmailValue
+	}
 
 	################################### MAIN ########################################
 	## Startup
-	Add-LogContent "--- Starting CMPackager Version $($Global:ScriptVersion) ---" -Load
-	if (-not (Get-Module ConfigurationManager)) {
+	if ($Setup) {
+		$inputXML = Get-Content "$PSScriptRoot\ExtraFiles\Scripts\CMPackagerSetup.xaml" -Raw
+		$inputXML = $inputXML -replace 'mc:Ignorable="d"', '' -replace "x:N", 'N' -replace '^<Win.*', '<Window'
+		[void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework')
+		[xml]$XAML = $inputXML
+		#Read XAML
+ 
+		$reader = (New-Object System.Xml.XmlNodeReader $xaml)
 		try {
-			Add-LogContent "Importing ConfigurationManager Module"
-			Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-		} 
-		catch {
-			$ErrorMessage = $_.Exception.Message
-			Add-LogContent "ERROR: Importing ConfigurationManager Module Failed!"
-			Add-LogContent "ERROR: $ErrorMessage"
-			Exit 1
+			$Form = [Windows.Markup.XamlReader]::Load( $reader )
 		}
+		catch {
+			Write-Warning "Unable to parse XML, with error: $($Error[0])`n Ensure that there are NO SelectionChanged or TextChanged properties in your textboxes (PowerShell cannot process them)"
+			throw
+		}
+ 
+		#===========================================================================
+		# Load XAML Objects In PowerShell
+		#===========================================================================
+  
+		$xaml.SelectNodes("//*[@Name]") | ForEach-Object { #"trying item $($_.Name)";
+			try { Set-Variable -Name "WPF$($_.Name)" -Value $Form.FindName($_.Name) -ErrorAction Stop }
+			catch { throw }
+		}
+
+		$WPFtoggleButtonSendEmail.Add_Click( {
+				Update-GUI
+			})
+
+		$WPFtextBoxSiteCode.Add_LostFocus( {
+				Update-GUI
+			})
+
+		$WPFtextBoxSiteCode.Add_TextChanged( {
+				Update-GUI
+			})
+
+		$WPFtextBoxSiteServer.Add_TextChanged( {
+				Update-GUI
+			})
+
+		$WPFbuttonQueryCols.Add_Click( {
+			$form.Cursor = "Wait"
+				Connect-ConfigMgr
+				Push-Location
+				Set-Location $Global:CMSite
+				(Get-CMDeviceCollection "$($WPFcomboBoxPreferredDeployColl.Text)*") | ForEach-Object { $WPFcomboBoxPreferredDeployColl.Items.Add($_.Name) }
+				Pop-Location
+				$form.Cursor = "Arrow"
+			})
+
+		$WPFbuttonConnect.Add_Click( {
+				$Global:SiteCode = ($WPFtextBoxSiteCode.Text).replace(":", "")
+				$Global:CMSite = "$($Global:SiteCode):"
+				$Global:SiteServer = $WPFtextBoxSiteServer.Text
+				$Global:SiteServer | Out-Null
+				$form.Cursor = "Wait"
+				Connect-ConfigMgr
+				Push-Location
+				Set-Location $Global:CMSite
+				Get-CMDistributionPointGroup | ForEach-Object { $WPFcomboBoxPreferredDistPoint.Items.Add($_.Name) }
+				Pop-Location
+				$form.Cursor = "Arrow"
+			})
+
+		$WPFbuttonBrowseRoot.Add_Click( {
+				$FileDialogResult = Start-OpenFolderDialog -OpenFolderWindowTitle "Select ConfigMgr Content Root Directory" -InitialDirectory $WPFtextBoxContentRoot.text
+				if (-not ([System.String]::IsNullorEmpty($FileDialogResult))) {
+					$WPFtextBoxContentRoot.text = $FileDialogResult
+				}
+			})
+
+		$WPFbuttonBrowseIcon.Add_Click( {
+				$FileDialogResult = Start-OpenFolderDialog -OpenFolderWindowTitle "Select Icon Repository Directory" -InitialDirectory $WPFtextBoxIconRepository.text
+				if (-not ([System.String]::IsNullorEmpty($FileDialogResult))) {
+					$WPFtextBoxIconRepository.text = $FileDialogResult
+				}
+			})
+
+		$WPFbuttonBrowseWorkDir.Add_Click( {
+				$FileDialogResult = Start-OpenFolderDialog -OpenFolderWindowTitle "Select CMPackager Working Directory" -InitialDirectory $WPFtextBoxWorkingDir.text
+				if (-not ([System.String]::IsNullorEmpty($FileDialogResult))) {
+					$WPFtextBoxWorkingDir.text = $FileDialogResult
+				}
+			})
+
+		$Form.Add_ContentRendered( {
+				foreach ($key in $Global:XMLtoDisplayHash.Keys) {
+					Write-Host $key $XMLtoDisplayHash[$key]
+					$Value = ($CMPackagerXML.PackagerPrefs.$key)
+					$DisplayVariable = Get-Variable $XMLtoDisplayHash[$key] -ValueOnly
+					switch -wildcard ($XMLtoDisplayHash[$key]) {
+						*toggleButton* {
+							$DisplayVariable.IsChecked = [System.Convert]::ToBoolean($Value)
+						}
+						Default {
+							$DisplayVariable.Text = $Value
+						}
+					}
+				}
+
+				$FoundSiteCode = (New-Object -ComObject Microsoft.SMS.Client -Strict -ErrorAction SilentlyContinue).GetAssignedSite()
+				if (-not [System.String]::IsNullOrEmpty($FoundSiteCode)) {
+					$WPFtextBoxSiteCode.Text = $FoundSiteCode
+				}
+Update-GUI
+			})
+
+		$WPFbuttonSave.Add_Click( {
+			$form.Cursor = "Wait"
+				foreach ($key in $Global:XMLtoDisplayHash.Keys) {
+					$DisplayVariable = Get-Variable $XMLtoDisplayHash[$key] -ValueOnly
+					switch -wildcard ($XMLtoDisplayHash[$key]) {
+						*toggleButton* {
+							$Value = ($DisplayVariable.IsChecked).ToString()
+						}
+						Default {
+							$Value = $DisplayVariable.Text
+						}
+					}
+					$CMPackagerXML.PackagerPrefs.$key = [String]$Value
+					Update-GUI
+				}
+				$CMPackagerXML.PackagerPrefs.LogPath = "$(Split-Path $WPFtextBoxWorkingDir.Text -Parent)\CMPackager.log"
+				$CMPackagerXML.Save("$PSScriptRoot\CMPackager.prefs")
+				$form.Cursor = "Arrow"
+			})
+
+		$Form.ShowDialog() | Out-Null
+		exit
 	}
 
-	if ($null -eq (Get-PSDrive -Name $Global:SiteCode -ErrorAction SilentlyContinue)) {
-		try {
-			New-PSDrive -Name $Global:SiteCode -PSProvider "AdminUI.PS.Provider\CMSite" -Root $Global:SiteServer
-		}
-		catch {
-			Add-LogContent "ERROR - The CM PSDrive could not be loaded. Exiting..."
-			Add-LogContent "ERROR: $ErrorMessage"
-			Exit 1
-		}
-	}
+	Add-LogContent "--- Starting CMPackager Version $($Global:ScriptVersion) ---" -Load
+	Connect-ConfigMgr
 
 	## Create the Temp Folder if needed
 	Add-LogContent "Creating CMPackager Temp Folder"
@@ -1452,6 +1725,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Exit 0
 		}
 	}
+
+
 
 	If ($Global:SendEmail -and $SendEmailPreference) {
 		Send-EmailMessage

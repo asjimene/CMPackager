@@ -9,11 +9,9 @@
 	<!-- IconRepo - [String] Repository for Application Icons to be used in software Center -->
 	<IconRepo>\\Server\Share\Apps\Application Icons</IconRepo>
 	<!-- SCCMSite - [String] SCCM Site Name -->
-	<CMSite>SITE:</CMSite>
+	<CMSite>PS1:</CMSite>
 	<!-- FQDN of the Primary Site Server -->
 	<SiteServer>primarysite.contoso.com</SiteServer>
-	<!-- RequirementsTemplateAppName - [String] Application used to copy requirements rules from -->
-	<RequirementsTemplateAppName>Application Requirements Template 1</RequirementsTemplateAppName>
 	<!-- NoVersionInSWCenter - [Boolean] Set to True to have Application Titles in Software Center with no version (Will Display in SW Center as "$Appname" instead of "$Appname $Appversion" -->
 	<NoVersionInSWCenter>False</NoVersionInSWCenter>
 	<!-- Email Preferences - An Email can optionally be sent after packaging is complete if any applications were Packaged -->
