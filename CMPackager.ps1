@@ -1376,8 +1376,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$OldApp = $Latest2Apps | Select-Object -Last 1
 				Write-Host $oldapp.LocalizedDisplayName $newapp.LocalizedDisplayName
 				# Check that the DeploymentTypes and Deployment Type Names Match if not, skip supersedence
-				$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName
-				$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName
+				$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName | Sort-Object LocalizedDisplayName
+				$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName | Sort-Object LocalizedDisplayName
 
 				if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
 					Write-Host "New and Old App Deployment Type Names Match"
