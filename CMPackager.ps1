@@ -1380,8 +1380,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 
 				if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
 					Foreach ($DeploymentType in $NewAppDeploymentTypes) {
+						Write-Host "Superseding $($DeploymentType.LocalizedDisplayName)"
 						$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
-						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType | out-null
+						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType
 					}
 				}
 			}
