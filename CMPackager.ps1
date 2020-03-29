@@ -1356,6 +1356,36 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Return $Success
 	}
 
+	function Add-CMPackagerSupersedence {
+		param (
+			$Recipe
+		)
+
+		$ApplicationName = $Recipe.ApplicationDef.Application.Name
+		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
+
+		# Get the Previous Application Deployment Type
+		Push-Location
+		Set-Location $CMSite
+		$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object Publisher -eq $ApplicationPublisher | Sort-Object DateCreated | Select-Object -first 2
+		if ($Latest2Apps.Count -eq 2) {
+			$NewApp = $Latest2Apps[0]
+			$OldApp = $Latest2Apps[1]
+		
+			# Check that the DeploymentTypes and Deployment Type Names Match if not, skip supersedence
+			$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName
+			$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName
+
+			if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
+				Foreach ($DeploymentType in $NewAppDeploymentTypes) {
+					$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
+					Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType
+				}
+			}
+		}
+		Pop-Location
+	}
+
 	Function Send-EmailMessage {
 		Add-LogContent "Sending Email"
 		$Global:EmailBody += "`n`nThis message was automatically generated"
