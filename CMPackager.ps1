@@ -41,7 +41,7 @@ process {
 
 	$Global:ScriptRoot = $PSScriptRoot
 
-	if (-not (Test-Path "$ScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue)){
+	if (-not (Test-Path "$ScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue)) {
 		$Setup = $true
 	}
 	## Global Variables (Only load if not setup)
@@ -1356,34 +1356,38 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Return $Success
 	}
 
-	function Add-CMPackagerSupersedence {
+	function Invoke-ApplicationSupersedence {
 		param (
 			$Recipe
 		)
 
 		$ApplicationName = $Recipe.ApplicationDef.Application.Name
 		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
+		$SupersedenceEnabled = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence)
 
-		# Get the Previous Application Deployment Type
-		Push-Location
-		Set-Location $CMSite
-		$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object Publisher -eq $ApplicationPublisher | Sort-Object DateCreated | Select-Object -first 2
-		if ($Latest2Apps.Count -eq 2) {
-			$NewApp = $Latest2Apps[0]
-			$OldApp = $Latest2Apps[1]
+		if ($SupersedenceEnabled) {
+			# Get the Previous Application Deployment Type
+			Push-Location
+			Set-Location $CMSite
+			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object Publisher -eq $ApplicationPublisher | Sort-Object DateCreated | Select-Object -first 2
+			if ($Latest2Apps.Count -eq 2) {
+				$NewApp = $Latest2Apps[0]
+				$OldApp = $Latest2Apps[1]
 		
-			# Check that the DeploymentTypes and Deployment Type Names Match if not, skip supersedence
-			$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName
-			$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName
+				# Check that the DeploymentTypes and Deployment Type Names Match if not, skip supersedence
+				$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName
+				$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName
 
-			if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
-				Foreach ($DeploymentType in $NewAppDeploymentTypes) {
-					$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
-					Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType
+				if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
+					Foreach ($DeploymentType in $NewAppDeploymentTypes) {
+						$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
+						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType | out-null
+					}
 				}
 			}
+			Pop-Location
 		}
-		Pop-Location
+		Write-Output $true
 	}
 
 	Function Send-EmailMessage {
@@ -1576,7 +1580,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			})
 
 		$WPFbuttonQueryCols.Add_Click( {
-			$form.Cursor = "Wait"
+				$form.Cursor = "Wait"
 				Connect-ConfigMgr
 				Push-Location
 				Set-Location $Global:CMSite
@@ -1639,11 +1643,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				if (-not [System.String]::IsNullOrEmpty($FoundSiteCode)) {
 					$WPFtextBoxSiteCode.Text = $FoundSiteCode
 				}
-Update-GUI
+				Update-GUI
 			})
 
 		$WPFbuttonSave.Add_Click( {
-			$form.Cursor = "Wait"
+				$form.Cursor = "Wait"
 				foreach ($key in $Global:XMLtoDisplayHash.Keys) {
 					$DisplayVariable = Get-Variable $XMLtoDisplayHash[$key] -ValueOnly
 					switch -wildcard ($XMLtoDisplayHash[$key]) {
@@ -1715,11 +1719,12 @@ Update-GUI
 	## Begin Looping through all the Recipes 
 	ForEach ($Recipe In $RecipeList) {
 		## Reset All Variables
-		$Download = $False
-		$ApplicationCreation = $False
-		$DeploymentTypeCreation = $False
-		$ApplicationDistribution = $False
-		$ApplicationDeployment = $False
+		$Download = $false
+		$ApplicationCreation = $false
+		$DeploymentTypeCreation = $false
+		$ApplicationDistribution = $false
+		$ApplicationSupersedence = $false
+		$ApplicationDeployment = $false
 	
 		## Import Recipe
 		Add-LogContent "Importing Content for $Recipe"
@@ -1727,27 +1732,33 @@ Update-GUI
 		[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
 	
 		## Perform Packaging Tasks
+		Write-Output "Download"
 		$Download = Start-ApplicationDownload -Recipe $ApplicationRecipe
-		Add-LogContent "Continue to Download: $Download"
+		Add-LogContent "Continue to ApplicationCreation: $Download"
 		If ($Download) {
-			Write-Output "Download"
+			Write-output "Application Creation"
 			$ApplicationCreation = Invoke-ApplicationCreation -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to ApplicationCreation: $ApplicationCreation"
+			Add-LogContent "Continue to DeploymentTypeCreation: $ApplicationCreation"
 		}
 		If ($ApplicationCreation) {
-			Write-Output "Application Creation"
+			Write-Output "Application Deployment Type Creation"
 			$DeploymentTypeCreation = Add-DeploymentType -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to DeploymentTypeCreation: $DeploymentTypeCreation"
+			Add-LogContent "Continue to ApplicationDistribution: $DeploymentTypeCreation"
 		}
 		If ($DeploymentTypeCreation) {
 			Write-Output "Application Distribution"
 			$ApplicationDistribution = Invoke-ApplicationDistribution -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to ApplicationDistribution: $ApplicationDistribution"
+			Add-LogContent "Continue to ApplicationSupersedence: $ApplicationDistribution"
 		}
 		If ($ApplicationDistribution) {
+			Write-Output "Application Supersedence"
+			$ApplicationSupersedence = Invoke-ApplicationSupersedence $ApplicationRecipe
+			Add-LogContent "Continue to Application Deployment: $ApplicationSupersedence"
+		}
+		If ($ApplicationSupersedence) {
 			Write-Output "Application Deployment"
 			$ApplicationDeployment = Invoke-ApplicationDeployment -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to ApplicationDeployment: $ApplicationDeployment"
+			Add-logContent "Completed Processing of $Recipe"
 		}
 		if ($Global:TemplateApplicationCreatedFlag -eq $true) {
 			Add-LogContent "WARN (LEGACY): The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the CMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
