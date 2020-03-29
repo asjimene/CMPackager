@@ -1372,20 +1372,18 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object Manufacturer -eq $ApplicationPublisher | Sort-Object DateCreated | Select-Object -first 2
 			Write-Host "Latest 2 apps = $($Latest2Apps.LocalizedDisplayName)"
 			if ($Latest2Apps.Count -eq 2) {
-				$NewApp = $Latest2Apps | Select-Object -First 1
-				$OldApp = $Latest2Apps | Select-Object -Last 1
-				Write-Host $oldapp.LocalizedDisplayName $newapp.LocalizedDisplayName
+				$NewApp = $Latest2Apps | Select-Object -Last 1
+				$OldApp = $Latest2Apps | Select-Object -First 1
+				Write-Host "Old: $($oldapp.LocalizedDisplayName) New: $($newapp.LocalizedDisplayName)"
+
 				# Check that the DeploymentTypes and Deployment Type Names Match if not, skip supersedence
 				$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName | Sort-Object LocalizedDisplayName
 				$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName | Sort-Object LocalizedDisplayName
 
-				if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
-					Write-Host "New and Old App Deployment Type Names Match"
-					Foreach ($DeploymentType in $NewAppDeploymentTypes) {
-						Write-Host "Superseding $($DeploymentType.LocalizedDisplayName)"
-						$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
-						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType
-					}
+				Foreach ($DeploymentType in $NewAppDeploymentTypes) {
+					Write-Host "Superseding $($DeploymentType.LocalizedDisplayName)"
+					$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
+					Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType | Out-Null
 				}
 			}
 			Pop-Location
