@@ -1364,7 +1364,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationName = $Recipe.ApplicationDef.Application.Name
 		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
 		$SupersedenceEnabled = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence)
-
+		Write-Output "Supersedence is $SupersedenceEnabled"
 		if ($SupersedenceEnabled) {
 			# Get the Previous Application Deployment Type
 			Push-Location
@@ -1373,12 +1373,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			if ($Latest2Apps.Count -eq 2) {
 				$NewApp = $Latest2Apps[0]
 				$OldApp = $Latest2Apps[1]
-		
+				Write-Output $oldapp.LocalizedDisplayName $newapp.LocalizedDisplayName
 				# Check that the DeploymentTypes and Deployment Type Names Match if not, skip supersedence
 				$NewAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $NewApp.LocalizedDisplayName
 				$OldAppDeploymentTypes = Get-CMDeploymentType -ApplicationName $OldApp.LocalizedDisplayName
 
 				if ($NewAppDeploymentTypes.LocalizedDisplayName -eq $OldAppDeploymentTypes.LocalizedDisplayName) {
+					Write-Output "New and Old App Deployment Type Names Match"
 					Foreach ($DeploymentType in $NewAppDeploymentTypes) {
 						Write-Host "Superseding $($DeploymentType.LocalizedDisplayName)"
 						$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
