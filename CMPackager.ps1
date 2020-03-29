@@ -1580,7 +1580,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Connect-ConfigMgr
 				Push-Location
 				Set-Location $Global:CMSite
-				(Get-CMDeviceCollection "$($WPFcomboBoxPreferredDeployColl.Text)*") | ForEach-Object { $WPFcomboBoxPreferredDeployColl.Items.Add($_.Name) }
+				(Get-CMDeviceCollection -CollectionName "$($WPFcomboBoxPreferredDeployColl.Text)*") | ForEach-Object { $WPFcomboBoxPreferredDeployColl.Items.Add($_.Name) }
 				Pop-Location
 				$form.Cursor = "Arrow"
 			})
