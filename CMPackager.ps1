@@ -1363,7 +1363,20 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 
 		$ApplicationName = $Recipe.ApplicationDef.Application.Name
 		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
-		$SupersedenceEnabled = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence)
+		If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Supersedence.Supersedence))) {
+			$SupersedenceEnabled = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence.Supersedence)
+		}
+		else {
+			$SupersedenceEnabled = $false
+		}
+
+		If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Supersedence.Uninstall))) {
+			$UninstallOldApp = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence.Uninstall)
+		}
+		else {
+			$UninstallOldApp = $false
+		}
+
 		Write-Host "Supersedence is $SupersedenceEnabled"
 		if ($SupersedenceEnabled) {
 			# Get the Previous Application Deployment Type
@@ -1383,7 +1396,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				Foreach ($DeploymentType in $NewAppDeploymentTypes) {
 					Write-Host "Superseding $($DeploymentType.LocalizedDisplayName)"
 					$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
-					Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType | Out-Null
+					if ($UninstallOldApp) {
+						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType -Uninstall | Out-Null
+					}
+					else {
+						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType | Out-Null
+					}
 				}
 			}
 			Pop-Location

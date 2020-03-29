@@ -335,7 +335,12 @@
 		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
 	</Distribution>
 	<!-- You can automatically supersede the previous version of the application (Note that the Previous version has to have the same name, publisher and deployment type names)-->>
-	<Supersedence>[Boolean]</Supersedence>
+	<Supersedence>
+		<!-- Supersede this application automatically -->
+		<Supersedence>[Boolean]</Supersedence>
+		<!-- Uninstall previous version before installing the latest -->
+		<Uninstall>[Boolean]</Uninstall>
+	</Supersedence>
 	<!-- You can optionally deploy the application to a specified Collection here -->
 	<Deployment>
 		<!-- DeploySoftware - [Boolean] Switch for Software Deployment, Application should be distributed before deployment -->
