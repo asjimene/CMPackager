@@ -1754,7 +1754,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 		If ($ApplicationDistribution) {
 			Write-Output "Application Supersedence"
-			$ApplicationSupersedence = Invoke-ApplicationSupersedence $ApplicationRecipe
+			$ApplicationSupersedence = Invoke-ApplicationSupersedence -Recipe $ApplicationRecipe
 			Add-LogContent "Continue to Application Deployment: $ApplicationSupersedence"
 		}
 		If ($ApplicationSupersedence) {
