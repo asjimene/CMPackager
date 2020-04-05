@@ -361,11 +361,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 
 			if (-not ([System.String]::IsNullOrEmpty($Download.Version))) {
 				## Version Check after prefetch script (skip download if possible)
-				## This was not working well. Will revisit later
+				## To Set the Download Version in the Prefetch Script, Simply set the variable $Download.Version to the [String]Version of the Application
 				$ApplicationSWVersion = $Download.Version
+				Add-LogContent "Prefetch Script Provided a Download Version of: $ApplicationSWVersion"
 				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$ApplicationSWVersion)
 				
-				Add-LogContent "Version Check after prefetch script is $newapp Version Found is: $ApplicationSWVersion"
+				Add-LogContent "Version Check after prefetch script is $newapp"
 				#$newApp = $true
 			}
 			else {
@@ -403,7 +404,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "Found Version $ApplicationSWVersion from Download FullVersion: $FullVersion"
 
 			## Determine if the Download Failed or if an Application Version was not detected, and add the Failure to the email if the Flag is set
-			if ((-not (Test-Path $DownloadFile)) -or ([System.String]::IsNullOrEmpty($ApplicationSWVersion))) {
+			if (((-not (Test-Path $DownloadFile)) -and $newApp) -or ([System.String]::IsNullOrEmpty($ApplicationSWVersion))) {
 				Add-LogContent "ERROR: Failed to Download or find the Version for $ApplicationName"
 				if ($Global:NotifyOnDownloadFailure) {
 					$Global:SendEmail = $true; $Global:SendEmail | Out-Null
