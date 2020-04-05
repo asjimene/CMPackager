@@ -342,10 +342,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Recipe
 		)
 		$ApplicationName = $Recipe.ApplicationDef.Application.Name
-		$newApp = $false
 
 		ForEach ($Download In $Recipe.ApplicationDef.Downloads.ChildNodes) {
 			## Set Variables
+			$newApp = $false
 			$DownloadFileName = $Download.DownloadFileName
 			$URL = $Download.URL
 			$DownloadVersionCheck = $Download.DownloadVersionCheck
@@ -363,13 +363,15 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				## Version Check after prefetch script (skip download if possible)
 				## This was not working well. Will revisit later
 				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Download.Version)
+				$ApplicationSWVersion = $Download.Version
+				Add-LogContent "Version Check after prefetch script is $newapp Version Found is: $ApplicationSWVersion"
 				#$newApp = $true
 			}
 			else {
 				$newApp = $true
 			}
 			
-			Add-LogContent "Version Check after prefetch script is $newapp"
+			
 
 			## Download the Application
 			If ((-not ([String]::IsNullOrEmpty($URL))) -and ($newapp)) {
