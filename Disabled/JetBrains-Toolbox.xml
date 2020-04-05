@@ -13,13 +13,14 @@
 			$json = Invoke-WebRequest $releases | ConvertFrom-Json
 			$LinkPath = $json.TBA.downloads.windows.link
 			$Version = "$($json.TBA.build)"
+			$Download.Version = $Version
 			$URL = $LinkPath
 			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>jetbrains-toolbox.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>$Version</DownloadVersionCheck>
+			<DownloadVersionCheck></DownloadVersionCheck>
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 	</Downloads>
