@@ -362,8 +362,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			if (-not ([System.String]::IsNullOrEmpty($Download.Version))) {
 				## Version Check after prefetch script (skip download if possible)
 				## This was not working well. Will revisit later
-				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$Download.Version)
 				$ApplicationSWVersion = $Download.Version
+				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$ApplicationSWVersion)
+				
 				Add-LogContent "Version Check after prefetch script is $newapp Version Found is: $ApplicationSWVersion"
 				#$newApp = $true
 			}
