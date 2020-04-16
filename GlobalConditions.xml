@@ -51,7 +51,7 @@
 		<Class>Win32_OperatingSystem</Class>
 		<Namespace>root\cimv2</Namespace>
 		<Property>OSArchitecture</Property>
-		<WhereClause>OSArchitecture = "64-bit"</WhereClause>
+		<WhereClause>OSArchitecture LIKE "%64%"</WhereClause>
 	</GlobalCondition>
 	<GlobalCondition>
 	<Name>AutoPackage - DellBIOSProvider Prereq Check</Name>
