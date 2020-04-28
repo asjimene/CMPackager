@@ -353,7 +353,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$AppRepoFolder = $Download.AppRepoFolder
 			$ExtraCopyFunctions = $Download.ExtraCopyFunctions
 
-			## Run the prefetch script if it exists
+			## Run the prefetch script if it exists, the prefetch script can be used to determine the location of the download URL, and optionally provide
+			## the software version before the download occurs
 			$PrefetchScript = $Download.PrefetchScript
 			If (-not ([String]::IsNullOrEmpty($PrefetchScript))) {
 				Invoke-Expression $PrefetchScript | Out-Null
@@ -365,15 +366,17 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$ApplicationSWVersion = $Download.Version
 				Add-LogContent "Prefetch Script Provided a Download Version of: $ApplicationSWVersion"
 				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$ApplicationSWVersion)
-				
-				Add-LogContent "Version Check after prefetch script is $newapp"
-				#$newApp = $true
 			}
 			else {
 				$newApp = $true
 			}
-			
-			
+
+			Add-LogContent "Version Check after prefetch script is $newapp"
+			if ($newApp) {
+				Add-LogContent "$ApplicationName will be downloaded"
+			} else {
+				Add-LogContent "$ApplicationName will not be downloaded"
+			}
 
 			## Download the Application
 			If ((-not ([String]::IsNullOrEmpty($URL))) -and ($newapp)) {
@@ -382,6 +385,16 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
 				$request | Out-Null
 				Add-LogContent "Completed Downloading $ApplicationName"
+
+				## Run the Version Check Script and record the Version and FullVersion
+				If (-not ([String]::IsNullOrEmpty($DownloadVersionCheck))) {
+					Invoke-Expression $DownloadVersionCheck | Out-Null
+					$Download.Version = [string]$Version
+					$Download.FullVersion = [string]$FullVersion
+				}
+
+				$ApplicationSWVersion = $Download.Version
+				Add-LogContent "Found Version $ApplicationSWVersion from Download FullVersion: $FullVersion"
 			}
 			else {
 				if (-not $newApp) {
@@ -391,17 +404,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					Add-LogContent "URL Not Specified, Skipping Download"
 				}
 			}
-
-		
-			## Run the Version Check Script and record the Version and FullVersion
-			If (-not ([String]::IsNullOrEmpty($DownloadVersionCheck))) {
-				Invoke-Expression $DownloadVersionCheck | Out-Null
-				$Download.Version = [string]$Version
-				$Download.FullVersion = [string]$FullVersion
-			}
-
-			$ApplicationSWVersion = $Download.Version
-			Add-LogContent "Found Version $ApplicationSWVersion from Download FullVersion: $FullVersion"
 
 			## Determine if the Download Failed or if an Application Version was not detected, and add the Failure to the email if the Flag is set
 			if (((-not (Test-Path $DownloadFile)) -and $newApp) -or ([System.String]::IsNullOrEmpty($ApplicationSWVersion))) {
