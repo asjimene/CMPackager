@@ -1393,7 +1393,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object {($_.Manufacturer -eq $ApplicationPublisher) -and ($_.IsExpired -eq $false) -and ($_.IsSuperseded -eq $false)} | Sort-Object DateCreated -Descending | Select-Object -first 2
 			Write-Host "Latest 2 apps = $($Latest2Apps.LocalizedDisplayName)"
 			if ($Latest2Apps.Count -eq 2) {
-				$NewApp = $Latest2Apps | Select-Object -Firet 1
+				$NewApp = $Latest2Apps | Select-Object -First 1
 				$OldApp = $Latest2Apps | Select-Object -last 1
 				Write-Host "Old: $($oldapp.LocalizedDisplayName) New: $($newapp.LocalizedDisplayName)"
 
