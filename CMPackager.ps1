@@ -1390,7 +1390,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			# Get the Previous Application Deployment Type
 			Push-Location
 			Set-Location $CMSite
-			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object Manufacturer -eq $ApplicationPublisher | Sort-Object DateCreated | Select-Object -first 2
+			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object Manufacturer -eq $ApplicationPublisher | Where-Object IsExpired -eq $false | Where-Object IsSuperseded -eq $false | Sort-Object DateCreated -Descending | Select-Object -first 2
 			Write-Host "Latest 2 apps = $($Latest2Apps.LocalizedDisplayName)"
 			if ($Latest2Apps.Count -eq 2) {
 				$NewApp = $Latest2Apps | Select-Object -Last 1
