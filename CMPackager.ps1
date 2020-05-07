@@ -870,6 +870,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Version = $AssociatedDownload.Version
 			If (-not ([String]::IsNullOrEmpty($AssociatedDownload.FullVersion))) {
 				$FullVersion = $AssociatedDownload.FullVersion
+				$AppFullVersion = $AssociatedDownload.FullVersion
 			}
 		
 			# General
