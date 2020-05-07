@@ -2,7 +2,7 @@
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
-	 Last Updated:  04/04/2020
+	 Last Updated:  05/06/2020
 	 Author:		Andrew Jimenez (asjimene) - https://github.com/asjimene/
 	 Filename:     	CMPackager.ps1
 	===========================================================================
@@ -37,7 +37,7 @@ DynamicParam {
 }
 process {
 
-	$Global:ScriptVersion = "20.04.04.0"
+	$Global:ScriptVersion = "20.05.06.0"
 
 	$Global:ScriptRoot = $PSScriptRoot
 
