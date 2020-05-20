@@ -5,7 +5,7 @@
 		<Publisher>FileZilla Project</Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://filezilla-project.org/</UserDocumentation>
-		<Icon>FileZilla.ico</Icon>
+		<Icon>filezilla.png</Icon>
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">

@@ -5,7 +5,7 @@
 		<Publisher>Microsoft</Publisher>
 		<AutoInstall>False</AutoInstall>
 		<UserDocumentation>https://github.com/microsoft/PowerToys/</UserDocumentation>
-		<Icon>PowerToys.ico</Icon>
+		<Icon>MicrosoftPowerToys.png</Icon>
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
