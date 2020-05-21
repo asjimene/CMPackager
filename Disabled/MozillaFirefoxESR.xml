@@ -9,6 +9,11 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+				$webrequest = Invoke-WebRequest 'https://download.mozilla.org/?product=firefox-esr-msi-latest-ssl&amp;os=win64&amp;lang=en-GB' -MaximumRedirection 0 -ErrorAction SilentlyContinue
+				$URL = $webrequest.Headers.Location
+				$Download.Version = [regex]::replace($URL,".*%20","").replace(".msi","")
+			</PrefetchScript>
 			<URL>https://download.mozilla.org/?product=firefox-esr-msi-latest-ssl&amp;os=win64&amp;lang=en-US</URL>
 			<DownloadFileName>FirefoxESRx64.msi</DownloadFileName>
 			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
@@ -16,6 +21,11 @@
 			<Version></Version>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>
+				$webrequest = Invoke-WebRequest 'https://download.mozilla.org/?product=firefox-esr-msi-latest-ssl&amp;os=win&amp;lang=en-GB' -MaximumRedirection 0 -ErrorAction SilentlyContinue
+				$URL = $webrequest.Headers.Location
+				$Download.Version = [regex]::replace($URL,".*%20","").replace(".msi","")
+			</PrefetchScript>
 			<URL>https://download.mozilla.org/?product=firefox-esr-msi-latest-ssl&amp;os=win&amp;lang=en-US</URL>
 			<DownloadFileName>FirefoxESRx86.msi</DownloadFileName>
 			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
