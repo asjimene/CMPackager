@@ -1,0 +1,63 @@
+<ApplicationDef>
+	<Application>
+		<Name>VMWare Tools</Name>
+		<Description>VMware Tools provide drivers and software to improve the integration of guest operating systems with the underlying hypervisor.</Description>
+		<Publisher>VMware</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://docs.vmware.com/en/VMware-Tools/</UserDocumentation>
+		<Icon>VMware-Tools.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+			$URL = "https://packages.vmware.com/tools/releases/latest/windows/x64/$((invoke-webrequest https://packages.vmware.com/tools/releases/latest/windows/x64/ -UseBasicParsing | Select -ExpandProperty links | where -property href -like "VMware-tools-*.exe")[0].href)"
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>VMware-Tools.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>
+				$VersionDetails = (Get-item $TempDir\$DownloadFileName).VersionInfo
+			    $Version = "{0}.{1}.{2}.{3}" -f $VersionDetails.ProductMajorPart,$VersionDetails.ProductMinorPart,$VersionDetails.ProductBuildPart,$VersionDetails.ProductPrivatePart
+			</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>VMware Tools x64 Silent Install</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>VMware-Tools.exe /s /v/qn REBOOT=R</InstallProgram>
+			<UninstallCmd>MsiExec.exe /x{01767101-A688-4A95-9C83-6DED9EB6735D} /s /v/qn REBOOT=R</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>40</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>vmtoolsd.exe</Name>
+					<Path>%ProgramFiles%\VMware\VMware Tools</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+					<Is64Bit>False</Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
