@@ -1,0 +1,56 @@
+<ApplicationDef>
+	<Application>
+		<Name>Python 3</Name>
+		<Description>Python is a programming language that lets you work quickly and integrate systems more effectively.</Description>
+		<Publisher>Python Foundation</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.python.org/</UserDocumentation>
+		<Icon>Python.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL =  (Invoke-WebRequest https://www.python.org/downloads/ -UseBasicParsing | Select -ExpandProperty links | ?  href -like "*exe*").href</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>Python3.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = (Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Python3 Silent Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>Python3.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0</InstallProgram>
+			<UninstallCmd>Python3.exe /Uninstall</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>CustomScript</DetectionMethodType>
+			<ScriptLanguage>PowerShell</ScriptLanguage>
+			<DetectionMethod>if ((get-item "C:\Program Files (x86)\Python38-32\python.exe").VersionInfo.ProductVersionRaw -ge [Version]$Version)
+    {
+        Write-Host "Installed"
+    }
+else
+    {
+    }
+			</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

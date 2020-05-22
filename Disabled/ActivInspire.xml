@@ -1,0 +1,77 @@
+<ApplicationDef>
+	<Application>
+		<Name>Promethean ActivInspire</Name>
+		<Description>ActivInspire is a collaborative lesson delivery software for interactive displays. Known and loved by educators around the world, ActivInspire provides a vast suite of tools to create and deliver dynamic lessons</Description>
+		<Publisher>Promethean</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.prometheanworld.com/products/lesson-delivery-software/activinspire/</UserDocumentation>
+		<Icon>ActivInspire.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$URL = (Invoke-Webrequest http://www.activsoftware.co.uk/update/Inspire/en-us/updatewin.txt | Select -expand Content).Split("`n")[2]</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>ActivInspireAppOnly.exe</DownloadFileName>
+			<DownloadVersionCheck>$Version = (Invoke-Webrequest http://www.activsoftware.co.uk/update/Inspire/en-us/updatewin.txt | Select -expand Content).Split("`n")[1];
+			$FullVersion = [String](Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersionRaw
+			</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>ActivInspire Silent Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<Comments>This does not license ActivInspire</Comments>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>ActivInspireAppOnly.exe /S /V/qn</InstallProgram>
+			<UninstallCmd>MsiExec.exe /x {57527AB6-1DEF-4E65-A903-D23067D22CD1} /qn</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>120</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>Inspire.exe</Name>
+					<Path>%ProgramFiles(x86)%\Activ Software\Inspire\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+					<Is64Bit>False</Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<Requirements>
+				<RuleName></RuleName>
+			</Requirements>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="ActivInspire">
+					<InstallBehaviorExe>Inspire.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+		<DistributeToGroup></DistributeToGroup>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

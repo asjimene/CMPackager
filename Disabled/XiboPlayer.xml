@@ -1,0 +1,75 @@
+<ApplicationDef>
+	<Application>
+		<Name>Xibo Player</Name>
+		<Description>Built for the Xibo CMS, runs on Windows.</Description>
+		<Publisher>Xibo Signage</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://xibo.org.uk/xibo-for-windows</UserDocumentation>
+		<Icon>XiboPlayer.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $URL = "https://github.com$((Invoke-WebRequest https://github.com/xibosignage/xibo-dotnetclient/releases/latest -UseBasicParsing | Select -expand links | ? href -like "*win32*"| Sort-Object href -Descending)[0].href.ToString())"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>XiboPlayer.msi</DownloadFileName>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo $DownloadFile -Property ProductVersion)).Trim()</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silently install XiboPlayer</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments></Comments>
+			<CacheContent>True</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>XiboPlayer.msi</InstallationMSI>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>ForceReboot</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<ScriptLanguage></ScriptLanguage>
+			<DetectionMethod>MSI</DetectionMethod>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Xibo Player">
+					<InstallBehaviorExe>XiboClient.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="Xibo Player Watchdog">
+					<InstallBehaviorExe>XiboClientWatchdog.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
+			<Dependencies>
+				<DependencyGroup GroupName="Visual Studio Cpp redistributable">
+					<DependencyGroupApp AppName="Visual Studio CPP redist">
+						<DependentDepType>Silently Install VCRedist</DependentDepType>
+						<DependencyAutoInstall>True</DependencyAutoInstall>
+					</DependencyGroupApp>
+				</DependencyGroup>
+			</Dependencies>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

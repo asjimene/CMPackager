@@ -1,0 +1,69 @@
+<ApplicationDef>
+	<Application>
+		<Name>Scratch</Name>
+		<Description>With Scratch, you can program your own interactive stories, games, and animations and share your creations with others in the online community.</Description>
+		<Publisher>MIT Media Lab</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://scratch.mit.edu/</UserDocumentation>
+		<Icon>Scratch.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+            $URL =  (Invoke-WebRequest -Uri https://scratch.mit.edu/js/download.bundle.js | Select -ExpandProperty Content | Select-String "https://downloads.scratch.mit.edu/desktop/Scratch%20Desktop%20Setup%.*.exe" ).Matches[0].ToString()</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>ScratchInstaller.exe</DownloadFileName>
+			<DownloadVersionCheck>
+			$FullVersion = ([String](Get-ChildItem $DownloadFile | Get-ExtensionAttribute -ExtensionAttribute FileVersion).FileVersion).Trim()
+			$Version = ([String](Get-ChildItem $DownloadFile | Get-ExtensionAttribute -ExtensionAttribute ProductVersion).ProductVersion).Trim()</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silently install Scratch</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<Comments>Silent Installer for Scratch</Comments>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>ScratchInstaller.exe /allusers /S</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles%\Scratch Desktop\Uninstall Scratch Desktop.exe`" /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>Scratch Desktop.exe</Name>
+					<Path>%ProgramFiles%\Scratch Desktop\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+					<Is64Bit>True</Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+		<Distribution>
+			<DistributeContent>True</DistributeContent>
+		</Distribution>
+		<Supersedence>
+			<Supersedence>True</Supersedence>
+			<Uninstall>False</Uninstall>
+		</Supersedence>
+		<Deployment>
+			<DeploySoftware>False</DeploySoftware>
+			<DeploymentCollection></DeploymentCollection>
+		</Deployment>
+	</ApplicationDef>

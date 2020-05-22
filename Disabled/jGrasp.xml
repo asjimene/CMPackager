@@ -1,0 +1,70 @@
+<ApplicationDef>
+	<Application>
+		<Name>jGrasp</Name>
+		<Description>jGRASP is a lightweight development environment, created specifically to provide automatic generation of software visualizations to improve the comprehensibility of software.</Description>
+		<Publisher>Auburn University</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.jgrasp.org/</UserDocumentation>
+		<Icon>jgrasp.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<!-- Thanks to n8felton's autopkg script for figuring out the download link https://github.com/autopkg/n8felton-recipes/blob/master/jGrasp/jGrasp.download.recipe -->
+			<PrefetchScript>
+				[regex]$rx1 = "(?&lt;url&gt;[^:]+):(?&lt;path&gt;[^:]+)"
+				$Content = Invoke-WebRequest http://jgrasp.org/cgiserver.txt | Select -ExpandProperty Content
+				$Match1 = $rx1.Match($Content)
+				$Content = Invoke-Webrequest "https://$($Match1.Groups["url"].Value)/$($Match1.Groups["path"].Value)/version5.pl" | Select -ExpandProperty Content
+				[regex]$rx2 = "(?&lt;version&gt;(?:(?&lt;major&gt;\d+)\.)?(?:(?&lt;minor&gt;\d+)\.)?(?&lt;patch&gt;\d+)(?&lt;extra&gt;[^;]*))"
+				$Match2 = $rx2.Match($Content)
+				$URL =  "https://jgrasp.org/dl4g/jgrasp/jgrasp$($Match2.Groups["major"].Value)$($Match2.Groups["minor"].Value)$($Match2.Groups["patch"].Value)$($Match2.Groups["extra"].Value).exe"
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>jgrasp.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>
+			$Version = "$($Match2.Groups["major"].Value).$($Match2.Groups["minor"].Value).$($Match2.Groups["patch"].Value)$($Match2.Groups["extra"].Value)"</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>jGrasp Silent Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>jgrasp.exe /quiet</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles(x86)%\jGrasp\uninstall.exe`" /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>RegistryKeyValue</DetectionClauseType>
+					<Hive>LocalMachine</Hive>
+					<KeyName>SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\jGRASP</KeyName>
+					<PropertyType>String</PropertyType>
+					<ValueName>DisplayVersion</ValueName>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<ExpectedValue>$Version</ExpectedValue>
+					<Value>True</Value>
+					<Is64Bit>True</Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
