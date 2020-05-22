@@ -1333,11 +1333,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Push-Location
 		Set-Location $CMSite
 		If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
+			$UpdateSuperseded = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
 				Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
 					Try {
 						Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
-						New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
+						If ($UpdateSuperseded) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
+						New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -UpdateSupersedence:$UpdateSuperseded -ErrorAction Stop
 					}
 					Catch {
 						$ErrorMessage = $_.Exception.Message

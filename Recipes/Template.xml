@@ -345,6 +345,8 @@
 	<Deployment>
 		<!-- DeploySoftware - [Boolean] Switch for Software Deployment, Application should be distributed before deployment -->
 		<DeploySoftware></DeploySoftware>
+		<!-- UpdateSuperseded - [Boolean] Whether the deployment should automatically upgrade superseded versions -->
+		<UpdateSuperseded></UpdateSuperseded>
 		<!-- DeploymentCollection - [String] Collection for the software to be deployed to -->
 		<DeploymentCollection></DeploymentCollection>
 	</Deployment>
