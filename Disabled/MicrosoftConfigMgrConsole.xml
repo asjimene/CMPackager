@@ -1,0 +1,78 @@
+<ApplicationDef>
+	<Application>
+		<Name>Configuration Manager Console</Name>
+		<Description>Administrators use the Configuration Manager console to manage the Configuration Manager environment.</Description>
+		<Publisher>Microsoft Corporation</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://docs.microsoft.com/en-us/mem/configmgr/</UserDocumentation>
+		<Icon>ConfigMgr.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+        <!-- file/product version = 5.00.8961.1000 -->
+        <!-- msi version = 5.2002.1052.1000 -->
+        <!-- m.cm.exe version = 5.2002.1053.1000 -->
+        <!-- $Version is needed for output path -->
+        <!-- $Download.Version is needed for application's name etc -->
+			<PrefetchScript>$DownloadFile = '\\' + $SiteServer + '\SMS_' + $SiteCode + '\tools\ConsoleSetup\*'
+			$Version = ([string](Get-MSIInfo -Path (Get-ChildItem $DownloadFile -Filter 'AdminConsole.msi' | Select-Object -ExpandProperty FullName) -Property ProductVersion)).TrimStart().TrimEnd()
+			$Download.Version = [string]$Version
+			$ApplicationSWVersion = $Download.Version
+			</PrefetchScript>
+			<!-- <URL></URL> -->
+			<!-- <DownloadFileName>'\\localhost\SMS_TST\tools\ConsoleSetup\'</DownloadFileName> -->
+			<Version></Version>
+			<!-- <FullVersion></FullVersion> -->
+			<!-- <DownloadVersionCheck></DownloadVersionCheck> -->
+			<!-- <ExtraCopyFunctions></ExtraCopyFunctions> -->
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>ConfigMgr Console setup</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>ConsoleSetup.exe /q TargetDir="%ProgramFiles(x86)%\Microsoft Configuration Manager\AdminConsole" DefaultSiteServerName="configmgr.contoso.com"</InstallProgram>
+			<UninstallCmd>ConsoleSetup.exe /uninstall /q</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>AdminUI.ConsoleBuilder.exe</Name>
+					<Path>%ProgramFiles(x86)%\Microsoft Configuration Manager\AdminConsole\bin</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
