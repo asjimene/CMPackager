@@ -1,0 +1,64 @@
+ <ApplicationDef>
+	<Application>
+		<Name>GAM ADV-XTD3</Name>
+		<Description>Manage Google G Suite - Extended with TeamDrive support and Drive REST v3 - Python 3.7+.</Description>
+		<Publisher>taers232c</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://github.com/taers232c/GAMADV-XTD3/wiki</UserDocumentation>
+		<Icon>GAM.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $URL = "https://github.com$((Invoke-WebRequest https://github.com/taers232c/GAMADV-XTD3/releases/latest -UseBasicParsing | Select -expand links | ? href -like "*windows-x86_64.msi").href.ToString())"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>GAMADV-XTD3.msi</DownloadFileName>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo $DownloadFile -Property ProductVersion)).Trim()</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silently install GAM-ADVXTD3</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments></Comments>
+			<CacheContent>True</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>GAMADV-XTD3.msi</InstallationMSI>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<ScriptLanguage></ScriptLanguage>
+			<DetectionMethod>MSI</DetectionMethod>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="GAM">
+					<InstallBehaviorExe>gam.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

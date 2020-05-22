@@ -1,0 +1,64 @@
+ <ApplicationDef>
+	<Application>
+		<Name>mRemoteNG</Name>
+		<Description>mRemoteNG is a fork of mRemote: an open source, tabbed, multi-protocol, remote connections manager</Description>
+		<Publisher>mRemoteNG Dev team</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://github.com/mRemoteNG/mRemoteNG/wiki</UserDocumentation>
+		<Icon>mRemoteNG.ico</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $URL = "https://github.com$((Invoke-WebRequest https://github.com/mRemoteNG/mRemoteNG/releases/latest -UseBasicParsing | Select -expand links | ? href -like "*.msi").href.ToString())"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>mRemoteNG.msi</DownloadFileName>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo $DownloadFile -Property ProductVersion)).Trim()</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silently install mRemoteNG</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments></Comments>
+			<CacheContent>True</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>mRemoteNG.msi</InstallationMSI>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<ScriptLanguage></ScriptLanguage>
+			<DetectionMethod>MSI</DetectionMethod>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="mRemoteNG">
+					<InstallBehaviorExe>mRemoteNG.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

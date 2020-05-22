@@ -1,0 +1,76 @@
+<ApplicationDef>
+	<Application>
+		<Name>Blender</Name>
+		<Description>Blender is the free and open source 3D creation suite. It supports the entirety of the 3D pipeline-modeling, rigging, animation, simulation, rendering, compositing and motion tracking, video editing and 2D animation pipeline.</Description>
+		<Publisher>Blender Foundation</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.blender.org/</UserDocumentation>
+		<Icon>Blender.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+            $URL = (Invoke-WebRequest -Uri (Invoke-WebRequest https://www.blender.org/download/ -UseBasicParsing | Select -expand links | Where-Object href -like "*windows64.msi/").href[0] | select -ExpandProperty links | ? href -like "*.msi").href.ToString()</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>Blender.msi</DownloadFileName>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo $DownloadFile -Property ProductVersion)).Trim()</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silently install Blender</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments></Comments>
+			<CacheContent>True</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>Blender.msi</InstallationMSI>
+			<UninstallCmd>msiexec /x `"{EDFAE2A8-E73B-4CD1-9648-46A7E4434BDA}`" /qn</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<ScriptLanguage></ScriptLanguage>
+			<DetectionMethod>Custom</DetectionMethod>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>WindowsInstaller</DetectionClauseType>
+					<ProductCode>{EDFAE2A8-E73B-4CD1-9648-46A7E4434BDA}</ProductCode>
+					<Existence>False</Existence>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<ExpectedValue>$Version</ExpectedValue>
+					<PropertyType>ProductVersion</PropertyType>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Blender">
+					<InstallBehaviorExe>Blender.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>

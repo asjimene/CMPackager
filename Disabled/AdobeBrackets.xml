@@ -1,0 +1,76 @@
+ <ApplicationDef>
+	<Application>
+		<Name>Adobe Brackets</Name>
+		<Description>An open source code editor for the web, written in JavaScript, HTML and CSS.</Description>
+		<Publisher>Adobe</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>http://brackets.io/</UserDocumentation>
+		<Icon>AdobeBrackets.png</Icon>
+		<FolderPath></FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $URL = "https://github.com$((Invoke-WebRequest https://github.com/adobe/brackets/releases/latest -UseBasicParsing | Select -expand links | ? href -like "*.msi").href.ToString())"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>AdobeBrackets.msi</DownloadFileName>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo $DownloadFile -Property ProductVersion)).Trim()</DownloadVersionCheck>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder></AppRepoFolder>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Silently install Adobe Brackets</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments></Comments>
+			<CacheContent>True</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram></InstallProgram>
+			<InstallationMSI>AdobeBrackets.msi</InstallationMSI>
+			<UninstallCmd>msiexec /x {43086E55-5B37-4DA8-852F-EEC6C75ECFE9} /qn</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<ScriptLanguage></ScriptLanguage>
+			<DetectionMethod>Custom</DetectionMethod>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>WindowsInstaller</DetectionClauseType>
+					<ProductCode>{43086E55-5B37-4DA8-852F-EEC6C75ECFE9}</ProductCode>
+					<Existence>False</Existence>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<ExpectedValue>$Version</ExpectedValue>
+					<PropertyType>ProductVersion</PropertyType>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Brackets">
+					<InstallBehaviorExe>Brackets.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+		<DeploymentCollection></DeploymentCollection>
+	</Deployment>
+</ApplicationDef>
