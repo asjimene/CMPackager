@@ -18,9 +18,11 @@
 			$Version = ([string](Get-MSIInfo -Path (Get-ChildItem $DownloadFile -Filter 'AdminConsole.msi' | Select-Object -ExpandProperty FullName) -Property ProductVersion)).TrimStart().TrimEnd()
 			$Download.Version = [string]$Version
 			$ApplicationSWVersion = $Download.Version
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType| Where-Object DeploymentType -eq $DepTypeName
+			$AssociatedDeploymentType.InstallProgram = 'ConsoleSetup.exe /q TargetDir="%ProgramFiles(x86)%\Microsoft Configuration Manager\AdminConsole" DefaultSiteServerName="{0}"' -f $SiteServer
 			</PrefetchScript>
 			<!-- <URL></URL> -->
-			<!-- <DownloadFileName>'\\localhost\SMS_TST\tools\ConsoleSetup\'</DownloadFileName> -->
+			<!-- <DownloadFileName></DownloadFileName> -->
 			<Version></Version>
 			<!-- <FullVersion></FullVersion> -->
 			<!-- <DownloadVersionCheck></DownloadVersionCheck> -->
@@ -35,7 +37,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>ConsoleSetup.exe /q TargetDir="%ProgramFiles(x86)%\Microsoft Configuration Manager\AdminConsole" DefaultSiteServerName="configmgr.contoso.com"</InstallProgram>
+			<InstallProgram></InstallProgram>
 			<UninstallCmd>ConsoleSetup.exe /uninstall /q</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
