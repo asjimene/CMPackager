@@ -1,0 +1,78 @@
+<ApplicationDef>
+	<Application>
+		<Name>PowerShell</Name>
+		<Description>PowerShell is a cross-platform task automation and configuration management framework, consisting of a command-line shell and scripting language.</Description>
+		<Publisher>Microsoft Corporation</Publisher>
+		<AutoInstall>False</AutoInstall>
+		<UserDocumentation>https://github.com/PowerShell/PowerShell</UserDocumentation>
+		<Icon>PowerShell.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$content = Invoke-WebRequest https://github.com/PowerShell/PowerShell/releases/latest -UseBasicParsing
+			$LinkPath = ($content | Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*PowerShell-*-win-x64.msi").href
+			$URL = "https://github.com$LinkPath"</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>PowerShell.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+		</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>PowerShell win x64 msi</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<Comments></Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>PowerShell.msi</InstallationMSI>
+			<!-- ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 -->
+			<!-- https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-7 -->
+			<InstallProgram>msiexec.exe /i PowerShell.msi /qn /norestart /l*v install.log</InstallProgram>
+			<UninstallCmd>msiexec.exe /x PowerShell.msi /q /qn /norestart /l*v uninstall.log</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>pwsh.exe</Name>
+					<Path>%ProgramFiles%\PowerShell\7</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>False</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
