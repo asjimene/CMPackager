@@ -12,7 +12,7 @@
 			<PrefetchScript>
 				$webrequest = Invoke-WebRequest 'https://download.mozilla.org/?product=firefox-esr-msi-latest-ssl&amp;os=win64&amp;lang=en-GB' -MaximumRedirection 0 -ErrorAction SilentlyContinue
 				$URL = $webrequest.Headers.Location
-				$Download.Version = [regex]::Match($URL,".*/releases/([.\d]*).*").captures.groups[1]
+				$Download.Version = [regex]::Match($URL,".*/releases/([.\d]*).*").captures.groups[1].Value
 			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>FirefoxESRx64.msi</DownloadFileName>
@@ -24,7 +24,7 @@
 			<PrefetchScript>
 				$webrequest = Invoke-WebRequest 'https://download.mozilla.org/?product=firefox-esr-msi-latest-ssl&amp;os=win&amp;lang=en-GB' -MaximumRedirection 0 -ErrorAction SilentlyContinue
 				$URL = $webrequest.Headers.Location
-				$Download.Version = [regex]::Match($URL,".*/releases/([.\d]*).*").captures.groups[1]
+				$Download.Version = [regex]::Match($URL,".*/releases/([.\d]*).*").captures.groups[1].Value
 			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>FirefoxESRx86.msi</DownloadFileName>
