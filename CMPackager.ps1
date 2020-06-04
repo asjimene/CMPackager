@@ -99,11 +99,11 @@ process {
 		"PreferredDeployCollection"           = "WPFcomboBoxPreferredDeployColl"
 	}
 		 
-	if (Test-Path "$PSScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue) {
-		$CMPackagerXML = [XML](Get-Content "$PSScriptRoot\CMPackager.prefs")
+	if (Test-Path "$ScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue) {
+		$CMPackagerXML = [XML](Get-Content "$ScriptRoot\CMPackager.prefs")
 	}
 	else {
-		$CMPackagerXML = [XML](Get-Content "$PSScriptRoot\CMPackager.prefs.template")
+		$CMPackagerXML = [XML](Get-Content "$ScriptRoot\CMPackager.prefs.template")
 	}
 
 	$Global:OperatorsLookup = @{ And = 'And'; Or = 'Or'; Other = 'Other'; IsEquals = 'Equals'; NotEquals = 'Not equal to'; GreaterThan = 'Greater than'; LessThan = 'Less than'; Between = 'Between'; NotBetween = 'Not Between'; GreaterEquals = 'Greater than or equal to'; LessEquals = 'Less than or equal to'; BeginsWith = 'Begins with'; NotBeginsWith = 'Does not begin with'; EndsWith = 'Ends with'; NotEndsWith = 'Does not end with'; Contains = 'Contains'; NotContains = 'Does not contain'; AllOf = 'All of'; OneOf = 'OneOf'; NoneOf = 'NoneOf'; SetEquals = 'Set equals'; SubsetOf = 'Subset of'; ExcludesAll = 'Exludes all' }
@@ -341,7 +341,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Param (
 			$Recipe
 		)
-		$ApplicationName = $Recipe.ApplicationDef.Application.Name
+		$ApplicationName = Invoke-Expression $Recipe.ApplicationDef.Application.Name
 
 		ForEach ($Download In $Recipe.ApplicationDef.Downloads.ChildNodes) {
 			## Set Variables
@@ -451,12 +451,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		)
 	
 		## Set Variables
-		$ApplicationName = $Recipe.ApplicationDef.Application.Name
-		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
-		$ApplicationDescription = $Recipe.ApplicationDef.Application.Description
-		$ApplicationDocURL = $Recipe.ApplicationDef.Application.UserDocumentation
+		$ApplicationName = Invoke-Expression $Recipe.ApplicationDef.Application.Name
+		$ApplicationPublisher = Invoke-Expression $Recipe.ApplicationDef.Application.Publisher
+		$ApplicationDescription = Invoke-Expression $Recipe.ApplicationDef.Application.Description
+		$ApplicationDocURL = Invoke-Expression $Recipe.ApplicationDef.Application.UserDocumentation
 		$ApplicationIcon = "$Global:IconRepo\$($Recipe.ApplicationDef.Application.Icon)"
-		$ApplicationFolderPath = $Recipe.ApplicationDef.Application.FolderPath
+		$ApplicationFolderPath = Invoke-Expression $Recipe.ApplicationDef.Application.FolderPath
 		if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
 			$ApplicationIcon = "$ScriptRoot\ExtraFiles\Icons\$($Recipe.ApplicationDef.Application.Icon)"
 			if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
@@ -778,7 +778,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Pop-Location
 	}
 
-
 	Function Add-CMDeploymentTypeProcessDetection {
 		# Creates a Deployment Type Process Detection "Install Behavior tab in Deployment types".
 		Param (
@@ -851,10 +850,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Recipe
 		)
 	
-		$ApplicationName = $Recipe.ApplicationDef.Application.Name
-		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
-		$ApplicationDescription = $Recipe.ApplicationDef.Application.Description
-		$ApplicationDocURL = $Recipe.ApplicationDef.Application.UserDocumentation
+		$ApplicationName = Invoke-Expression $Recipe.ApplicationDef.Application.Name
+		$ApplicationPublisher = Invoke-Expression $Recipe.ApplicationDef.Application.Publisher
+		$ApplicationDescription = Invoke-Expression $Recipe.ApplicationDef.Application.Description
+		$ApplicationDocURL = = Invoke-Expression = Invoke-Expression $Recipe.ApplicationDef.Application.UserDocumentation
 	
 		## Set Return Value to True, It will toggle to False if something Fails
 		$DepTypeReturn = $true
@@ -1258,7 +1257,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Param (
 			$Recipe
 		)
-		$ApplicationName = $Recipe.ApplicationDef.Application.Name
+		$ApplicationName = Invoke-Expression $Recipe.ApplicationDef.Application.Name
 		ForEach ($Download In ($Recipe.ApplicationDef.Downloads.Download)) {
 			If (-not ([System.String]::IsNullOrEmpty($Download.Version))) {
 				$ApplicationSWVersion = $Download.Version
@@ -1322,7 +1321,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		)
 	
 		$Success = $true
-		$ApplicationName = $Recipe.ApplicationDef.Application.Name
+		$ApplicationName = Invoke-Expression $Recipe.ApplicationDef.Application.Name
 		ForEach ($Download In ($Recipe.ApplicationDef.Downloads.Download)) {
 			If (-not ([System.String]::IsNullOrEmpty($Download.Version))) {
 				$ApplicationSWVersion = $Download.Version
@@ -1371,8 +1370,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Recipe
 		)
 
-		$ApplicationName = $Recipe.ApplicationDef.Application.Name
-		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
+		$ApplicationName = Invoke-Expression $Recipe.ApplicationDef.Application.Name
+		$ApplicationPublisher = Invoke-Expression $Recipe.ApplicationDef.Application.Publisher
 		If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Supersedence.Supersedence))) {
 			$SupersedenceEnabled = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence.Supersedence)
 		}
@@ -1517,6 +1516,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 		Write-Output $OpenFileDialog.FileName
 	}
+	
 	Function Test-GUItestConnectButton {
 		if ((($WPFtextBoxSiteCode.Text -like "???") -or ($WPFtextBoxSiteCode.Text -like "???:")) -and (-not ([System.String]::IsNullOrEmpty($WPFtextBoxSiteServer.Text)))) {
 			$WPFbuttonConnect.IsEnabled = $true
@@ -1568,7 +1568,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	################################### MAIN ########################################
 	## Startup
 	if ($Setup) {
-		$inputXML = Get-Content "$PSScriptRoot\ExtraFiles\Scripts\CMPackagerSetup.xaml" -Raw
+		$inputXML = Get-Content "$ScriptRoot\ExtraFiles\Scripts\CMPackagerSetup.xaml" -Raw
 		$inputXML = $inputXML -replace 'mc:Ignorable="d"', '' -replace "x:N", 'N' -replace '^<Win.*', '<Window'
 		[void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework')
 		[xml]$XAML = $inputXML
@@ -1758,7 +1758,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		## Import Recipe
 		Add-LogContent "Importing Content for $Recipe"
 		Write-Output "Begin Processing: $Recipe"
-		[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
+		[xml]$ApplicationRecipe = Get-Content "$ScriptRoot\Recipes\$Recipe"
 	
 		## Perform Packaging Tasks
 		Write-Output "Download"
