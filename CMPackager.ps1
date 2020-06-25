@@ -374,7 +374,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Add-LogContent "Version Check after prefetch script is $newapp"
 			if ($newApp) {
 				Add-LogContent "$ApplicationName will be downloaded"
-			} else {
+			}
+			else {
 				Add-LogContent "$ApplicationName will not be downloaded"
 			}
 
@@ -1110,13 +1111,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 								$CmdSwitches += " $CmdSwitch"
 							}
 						}
-						Custom {
-							Add-LogContent "Removing MSI Detection Method before adding new Detection Method"
-							Push-Location
-							Set-Location $CMSite
-							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -ScriptText "Write-Output 0" -ScriptType PowerShell
-							Pop-Location
-						}
 					}
 				
 					## Run the Add-CMApplicationDeployment Command
@@ -1137,6 +1131,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 						$DepTypeReturn = $false
 					}
 					If ($DepTypeAddDetectionMethods) {
+						if ($DepTypeDetectionMethodType -eq "Custom") {
+							Add-LogContent "Removing MSI Detection Method before adding new Detection Method"
+							Push-Location
+							Set-Location $CMSite
+							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -ScriptText "Write-Output 0" -ScriptType PowerShell
+							Pop-Location
+						}
 						Add-LogContent "Adding Detection Methods"
 					
 						Add-LogContent "Number of Detection Methods: $($DepTypeDetectionMethods.Count)"
@@ -1399,7 +1400,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			# Get the Previous Application Deployment Type
 			Push-Location
 			Set-Location $CMSite
-			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object {($_.Manufacturer -eq $ApplicationPublisher) -and ($_.IsExpired -eq $false) -and ($_.IsSuperseded -eq $false)} | Sort-Object DateCreated -Descending | Select-Object -first 2
+			$Latest2Apps = Get-CMApplication -Name "$ApplicationName*" -Fast | Where-Object { ($_.Manufacturer -eq $ApplicationPublisher) -and ($_.IsExpired -eq $false) -and ($_.IsSuperseded -eq $false) } | Sort-Object DateCreated -Descending | Select-Object -first 2
 			Write-Host "Latest 2 apps = $($Latest2Apps.LocalizedDisplayName)"
 			if ($Latest2Apps.Count -eq 2) {
 				$NewApp = $Latest2Apps | Select-Object -First 1
