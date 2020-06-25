@@ -1091,6 +1091,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 							}
 						}
 						CustomScript {
+							Add-LogContent "Removing MSI Detection Method before adding new Detection Method"
+							Push-Location
+							Set-Location $CMSite
+							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
+							Pop-Location
+
+							
 							$CmdSwitches += " -InstallCommand `"$DepTypeInstallationProgram`""
 						
 							$DepTypeScriptLanguage = $DeploymentType.ScriptLanguage
