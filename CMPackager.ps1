@@ -1094,7 +1094,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 							Add-LogContent "Removing MSI Detection Method before adding new Detection Method"
 							Push-Location
 							Set-Location $CMSite
-							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -AddDetectionClause $DepTypeDetectionMethods
+							Set-CMMsiDeploymentType -ApplicationName "$DepTypeApplicationName" -DeploymentTypeName "$DepTypeDeploymentTypeName" -ScriptText "Write-Output 0" -ScriptType PowerShell
 							Pop-Location
 
 							
