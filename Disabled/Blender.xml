@@ -10,11 +10,10 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>
-            $URL = (Invoke-WebRequest -Uri (Invoke-WebRequest https://www.blender.org/download/ -UseBasicParsing | Select -expand links | Where-Object href -like "*windows64.msi/").href[0] | select -ExpandProperty links | ? href -like "*.msi").href.ToString()</PrefetchScript>
+			<PrefetchScript>$URL = (Invoke-WebRequest -Uri (Invoke-WebRequest https://www.blender.org/download/ -UseBasicParsing | Select -expand links | Where-Object href -like "*windows64.msi/").href[0] | select -ExpandProperty links | ? href -like "*.msi").href.ToString()</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Blender.msi</DownloadFileName>
-			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo $DownloadFile -Property ProductVersion)).Trim()</DownloadVersionCheck>
+			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<AppRepoFolder></AppRepoFolder>
@@ -30,9 +29,9 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram></InstallProgram>
+			<InstallProgram>Blender.msi /qn /norestart ALLUSERS=2</InstallProgram>
 			<InstallationMSI>Blender.msi</InstallationMSI>
-			<UninstallCmd>msiexec /x `"{EDFAE2A8-E73B-4CD1-9648-46A7E4434BDA}`" /qn</UninstallCmd>
+			<UninstallCmd></UninstallCmd>
 			<Force32bit>False</Force32bit>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -41,20 +40,7 @@
 			<EstRuntimeMins>5</EstRuntimeMins>
 			<MaxRuntimeMins>15</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
-			<DetectionMethodType>Custom</DetectionMethodType>
-			<ScriptLanguage></ScriptLanguage>
-			<DetectionMethod>Custom</DetectionMethod>
-			<CustomDetectionMethods>
-				<DetectionClause>
-					<DetectionClauseType>WindowsInstaller</DetectionClauseType>
-					<ProductCode>{EDFAE2A8-E73B-4CD1-9648-46A7E4434BDA}</ProductCode>
-					<Existence>False</Existence>
-					<ExpressionOperator>GreaterEquals</ExpressionOperator>
-					<ExpectedValue>$Version</ExpectedValue>
-					<PropertyType>ProductVersion</PropertyType>
-					<Value>True</Value>
-				</DetectionClause>
-			</CustomDetectionMethods>
+			<DetectionMethodType>MSI</DetectionMethodType>
 			<InstallBehavior>
 				<InstallBehaviorProcess DisplayName="Blender">
 					<InstallBehaviorExe>Blender.exe</InstallBehaviorExe>
@@ -67,10 +53,9 @@
 	</Distribution>
 	<Supersedence>
 		<Supersedence>True</Supersedence>
-		<Uninstall>False</Uninstall>
+		<Uninstall>True</Uninstall>
 	</Supersedence>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
-		<DeploymentCollection></DeploymentCollection>
+		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
 </ApplicationDef>
