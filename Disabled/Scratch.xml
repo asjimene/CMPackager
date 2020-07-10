@@ -11,7 +11,7 @@
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>
-            $URL =  (Invoke-WebRequest -Uri https://scratch.mit.edu/js/download.bundle.js | Select -ExpandProperty Content | Select-String "https://downloads.scratch.mit.edu/desktop/Scratch%20Setup.exe" ).Matches[0].ToString()</PrefetchScript>
+            $URL =  (Invoke-WebRequest -Uri https://scratch.mit.edu/js/download.bundle.js |  Select -ExpandProperty Content | Select-String "https://downloads.scratch.mit.edu/desktop/Scratch%20Setup.exe" ).Matches[0].ToString()</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>ScratchInstaller.exe</DownloadFileName>
 			<DownloadVersionCheck>
