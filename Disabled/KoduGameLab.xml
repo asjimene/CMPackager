@@ -1,0 +1,66 @@
+<ApplicationDef>
+    <Application>
+        <Name>Microsoft Kodu Game Lab</Name>
+        <Description>Kodu is a new visual programming language made specifically for creating games. It is designed to be accessible for children and enjoyable for anyone. The visual nature of the language allows for rapid design iteration using only an Xbox game controller for input (mouse/keyboard input is also supported). Requires .NetFX 3.5 and XNA Framework 4.0.</Description>
+        <Publisher>Microsoft</Publisher>
+        <AutoInstall>True</AutoInstall>
+        <UserDocumentation>https://www.microsoft.com/en-us/download/details.aspx?id=10056</UserDocumentation>
+        <Icon>KoduGameLab.png</Icon>
+    </Application>
+    <Downloads>
+        <Download DeploymentType="DeploymentType1">
+            <PrefetchScript>$URL = ((Invoke-WebRequest "https://www.microsoft.com/en-us/download/confirmation.aspx?id=10056" -UseBasicParsing).Links | Where-Object href -like "*KoduSetup.msi")[0].href</PrefetchScript>
+            <URL></URL>
+            <DownloadFileName>KoduSetup.msi</DownloadFileName>
+            <DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $TempDir\KoduSetup.msi -Property ProductVersion)).TrimStart().TrimEnd()
+            $InstallScriptContent = "Start /wait `"`" msiexec.exe /i KoduSetup.msi /qn ALLUSERS=1" + "`r`n" +
+                                    "DEL /F /Q `"C:\Users\Public\Desktop\Configure Kodu Game Lab.lnk`"" + "`r`n" +
+                                    "DEL /F /Q `"C:\Users\Public\Desktop\Kodu Game Lab.lnk`""
+            </DownloadVersionCheck>
+            <ExtraCopyFunctions>Set-Content -Path "$DestinationPath\install.cmd" -Value $InstallScriptContent -Force</ExtraCopyFunctions>
+            <FullVersion></FullVersion>
+            <Version></Version>
+        </Download>
+    </Downloads>
+    <DeploymentTypes>
+        <DeploymentType Name="DeploymentType1">
+            <DeploymentTypeName>Silent Installer for Microsoft Kodu Game Lab</DeploymentTypeName>
+            <InstallationType>MSI</InstallationType>
+            <Comments>Silent Installer for Microsoft Kodu Game Lab</Comments>
+            <Language>English</Language>
+            <CacheContent>False</CacheContent>
+            <BranchCache>True</BranchCache>
+            <ContentFallback>True</ContentFallback>
+            <OnSlowNetwork>Download</OnSlowNetwork>
+            <InstallProgram>install.cmd</InstallProgram>
+            <InstallationMSI>KoduSetup.msi</InstallationMSI>
+            <InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+            <LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+            <UserInteractionMode>Hidden</UserInteractionMode>
+            <ReqUserInteraction>False</ReqUserInteraction>
+            <EstRuntimeMins>5</EstRuntimeMins>
+            <MaxRuntimeMins>15</MaxRuntimeMins>
+            <RebootBehavior>BasedOnExitCode</RebootBehavior>
+            <DetectionMethodType>MSI</DetectionMethodType>
+            <RequirementsRules>
+                <RequirementsRule>
+                    <RequirementsRuleType>Existential</RequirementsRuleType>
+                    <RequirementsRuleValue>
+                        <RuleValue>True</RuleValue>
+                    </RequirementsRuleValue>
+                    <RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+                </RequirementsRule>
+            </RequirementsRules>
+        </DeploymentType>
+    </DeploymentTypes>
+    <Distribution>
+        <DistributeContent>True</DistributeContent>
+    </Distribution>
+    <Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+    <Deployment>
+        <DeploySoftware>True</DeploySoftware>
+    </Deployment>
+</ApplicationDef>
