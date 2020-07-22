@@ -1463,7 +1463,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	
 		if ($null -eq (Get-PSDrive -Name $Global:SiteCode -ErrorAction SilentlyContinue)) {
 			try {
-				New-PSDrive -Name $Global:SiteCode -PSProvider "AdminUI.PS.Provider\CMSite" -Root $Global:SiteServer
+				New-PSDrive -Name $Global:SiteCode -PSProvider "AdminUI.PS.Provider\CMSite" -Root $Global:SiteServer -Scope Script
 			}
 			catch {
 				Add-LogContent "ERROR - The CM PSDrive could not be loaded. Exiting..."
