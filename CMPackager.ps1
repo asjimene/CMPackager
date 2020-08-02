@@ -30,7 +30,7 @@ DynamicParam {
 	$AttribColl.Add($ParamAttrib)
 	$configurationFileNames = Get-ChildItem -Path "$PSScriptRoot\Recipes" | Select-Object -ExpandProperty Name
 	$AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute($configurationFileNames)))
-	$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string], $AttribColl)
+	$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string[]], $AttribColl)
 	$RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 	$RuntimeParamDic.Add('SingleRecipe', $RuntimeParam)
 	return  $RuntimeParamDic
@@ -1751,7 +1751,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	$RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
 	Add-LogContent -Content "All Recipes: $RecipeList"
 	if (-not ([System.String]::IsNullOrEmpty($PSBoundParameters.SingleRecipe))) {
-		$RecipeList = $RecipeList | Where-Object { $_ -eq $PSBoundParameters.SingleRecipe }
+		$RecipeList = $RecipeList | Where-Object { $_ -in $PSBoundParameters.SingleRecipe }
 	}
 	## Begin Looping through all the Recipes 
 	ForEach ($Recipe In $RecipeList) {
