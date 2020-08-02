@@ -383,7 +383,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			If ((-not ([String]::IsNullOrEmpty($URL))) -and ($newapp)) {
 				Add-LogContent "Downloading $ApplicationName from $URL"
 				$ProgressPreference = 'SilentlyContinue'
-				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -ErrorAction Ignore
+				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile
 				$request | Out-Null
 				Add-LogContent "Completed Downloading $ApplicationName"
 
@@ -1763,44 +1763,49 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationSupersedence = $false
 		$ApplicationDeployment = $false
 	
-		## Import Recipe
-		Add-LogContent "Importing Content for $Recipe"
-		Write-Output "Begin Processing: $Recipe"
-		[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
-	
-		## Perform Packaging Tasks
-		Write-Output "Download"
-		$Download = Start-ApplicationDownload -Recipe $ApplicationRecipe
-		Add-LogContent "Continue to ApplicationCreation: $Download"
-		If ($Download) {
-			Write-output "Application Creation"
-			$ApplicationCreation = Invoke-ApplicationCreation -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to DeploymentTypeCreation: $ApplicationCreation"
-		}
-		If ($ApplicationCreation) {
-			Write-Output "Application Deployment Type Creation"
-			$DeploymentTypeCreation = Add-DeploymentType -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to ApplicationDistribution: $DeploymentTypeCreation"
-		}
-		If ($DeploymentTypeCreation) {
-			Write-Output "Application Distribution"
-			$ApplicationDistribution = Invoke-ApplicationDistribution -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to Application Supersedence: $ApplicationDistribution"
-		}
-		If ($ApplicationDistribution) {
-			Write-Output "Application Supersedence"
-			$ApplicationSupersedence = Invoke-ApplicationSupersedence -Recipe $ApplicationRecipe
-			Add-LogContent "Continue to Application Deployment: $ApplicationSupersedence"
-		}
-		If ($ApplicationSupersedence) {
-			Write-Output "Application Deployment"
-			$ApplicationDeployment = Invoke-ApplicationDeployment -Recipe $ApplicationRecipe
-			Add-logContent "Completed Processing of $Recipe"
-		}
-		if ($Global:TemplateApplicationCreatedFlag -eq $true) {
-			Add-LogContent "WARN (LEGACY): The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the CMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
-			Add-LogContent "THE REQUIREMENTS TEMPLATE APPLICTION IS NO LONGER NEEDED"
-			Exit 0
+		try {
+			## Import Recipe
+			Add-LogContent "Importing Content for $Recipe"
+			Write-Output "Begin Processing: $Recipe"
+			[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
+		
+			## Perform Packaging Tasks
+			Write-Output "Download"
+			$Download = Start-ApplicationDownload -Recipe $ApplicationRecipe
+			Add-LogContent "Continue to ApplicationCreation: $Download"
+			If ($Download) {
+				Write-output "Application Creation"
+				$ApplicationCreation = Invoke-ApplicationCreation -Recipe $ApplicationRecipe
+				Add-LogContent "Continue to DeploymentTypeCreation: $ApplicationCreation"
+			}
+			If ($ApplicationCreation) {
+				Write-Output "Application Deployment Type Creation"
+				$DeploymentTypeCreation = Add-DeploymentType -Recipe $ApplicationRecipe
+				Add-LogContent "Continue to ApplicationDistribution: $DeploymentTypeCreation"
+			}
+			If ($DeploymentTypeCreation) {
+				Write-Output "Application Distribution"
+				$ApplicationDistribution = Invoke-ApplicationDistribution -Recipe $ApplicationRecipe
+				Add-LogContent "Continue to Application Supersedence: $ApplicationDistribution"
+			}
+			If ($ApplicationDistribution) {
+				Write-Output "Application Supersedence"
+				$ApplicationSupersedence = Invoke-ApplicationSupersedence -Recipe $ApplicationRecipe
+				Add-LogContent "Continue to Application Deployment: $ApplicationSupersedence"
+			}
+			If ($ApplicationSupersedence) {
+				Write-Output "Application Deployment"
+				$ApplicationDeployment = Invoke-ApplicationDeployment -Recipe $ApplicationRecipe
+				Add-logContent "Completed Processing of $Recipe"
+			}
+			if ($Global:TemplateApplicationCreatedFlag -eq $true) {
+				Add-LogContent "WARN (LEGACY): The Requirements Application has been created, please do the following:`r`n1. Add an `"Install Behavior`" entry to the `"Templates`" deployment type of the $RequirementsTemplateAppName Application`r`n2. Run the CMPackager again to finish prerequisite setup and begin packaging software.`r`nExiting."
+				Add-LogContent "THE REQUIREMENTS TEMPLATE APPLICTION IS NO LONGER NEEDED"
+				Exit 0
+			}
+		} catch {
+			Add-LogContent "Error processing ${Recipe}: $_ $($_.ScriptStackTrace)"
+			Write-Error $_
 		}
 	}
 
