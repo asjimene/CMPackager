@@ -28,6 +28,7 @@ DynamicParam {
 	$ParamAttrib.ParameterSetName = '__AllParameterSets'
 	$AttribColl = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
 	$AttribColl.Add($ParamAttrib)
+	$AttribColl.Add((New-Object System.Management.Automation.AliasAttribute('Recipe')))
 	$configurationFileNames = Get-ChildItem -Path "$PSScriptRoot\Recipes" | Select-Object -ExpandProperty Name
 	$AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute($configurationFileNames)))
 	$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string[]], $AttribColl)
