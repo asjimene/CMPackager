@@ -11,7 +11,7 @@
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>
 			[xml]$RStudioDLs = (Invoke-WebRequest https://download1.rstudio.org/).Content
-			$LatestDL = ($RStudioDLs.ListBucketResult.Contents | where Key -like "*.exe" | sort -Property lastModified -Descending)[0].key
+			"$LatestDL = ($RStudioDLs.ListBucketResult.Contents | where Key -notlike "*pro*" | where Key -like "*.exe" | sort -Property lastModified -Descending)[0].key"
 			$URL = "https://download1.rstudio.org/$LatestDL"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>RStudioSetup.exe</DownloadFileName>
