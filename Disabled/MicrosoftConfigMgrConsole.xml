@@ -9,13 +9,13 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-        <!-- file/product version = 5.00.8961.1000 -->
-        <!-- msi version = 5.2002.1052.1000 -->
-        <!-- m.cm.exe version = 5.2002.1053.1000 -->
         <!-- $Version is needed for output path -->
         <!-- $Download.Version is needed for application's name etc -->
+			<!-- The Console installer versions are not changed for hotfixes, -->
+			<!-- so the installed files are the only way to accurately ID the version. -->
 			<PrefetchScript>$DownloadFile = '\\' + $SiteServer + '\SMS_' + $SiteCode + '\tools\ConsoleSetup\*'
-			$Version = ([string](Get-MSIInfo -Path (Get-ChildItem $DownloadFile -Filter 'AdminConsole.msi' | Select-Object -ExpandProperty FullName) -Property ProductVersion)).TrimStart().TrimEnd()
+			$installer = Get-ChildItem $DownloadFile -Filter 'AdminConsole.msi' | Select-Object -ExpandProperty FullName
+			$Version = Get-MSISourceFileVersion -Msi $installer -FileName 'ConBlder.exe|AdminUI.ConsoleBuilder.exe'
 			$Download.Version = [string]$Version
 			$ApplicationSWVersion = $Download.Version
 			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType| Where-Object DeploymentType -eq $DepTypeName
