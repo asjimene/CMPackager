@@ -1,0 +1,79 @@
+<ApplicationDef>
+	<Application>
+		<Name>Configuration Manager Support Center</Name>
+		<Description>Use Support Center for client troubleshooting, real-time log viewing, or capturing the state of a Configuration Manager client computer for later analysis.</Description>
+		<Publisher>Microsoft Corporation</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://docs.microsoft.com/en-us/mem/configmgr/core/support/support-center</UserDocumentation>
+		<Icon>CMSupportCenter.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+        <!-- file/product version = 5.00.8961.1000 -->
+        <!-- msi version = 5.2002.1052.1000 -->
+        <!-- m.cm.exe version = 5.2002.1053.1000 -->
+        <!-- $Version is needed for output path -->
+        <!-- $Download.Version is needed for application's name etc -->
+			<PrefetchScript>$DownloadFile = '\\' + $SiteServer + '\SMS_' + $SiteCode + '\tools\SupportCenter\supportcenterinstaller.msi'
+			$Version = ([string](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()
+			$Download.Version = [string]$Version
+			$ApplicationSWVersion = $Download.Version
+			</PrefetchScript>
+			<!-- <URL></URL> -->
+			<!-- <DownloadFileName></DownloadFileName> -->
+			<Version></Version>
+			<!-- <FullVersion></FullVersion> -->
+			<!-- <DownloadVersionCheck></DownloadVersionCheck> -->
+			<!-- <ExtraCopyFunctions></ExtraCopyFunctions> -->
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>ConfigMgr Support Center setup</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i supportcenterinstaller.msi /qn /norestart /l*v install.log</InstallProgram>
+			<UninstallCmd>msiexec /x supportcenterinstaller.msi /qn /norestart /l*v uninstall.log</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>ConfigMgrSupportCenter.exe</Name>
+					<Path>%ProgramFiles(x86)%\Configuration Manager Support Center</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>IsEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>True</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
