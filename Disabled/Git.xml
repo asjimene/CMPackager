@@ -10,6 +10,7 @@
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>$URL = (((Invoke-WebRequest https://git-scm.com/download/win).Links) | where -Property OuterText -EQ "64-bit Git for Windows Setup").href
+			$Download.Version = if ($URL -replace '\.windows' -match "\d+\.\d+\.\d+(\.\d+)?") {$matches[0]}
 			[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 			write-output $URL</PrefetchScript>
 			<URL></URL>
@@ -17,15 +18,19 @@
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<AppRepoFolder>x64</AppRepoFolder>
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$URL = (((Invoke-WebRequest https://git-scm.com/download/win).Links) | where -Property OuterText -EQ "32-bit Git for Windows Setup").href</PrefetchScript>
+			<PrefetchScript>$URL = (((Invoke-WebRequest https://git-scm.com/download/win).Links) | where -Property OuterText -EQ "32-bit Git for Windows Setup").href
+			$Download.Version = if ($URL -replace '\.windows' -match "\d+\.\d+\.\d+(\.\d+)?") {$matches[0]}
+			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Git-x86.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<AppRepoFolder>x86</AppRepoFolder>
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 	</Downloads>
