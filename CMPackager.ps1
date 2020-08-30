@@ -306,6 +306,64 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 	}
 
+	function Get-MSISourceFileVersion {
+		<#
+		.SYNOPSIS
+			Get the version of a file from an MSI's File Table
+		.DESCRIPTION
+			Search a Windows Installer database's File Table for a file name and return the version.
+		.EXAMPLE
+			PS C:\> Get-MSISourceFileVersion -Msi "C:\Program Files\Microsoft Configuration Manager\tools\ConsoleSetup\AdminConsole.msi" -FileName 'ConBlder.exe|AdminUI.ConsoleBuilder.exe'
+			Get the version of the file 'ConBlder.exe|AdminUI.ConsoleBuilder.exe'
+		.NOTES
+			https://docs.microsoft.com/en-us/windows/win32/msi/file-table
+		#>
+		[CmdletBinding()]
+		param (
+			[Parameter(Mandatory)][ValidateScript({Test-Path $_})][Alias('Installer')]
+			$Msi, # The MSI to query
+			[Parameter(Mandatory)][ValidateNotNullOrEmpty()]
+			$FileName # The file to find the version of. Must be an exact match, in the Windows Installer's format including the shortname https://docs.microsoft.com/en-us/windows/win32/msi/filename.
+		)
+
+		begin {
+			$windowsInstaller = New-Object -ComObject WindowsInstaller.Installer
+		}
+
+		process {
+			try {
+				$database = $windowsInstaller.GetType().InvokeMember(
+						"OpenDatabase", "InvokeMethod", $null,
+						$windowsInstaller, @((Get-Item $Msi).FullName, 0)
+					)
+
+				$query = "SELECT FileName,Version FROM File WHERE FileName = '$filename'"
+				$view = $database.GetType().InvokeMember(
+						"OpenView", "InvokeMethod", $null, $database, $query
+					)
+
+				$view.GetType().InvokeMember("Execute", "InvokeMethod", $null, $view, $null) | Out-Null
+
+				$record = $view.GetType().InvokeMember(
+						"Fetch", "InvokeMethod", $null, $view, $null
+					)
+
+				while ($record -ne $null) {
+					$fileName = $record.GetType().InvokeMember("StringData", "GetProperty", $null, $record, 1)
+					$version = $record.GetType().InvokeMember("StringData", "GetProperty", $null, $record, 2)
+
+					Write-Output ([version]$version)
+
+					$record = $view.GetType().InvokeMember("Fetch", "InvokeMethod", $null, $view, $null)
+				}
+
+			} finally {
+				$view.GetType().InvokeMember("Close", "InvokeMethod", $null, $view, $null) | Out-Null
+			}
+		}
+
+	} # Get-MSISourceFileVersion
+
 	function Invoke-VersionCheck {
 		## Contact CM and determine if the Application Version is New
 		[CmdletBinding()]
