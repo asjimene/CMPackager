@@ -11,7 +11,9 @@
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>$content = Invoke-WebRequest https://github.com/PowerShell/PowerShell/releases/latest -UseBasicParsing
 			$LinkPath = ($content | Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*PowerShell-*-win-x64.msi").href
-			$URL = "https://github.com$LinkPath"</PrefetchScript>
+			$URL = "https://github.com$LinkPath"
+			$Download.Version = if ($url -match "\d+\.\d+\.\d+(\.\d+)?") {$matches[0] + '.0'}
+			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>PowerShell.msi</DownloadFileName>
 			<Version></Version>
