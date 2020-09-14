@@ -5,7 +5,7 @@
 		<Publisher>audacityteam</Publisher>
 		<AutoInstall>True</AutoInstall>
 		<UserDocumentation>https://www.audacityteam.org/</UserDocumentation>
-		<Icon>Audacity.ico</Icon>
+		<Icon>Audacity.png</Icon>
 		<FolderPath>Audacity</FolderPath>
 	</Application>
 	<Downloads>
