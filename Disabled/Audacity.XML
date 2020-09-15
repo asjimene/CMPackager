@@ -11,10 +11,10 @@
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
 			<PrefetchScript>
-			$releases = 'https://fossies.org/windows/misc/'
-			$Filename = (Invoke-WebRequest -Uri $releases -UseBasicParsing).Links | Where-Object -Property href -Match 'audacity-win-.*.exe$' | Select-Object -First 1 -expand href
-			$LatestVersion = $Filename -split '-|.exe' | select -Skip 2 -First 1
-			$URL = $releases + $Filename
+			$Releases = 'https://fossies.org/windows/misc/'
+			$Filename = (Invoke-WebRequest -Uri $Releases -UseBasicParsing).Links | Where-Object -Property href -Match 'audacity-win-.*.exe$' | Select-Object -First 1 -expand href
+			[String]$Download.Version = $Filename -split '-|.exe' | select -Skip 2 -First 1
+			$URL = $Releases + $Filename
 			$HTTPheaders = @{
 				'Referer'    = $releases;
 				'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'
