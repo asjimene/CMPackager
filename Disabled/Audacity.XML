@@ -1,0 +1,70 @@
+<ApplicationDef>
+	<Application>
+		<Name>Audacity</Name>
+		<Description></Description>
+		<Publisher>audacityteam</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://www.audacityteam.org/</UserDocumentation>
+		<Icon>Audacity.png</Icon>
+		<FolderPath>Audacity</FolderPath>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+			$Releases = 'https://fossies.org/windows/misc/'
+			$Filename = (Invoke-WebRequest -Uri $Releases -UseBasicParsing).Links | Where-Object -Property href -Match 'audacity-win-.*.exe$' | Select-Object -First 1 -expand href
+			[String]$Download.Version = $Filename -split '-|.exe' | select -Skip 2 -First 1
+			$URL = $Releases + $Filename
+			$HTTPheaders = @{
+				'Referer'    = $Releases;
+				'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'
+			}
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>Audacity.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>
+			$FullVersion = (Get-ItemProperty $DownloadFile).VersionInfo.FileVersion.TrimStart().TrimEnd()
+			$Version = ($FullVersion).Replace(".0","").TrimStart().TrimEnd()
+			</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Audacity Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>Audacity.exe /VERYSILENT /NORESTART</InstallProgram>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>Audacity.exe</Name>
+					<Path>%ProgramFiles(x86)%\Audacity\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

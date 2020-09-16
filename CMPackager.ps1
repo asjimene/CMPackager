@@ -1,4 +1,4 @@
-﻿<#	
+<#	
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
@@ -442,7 +442,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			If ((-not ([String]::IsNullOrEmpty($URL))) -and ($newapp)) {
 				Add-LogContent "Downloading $ApplicationName from $URL"
 				$ProgressPreference = 'SilentlyContinue'
-				$request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile
+                IF ($HTTPheaders) {
+				    $request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile -Headers $HTTPheaders
+                }
+                else {
+				    $request = Invoke-WebRequest -Uri "$URL" -OutFile $DownloadFile
+                }
 				$request | Out-Null
 				Add-LogContent "Completed Downloading $ApplicationName"
 
