@@ -9,7 +9,12 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript></PrefetchScript>
+			<PrefetchScript>
+				$URL = "http://go.skype.com/msi-download"
+				. $ScriptRoot\ExtraFiles\Scripts\Get-RedirectedURL.ps1
+				$RDURL = Get-RedirectedURL -url $URL
+				[String]$Download.Version = $RDURL -split '\-|\.msi$' | select -Last 1 -Skip 1
+			</PrefetchScript>
 			<URL>http://www.skype.com/go/getskype-msi</URL>
 			<DownloadFileName>SkypeSetup.msi</DownloadFileName>
 			<Version></Version>
