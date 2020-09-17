@@ -611,6 +611,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			Directory {
 				$detMethodCommand = "New-CMDetectionClauseDirectory"
 				If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.Name))) {
+					$DetectionMethod.Name = ($DetectionMethod.Name).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 					$detMethodCommand += " -DirectoryName `'$($DetectionMethod.Name)`'"
 				}
 			}
