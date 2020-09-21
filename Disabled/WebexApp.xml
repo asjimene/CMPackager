@@ -9,12 +9,24 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript></PrefetchScript>
+			<PrefetchScript>
+				$Releases = "https://cisco.webex.com/webappng/sites/cisco/dashboard/download"
+				$ie = new-object -com internetexplorer.application
+				$ie.navigate("$Releases")
+				$ie.visible= $false
+				while ($ie.Busy -eq $true) 
+				{ 
+					Start-Sleep 1; 
+				}
+				[String]$Download.Version = ($ie.document.body.getElementsByClassName("app-build-version")| Select-Object -Property innerText ).innerText.TrimStart().TrimEnd()
+				$ie.Quit()
+				$Version = $Download.Version
+			</PrefetchScript>
 			<URL>https://akamaicdn.webex.com/client/webexapp.msi</URL>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadFileName>webexapp.msi</DownloadFileName>
-			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $TempDir\webexapp.msi -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<DownloadVersionCheck></DownloadVersionCheck>
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 	</Downloads>
