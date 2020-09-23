@@ -10,10 +10,15 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = "https://github.com$((Invoke-WebRequest https://github.com/mltframework/shotcut/releases/latest -UseBasicParsing | Select -expand links | ? href -like "*shotcut-win64-*.exe").href.ToString())"</PrefetchScript>
+			<PrefetchScript>
+				$URL = "https://github.com$((Invoke-WebRequest https://github.com/mltframework/shotcut/releases/latest -UseBasicParsing | Select -expand links | ? href -like "*shotcut-win64-*.exe").href.ToString())"
+				$Download.Version = ([String](Invoke-RestMethod https://api.github.com/repos/mltframework/shotcut/releases/latest).tag_name.Trim('v')).TrimStart().TrimEnd()
+				Add-LogContent "Found Version: $Download.Version "
+				$Version = $Download.Version
+			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Shotcutx64.exe</DownloadFileName>
-			<DownloadVersionCheck>$Version = (Invoke-RestMethod https://api.github.com/repos/mltframework/shotcut/releases/latest).tag_name.Trim('v')</DownloadVersionCheck>
+			<DownloadVersionCheck></DownloadVersionCheck>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<AppRepoFolder></AppRepoFolder>
@@ -51,6 +56,9 @@
 					<Is64Bit>True</Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<Requirements>
+				<RuleName>Existential of AutoPackage - OSArchitecture x64 Not Equal to 0</RuleName>
+			</Requirements>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
@@ -58,7 +66,7 @@
 		<DistributeToGroup></DistributeToGroup>
 	</Distribution>
 	<Supersedence>
-		<Supersedence>True</Supersedence>
+		<Supersedence>False</Supersedence>
 		<Uninstall>False</Uninstall>
 	</Supersedence>
 	<Deployment>
