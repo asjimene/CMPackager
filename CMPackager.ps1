@@ -618,6 +618,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			File {
 				$detMethodCommand = "New-CMDetectionClauseFile"
 				If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.Name))) {
+					$DetectionMethod.Name = ($DetectionMethod.Name).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 					$detMethodCommand += " -FileName `'$($DetectionMethod.Name)`'"
 				}
 			}
@@ -1032,7 +1033,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 								$_.Name -like "stDepType*"
 							})) {
 						If (-not ([System.String]::IsNullOrEmpty($DepTypeVar.Value))) {
-							$CmdSwitch = "-$($($DepTypeVar.Name).Replace("stDepType", '')) `"$($DepTypeVar.Value)`""
+							$CmdSwitch = "-$($($DepTypeVar.Name).Replace("stDepType", '')) `'$($DepTypeVar.Value)`'"
 							$CmdSwitches += " $CmdSwitch"
 						}
 					}
