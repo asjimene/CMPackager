@@ -573,6 +573,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		# Move the Application to folder path if supplied
 		Try {
 			If (-not ([System.String]::IsNullOrEmpty($ApplicationFolderPath))) {
+				# Create the folder if it does not exist
+				if (-not (Test-Path ".\Application\$ApplicationFolderPath")) {
+					New-Item -ItemType Directory -Path ".\Application\$ApplicationFolderPath" -ErrorAction SilentlyContinue
+				}
 				Add-LogContent "Command: Move-CMObject -InputObject (Get-CMApplication -Name ""$ApplicationName $ApplicationSWVersion"") -FolderPath "".\Application\$ApplicationFolderPath"""
 				Move-CMObject -InputObject (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion") -FolderPath ".\Application\$ApplicationFolderPath"
 			}
