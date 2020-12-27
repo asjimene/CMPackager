@@ -8,6 +8,8 @@
 	<ContentLocationRoot>\\server\share\Apps\All</ContentLocationRoot>
 	<!-- IconRepo - [String] Repository for Application Icons to be used in software Center -->
 	<IconRepo>\\Server\Share\Apps\Application Icons</IconRepo>
+	<!-- CMPSModulePath - [String] Path to non-default CM PowerShell Module (e.g. C:\Temp\PSModule\bin). If not specified, look in default console install directory -->
+	<CMPSModulePath></CMPSModulePath>
 	<!-- SCCMSite - [String] SCCM Site Name -->
 	<CMSite>PS1:</CMSite>
 	<!-- FQDN of the Primary Site Server -->
