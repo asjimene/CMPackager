@@ -57,6 +57,7 @@ process {
 
 		# Package Location Vars
 		$Global:ContentLocationRoot = $PackagerPrefs.PackagerPrefs.ContentLocationRoot
+		$Global:ContentFolderPattern = $PackagerPrefs.PackagerPrefs.ContentFolderPattern
 		$Global:IconRepo = $PackagerPrefs.PackagerPrefs.IconRepo
 
 		# CM Vars
@@ -402,6 +403,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$Recipe
 		)
 		$ApplicationName = $Recipe.ApplicationDef.Application.Name
+		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
 
 		ForEach ($Download In $Recipe.ApplicationDef.Downloads.ChildNodes) {
 			## Set Variables
@@ -485,12 +487,18 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
 				## Create Application Share Folder
+				$ContentPath = "$Global:ContentLocationRoot\$ApplicationName\Packages\$Version"
+				if ($Global:ContentFolderPattern) {	
+					$ContentFolderPatternReplace = $Global:ContentFolderPattern -Replace '\$ApplicationName',$ApplicationName -Replace '\$Publisher',$ApplicationPublisher -Replace '\$Version',$Version
+					$ContentPath = "$Global:ContentLocationRoot\$ContentFolderPatternReplace"
+				}
+
 				If ([String]::IsNullOrEmpty($AppRepoFolder)) {
-					$DestinationPath = "$Global:ContentLocationRoot\$ApplicationName\Packages\$Version"
+					$DestinationPath = $ContentPath
 					Add-LogContent "Destination Path set as $DestinationPath"
 				}
 				Else {
-					$DestinationPath = "$Global:ContentLocationRoot\$ApplicationName\Packages\$Version\$AppRepoFolder"
+					$DestinationPath = "$ContentPath\$AppRepoFolder"
 					Add-LogContent "Destination Path set as $DestinationPath"
 				}
 				New-Item -ItemType Directory -Path $DestinationPath -Force
@@ -955,11 +963,17 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		
 			# Content Settings
 			# Content Location
+			$ContentPath = "$Global:ContentLocationRoot\$ApplicationName\Packages\$Version"
+			if ($Global:ContentFolderPattern) {	
+				$ContentFolderPatternReplace = $Global:ContentFolderPattern -Replace '\$ApplicationName',$ApplicationName -Replace '\$Publisher',$ApplicationPublisher -Replace '\$Version',$Version
+				$ContentPath = "$Global:ContentLocationRoot\$ContentFolderPatternReplace"
+			}
+
 			If ([String]::IsNullOrEmpty($AssociatedDownload.AppRepoFolder)) {
-				$DepTypeContentLocation = "$Global:ContentLocationRoot\$ApplicationName\Packages\$Version"
+				$DepTypeContentLocation = $ContentPath
 			}
 			Else {
-				$DepTypeContentLocation = "$Global:ContentLocationRoot\$ApplicationName\Packages\$Version\$($AssociatedDownload.AppRepoFolder)"
+				$DepTypeContentLocation = "$ContentPath\$($AssociatedDownload.AppRepoFolder)"
 			}
 			$swDepTypeCacheContent = [System.Convert]::ToBoolean($DeploymentType.CacheContent)
 			$swDepTypeEnableBranchCache = [System.Convert]::ToBoolean($DeploymentType.BranchCache)
