@@ -67,6 +67,7 @@ process {
 		$Global:PreferredDistributionLoc = $PackagerPrefs.PackagerPrefs.PreferredDistributionLoc
 		$Global:PreferredDeployCollection = $PackagerPrefs.PackagerPrefs.PreferredDeployCollection
 		$Global:NoVersionInSWCenter = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NoVersionInSWCenter)
+		$Global:CMPSModulePath = $PackagerPrefs.PackagerPrefs.CMPSModulePath
 
 
 		# Email Vars
@@ -1516,7 +1517,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		if (-not (Get-Module ConfigurationManager)) {
 			try {
 				Add-LogContent "Importing ConfigurationManager Module"
-				Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+				if ($Global:CMPSModulePath) {
+					Import-Module (Join-Path $Global:CMPSModulePath ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+				} else {
+					Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1) -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+				}
 			} 
 			catch {
 				$ErrorMessage = $_.Exception.Message
