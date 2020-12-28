@@ -6,6 +6,8 @@
 	<LogPath>C:\Temp\CMPackager.log</LogPath>
 	<!-- ContentLocationRoot - [String] Location for the SCCM Content - Applications will end up in a folder under this Root like: ApplicationName\Packages\ApplicationVersion -->
 	<ContentLocationRoot>\\server\share\Apps\All</ContentLocationRoot>
+	<!-- ContentFolderPattern - [String] Pattern for content source path within the ContentLocationRoot folder. Available variables: $ApplicationName, $Publisher, $Version -->
+	<ContentFolderPattern>$ApplicationName\Packages\$Version</ContentFolderPattern>
 	<!-- IconRepo - [String] Repository for Application Icons to be used in software Center -->
 	<IconRepo>\\Server\Share\Apps\Application Icons</IconRepo>
 	<!-- CMPSModulePath - [String] Path to non-default CM PowerShell Module (e.g. C:\Temp\PSModule\bin). If not specified, look in default console install directory -->
