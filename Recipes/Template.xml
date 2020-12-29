@@ -333,6 +333,8 @@
 		<DistributeContent></DistributeContent>
 		<!-- DistributeToGroup - [String] Name of Distribution Point Group to distribute the Content to -->
 		<DistributeToGroup>All DPs except PXE</DistributeToGroup>
+		<!-- DistributeToDPs - [String] Comma delimited list of Distribution Points to distribute the Content to -->
+		<DistributeToDPs></DistributeToDPs>
 	</Distribution>
 	<!-- You can automatically supersede the previous version of the application (Note that the Previous version has to have the same name, publisher and deployment type names)-->>
 	<Supersedence>
