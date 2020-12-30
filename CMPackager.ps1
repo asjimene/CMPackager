@@ -528,16 +528,21 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationName = $Recipe.ApplicationDef.Application.Name
 		$ApplicationPublisher = $Recipe.ApplicationDef.Application.Publisher
 		$ApplicationDescription = $Recipe.ApplicationDef.Application.Description
+		$ApplicationAdminDescription = $Recipe.ApplicationDef.Application.AdminDescription
 		$ApplicationDocURL = $Recipe.ApplicationDef.Application.UserDocumentation
-		$ApplicationIcon = "$Global:IconRepo\$($Recipe.ApplicationDef.Application.Icon)"
+		$ApplicationOptionalReference = $Recipe.ApplicationDef.Application.OptionalReference
+		$ApplicationLinkText = $Recipe.ApplicationDef.Application.LinkText
+		$ApplicationPrivacyUrl = $Recipe.ApplicationDef.Application.PrivacyUrl
 		$ApplicationFolderPath = $Recipe.ApplicationDef.Application.FolderPath
-		if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
-			$ApplicationIcon = "$ScriptRoot\ExtraFiles\Icons\$($Recipe.ApplicationDef.Application.Icon)"
-			if (-not (Test-Path $ApplicationIcon -ErrorAction SilentlyContinue)) {
-				$ApplicationIcon = $null
-			}
-		}
+		$ApplicationOwner = $Recipe.ApplicationDef.Application.Owner
+		$ApplicationSupportContact = $Recipe.ApplicationDef.Application.SupportContact
+		$ApplicationKeywords = $Recipe.ApplicationDef.Application.Keywords
+		$ApplicationUserCategories = $Recipe.ApplicationDef.Application.UserCategories
+		$ApplicationAdminCategories = $Recipe.ApplicationDef.Application.AdminCategories
+		$ApplicationIcon = $Recipe.ApplicationDef.Application.Icon
 		$ApplicationAutoInstall = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.AutoInstall)
+		$ApplicationDisplaySupersedence = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.DisplaySupersedence)
+		$ApplicationIsFeatured = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.FeaturedApplication)
 		$AppCreated = $true
 	
 		ForEach ($Download In ($Recipe.ApplicationDef.Downloads.Download)) {
@@ -559,45 +564,161 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$ApplicationDisplayName = "$ApplicationName $ApplicationSWVersion"
 		}
 
+		Add-LogContent "Building application import command"
+
+		# Because I (also) hate the yellow squiggly lines
+		Write-Output $ApplicationDisplayName, $ApplicationPublisher, $ApplicationAutoInstall, $ApplicationDisplaySupersedence, $ApplicationIsFeatured | Out-Null
+
+		# Reference: https://docs.microsoft.com/en-us/powershell/module/configurationmanager/new-cmapplication
+		$NewAppCommand = 'New-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -LocalizedName "$ApplicationDisplayName" -SoftwareVersion "$ApplicationSWVersion" -ReleaseDate "$(Get-Date)" -AutoInstall $ApplicationAutoInstall -DisplaySupersedenceInApplicationCatalog $ApplicationDisplaySupersedence -IsFeatured $ApplicationIsFeatured'
+		$CmdSwitches = ''
+	
+		## Build the rest of the command based on values in the xml
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationPublisher)))  {
+			$CmdSwitches += ' -Publisher "$ApplicationPublisher"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationDescription)))  {
+			$CmdSwitches += ' -LocalizedDescription "$ApplicationDescription"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationIcon)))  {
+			$ApplicationIconPath = "$Global:IconRepo\$ApplicationIcon"
+			if (-not (Test-Path $ApplicationIconPath -ErrorAction SilentlyContinue)) {
+				$ApplicationIconPath = "$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon"
+				if (-not (Test-Path $ApplicationIconPath -ErrorAction SilentlyContinue)) {
+					$ApplicationIconPath = $null
+				}
+			}
+			$CmdSwitches += ' -IconLocationFile "$ApplicationIconPath"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationDocURL)))  {
+			$CmdSwitches += ' -UserDocumentation "$ApplicationDocURL"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationOptionalReference)))  {
+			$CmdSwitches += ' -OptionalReference "$ApplicationOptionalReference"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationAdminDescription)))  {
+			$CmdSwitches += ' -Description "$ApplicationAdminDescription"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationOwner)))  {
+			$CmdSwitches += ' -Owner "$ApplicationOwner"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationSupportContact)))  {
+			$CmdSwitches += ' -SupportContact "$ApplicationSupportContact"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationKeywords)))  {
+			$CmdSwitches += ' -Keyword "$ApplicationKeywords"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationLinkText)))  {
+			$CmdSwitches += ' -LinkText "$ApplicationLinkText"'
+		}
+
+		If (-not ([System.String]::IsNullOrEmpty($ApplicationPrivacyUrl)))  {
+			$CmdSwitches += ' -PrivacyUrl "$ApplicationPrivacyUrl"'
+		}
+	
+		## Run the New-CMApplication Command
+		$NewAppCommandFull = "$NewAppCommand$CmdSwitches"
+		Add-LogContent "Command: $NewAppCommandFull"
 		Try {
-			If (-not ([System.String]::IsNullOrEmpty($ApplicationIcon))) {
-				Add-LogContent "Command: New-CMApplication -Name $ApplicationName $ApplicationSWVersion -Description $ApplicationDescription -Publisher $ApplicationPublisher -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName $ApplicationDisplayName -LocalizedDescription $ApplicationDescription -UserDocumentation $ApplicationDocURL -IconLocationFile $ApplicationIcon"
-				New-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Description "$ApplicationDescription" -Publisher "$ApplicationPublisher" -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName "$ApplicationDisplayName" -LocalizedDescription "$ApplicationDescription" -UserDocumentation $ApplicationDocURL -IconLocationFile "$ApplicationIcon"
-			}
-			Else {
-				Add-LogContent "Command: New-CMApplication -Name $ApplicationName $ApplicationSWVersion -Description $ApplicationDescription -Publisher $ApplicationPublisher -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName $ApplicationDisplayName -LocalizedDescription $ApplicationDescription -UserDocumentation $ApplicationDocURL"
-				New-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Description "$ApplicationDescription" -Publisher "$ApplicationPublisher" -SoftwareVersion $ApplicationSWVersion -OptionalReference $ApplicationDocURL -AutoInstall $ApplicationAutoInstall -ReleaseDate (Get-Date) -LocalizedName "$ApplicationDisplayName" -LocalizedDescription "$ApplicationDescription" -UserDocumentation $ApplicationDocURL
-			}
+			Invoke-Expression $NewAppCommandFull | Out-Null
+			Add-LogContent "Application Created"
 		}
 		Catch {
 			$AppCreated = $false
 			$ErrorMessage = $_.Exception.Message
-			$FullyQualified = $_.FullyQualifiedErrorID
-			Add-LogContent "ERROR: Application Creation Failed!"
+			$FullyQualified = $_.Exeption.FullyQualifiedErrorID
+			Add-LogContent "ERROR: Creating Application Failed!"
 			Add-LogContent "ERROR: $ErrorMessage"
 			Add-LogContent "ERROR: $FullyQualified"
 			Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
 		}
 
-		# Move the Application to folder path if supplied
-		Try {
-			If (-not ([System.String]::IsNullOrEmpty($ApplicationFolderPath))) {
-				# Create the folder if it does not exist
-				if (-not (Test-Path ".\Application\$ApplicationFolderPath")) {
-					New-Item -ItemType Directory -Path ".\Application\$ApplicationFolderPath" -ErrorAction SilentlyContinue
+		# Apply categories if supplied. This was not availabe during application creation
+		if ($AppCreated) {
+			Try {
+				## Set user categories that display in Software Center
+				If (-not ([System.String]::IsNullOrEmpty($ApplicationUserCategories))) {
+					## Create list to store user categories
+					$AppUserCatList = New-Object System.Collections.ArrayList
+					foreach ($ApplicationUserCategory in ($ApplicationUserCategories).Split(",")) {
+						if (-not (($AppUserCatObj = Get-CMCategory -Name $ApplicationUserCategory | Where-Object {$_.CategoryTypeName -eq "CatalogCategories"}))) {
+							## Create if not found and add to list
+							Add-LogContent "$ApplicationUserCategory category was supplied in recipe, but does not exist. Creating user category"
+							$null = $AppUserCatList.Add((New-CMCategory -CategoryType "CatalogCategories" -Name $ApplicationUserCategory))
+						} else {
+							## Add to list
+							$null = $AppUserCatList.Add($AppUserCatObj)
+						}
+					}
 				}
-				Add-LogContent "Command: Move-CMObject -InputObject (Get-CMApplication -Name ""$ApplicationName $ApplicationSWVersion"") -FolderPath "".\Application\$ApplicationFolderPath"""
-				Move-CMObject -InputObject (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion") -FolderPath ".\Application\$ApplicationFolderPath"
+
+				## Set administrative categories that display in admin console
+				If (-not ([System.String]::IsNullOrEmpty($ApplicationAdminCategories))) {
+					## Create list to store admin categories
+					$AppAdminCatList = New-Object System.Collections.ArrayList
+					foreach ($ApplicationAdminCategory in ($ApplicationAdminCategories).Split(",")) {
+						if (-not (($AppAdminCatObj = Get-CMCategory -Name $ApplicationAdminCategory | Where-Object {$_.CategoryTypeName -eq "AppCategories"}))) {
+							## Create if not found and add to list
+							Add-LogContent "$ApplicationAdminCategory category was supplied in recipe, but does not exist. Creating admin category"
+							$null = $AppAdminCatList.Add((New-CMCategory -CategoryType "AppCategories" -Name $ApplicationAdminCategory))
+						} else {
+							## Add to list
+							$null = $AppAdminCatList.Add($AppAdminCatObj)
+						}
+					}
+				}
+
+				## Run Set-CMApplication depending on which types of categories exist
+				## Reference: https://docs.microsoft.com/en-us/powershell/module/configurationmanager/set-cmapplication
+				if (($AppUserCatList) -and ($AppAdminCatList)) {
+					Set-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -AddAppCategory $AppAdminCatList -AddUserCategory $AppUserCatList
+				} elseif ($AppUserCatList) {
+					Set-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -AddUserCategory $AppUserCatList
+				} elseif ($AppAdminCatList) {
+					Set-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -AddAppCategory $AppAdminCatList
+				}
+			}
+			Catch { 
+				$AppCreated = $false
+				$ErrorMessage = $_.Exception.Message
+				$FullyQualified = $_.Exception.FullyQualifiedErrorID
+				Add-LogContent "ERROR: Setting Application Categories Failed!"
+				Add-LogContent "ERROR: $ErrorMessage"
+				Add-LogContent "ERROR: $FullyQualified"
+				Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
 			}
 		}
-		Catch { 
-			$AppCreated = $false
-			$ErrorMessage = $_.Exception.Message
-			$FullyQualified = $_.FullyQualifiedErrorID
-			Add-LogContent "ERROR: Application Move Failed!"
-			Add-LogContent "ERROR: $ErrorMessage"
-			Add-LogContent "ERROR: $FullyQualified"
-			Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
+
+		# Move the Application to folder path if supplied
+		If ($AppCreated) {
+			Try {
+				If (-not ([System.String]::IsNullOrEmpty($ApplicationFolderPath))) {
+					# Create the folder if it does not exist
+					if (-not (Test-Path ".\Application\$ApplicationFolderPath")) {
+						New-Item -ItemType Directory -Path ".\Application\$ApplicationFolderPath" -ErrorAction SilentlyContinue
+					}
+					Add-LogContent "Command: Move-CMObject -InputObject (Get-CMApplication -Name ""$ApplicationName $ApplicationSWVersion"") -FolderPath "".\Application\$ApplicationFolderPath"""
+					Move-CMObject -InputObject (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion") -FolderPath ".\Application\$ApplicationFolderPath"
+				}
+			}
+			Catch { 
+				$AppCreated = $false
+				$ErrorMessage = $_.Exception.Message
+				$FullyQualified = $_.Exception.FullyQualifiedErrorID
+				Add-LogContent "ERROR: Application Move Failed!"
+				Add-LogContent "ERROR: $ErrorMessage"
+				Add-LogContent "ERROR: $FullyQualified"
+				Add-LogContent "ERROR: $($_.CategoryInfo.Category): $($_.CategoryInfo.Reason)"
+			}
 		}
 
 		## Send an Email if an Application was successfully Created and record the Application Name and Version for the Email

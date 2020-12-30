@@ -1,18 +1,40 @@
 <ApplicationDef>
 	<!-- Application - Sets the information shown in SCCM and in Software Center for the Application -->
 	<Application>
-		<!-- Name - [String] The Name of the Application (version number is appended)-->
+		<!-- Name (Required) - [String] The Name of the Application (version number is appended)-->
 		<Name></Name>
-		<!-- Description - [String] Application and Software Center Description -->
+		<!-- Description - [String] Software Center Description -->
 		<Description></Description>
+		<!-- AdminDescription - [String] Application Administrative Description -->
+		<AdminDescription></AdminDescription>
 		<!-- Publisher - [String] Application Publisher -->
 		<Publisher></Publisher>
 		<!-- AutoInstall - [Boolean] Allow Install In Task Sequence -->
 		<AutoInstall></AutoInstall>
-		<!-- UserDocumentation - [String] Information Link for Software Center -->
+		<!-- UserDocumentation - [String] Hyperlink, in URI format for information for Software Center -->
 		<UserDocumentation></UserDocumentation>
+		<!-- OptionalReference - [String] Reference Link in Admin Console -->
+		<OptionalReference></OptionalReference>
+		<!-- LinkText - [String] Specifies a description that appears in the Application Catalog with a hyperlink to additional information or documentation for the application. -->
+		<LinkText></LinkText>
+		<!-- PrivacyUrl - [String] Hyperlink, in URI format, to privacy information about the application. -->
+		<PrivacyUrl></PrivacyUrl>
+		<!-- Owner - [String] Owner for Application -->
+		<Owner></Owner>
+		<!-- SupportContact - [String] Support Contact for Application -->
+		<SupportContact></SupportContact>
 		<!-- Icon - [String] Icon File Name in Icon Repository (Repository is set in the Preferences File) -->
 		<Icon></Icon>
+		<!-- AdminCategories - [String] Comma Delimited Categories in the Console -->
+		<AdminCategories></AdminCategories>
+		<!-- UserCategories - [String] Comma Delimited Categories for Software Center -->
+		<UserCategories></UserCategories>
+		<!-- Keywords - [String] Comma Delimited Keywords for Searching in Software Center -->
+		<Keywords></Keywords>
+		<!-- FeaturedApplication - [Boolean] Display as a Featured Application and Hightlight in the Company Portal -->
+		<FeaturedApplication></FeaturedApplication>
+		<!-- DisplaySupersedence - [Boolean] Allows Users to See Deployments Superceded Appplications in Software Center -->
+		<DisplaySupersedence></DisplaySupersedence>
 		<!-- FolderPath - [String] The folder path in ConfigMgr where the Application should be created. Default location on the "Software Libary" node is the root under "Overview -> Application Management -> Applications". -->
 		<FolderPath></FolderPath>
 	</Application>
