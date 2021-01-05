@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$latestVersion = (((Invoke-WebRequest https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html) |Select-Object -ExpandProperty Links | where {$_.outertext -like "1* Planned Update, *"} |where {$_.href -like "continuous*"}|Sort-Object -Property innerText -Descending).innerText).Split(" ").replace(".","")[0]
+			<PrefetchScript>$latestVersion = (((Invoke-WebRequest https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html) |Select-Object -ExpandProperty Links | where {$_.outertext -like "2* Planned Update, *"} |where {$_.href -like "continuous*"}|Sort-Object -Property innerText -Descending).innerText).Split(" ").replace(".","")[0]
 $LatestVersion = $latestVersion.Replace("x",5)
 			$URL = "http://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/$($latestVersion)/AcroRdrDC$($LatestVersion)_en_US.exe"
 Add-LogContent $LatestVersion
