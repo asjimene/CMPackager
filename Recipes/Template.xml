@@ -128,6 +128,8 @@
 			<InstallationMSI></InstallationMSI>
 			<!-- UninstallCmd - [String] Uninstallation Command Line -->
 			<UninstallCmd></UninstallCmd>
+			<!-- RepairCmd - [String] Repair Command Line -->
+			<RepairCmd></RepairCmd>
 			<!-- Force32bit - [Boolean] Force 32 bit install -->
 			<Force32bit></Force32bit>
 			<!-- InstallationBehaviorType - [String] Installation behavior -->
@@ -371,6 +373,8 @@
 		<DeploySoftware></DeploySoftware>
 		<!-- UpdateSuperseded - [Boolean] Whether the deployment should automatically upgrade superseded versions -->
 		<UpdateSuperseded></UpdateSuperseded>
+		<!-- AllowRepair - [Boolean] Swtich for allowing users to repair applications from software center -->
+		<AllowRepair></AllowRepair>
 		<!-- DeploymentCollection - [String] Collection for the software to be deployed to -->
 		<DeploymentCollection></DeploymentCollection>
 	</Deployment>

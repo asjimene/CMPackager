@@ -1110,6 +1110,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$stDepTypeUninstallationProgram = $DeploymentType.UninstallCmd
 				$stDepTypeUninstallationProgram = ($stDepTypeUninstallationProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			}
+
+			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.RepairCmd))) {
+				$stDepTypeRepairCommand = ($DeploymentType.RepairCmd).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
+			}
 			$swDepTypeForce32Bit = [System.Convert]::ToBoolean($DeploymentType.Force32bit)
 		
 			# User Experience
@@ -1552,12 +1556,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Set-Location $CMSite
 		If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
 			$UpdateSuperseded = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
+			$AllowRepair = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.AllowRepair)
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
 				Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
 					Try {
 						Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
 						If ($UpdateSuperseded) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
-						New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -UpdateSupersedence:$UpdateSuperseded -ErrorAction Stop
+						New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -AllowRepairApp $AllowRepair -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -UpdateSupersedence:$UpdateSuperseded -ErrorAction Stop
 					}
 					Catch {
 						$ErrorMessage = $_.Exception.Message
@@ -1570,7 +1575,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			ElseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
 				Try {
 					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $Global:PreferredDeployCollection"
-					New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
+					New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -AllowRepairApp $AllowRepair -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
 				}
 				Catch {
 					$ErrorMessage = $_.Exception.Message
