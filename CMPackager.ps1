@@ -1485,16 +1485,18 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$DistContent = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Distribution.DistributeContent)
 		If ($DistContent) {
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToGroup))) {
-				$DistributionGroup = $Recipe.ApplicationDef.Distribution.DistributeToGroup
+				$DistributionGroups = ($Recipe.ApplicationDef.Distribution.DistributeToGroup).Split(",")
 				Add-LogContent "Distributing Content for $ApplicationName $ApplicationSWVersion to $($Recipe.ApplicationDef.Distribution.DistributeToGroup)"
-				Try {
-					Start-CMContentDistribution -ApplicationName "$ApplicationName $ApplicationSWVersion" -DistributionPointGroupName $DistributionGroup -ErrorAction Stop
-				}
-				Catch {
-					$ErrorMessage = $_.Exception.Message
-					Add-LogContent "ERROR: Content Distribution Failed!"
-					Add-LogContent "ERROR: $ErrorMessage"
-					$Success = $false
+				ForEach ($DistributionGroup In $DistributionGroups) {
+					Try {
+						Start-CMContentDistribution -ApplicationName "$ApplicationName $ApplicationSWVersion" -DistributionPointGroupName $DistributionGroup -ErrorAction Stop
+					}
+					Catch {
+						$ErrorMessage = $_.Exception.Message
+						Add-LogContent "ERROR: Content Distribution Failed!"
+						Add-LogContent "ERROR: $ErrorMessage"
+						$Success = $false
+					}
 				}
 			}
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToDPs))) {
@@ -1513,16 +1515,18 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				}
 			}
 			If ((([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToDPs)) -and ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Distribution.DistributeToGroup))) -and (-not ([String]::IsNullOrEmpty($Global:PreferredDistributionLoc)))) {
-				$DistributionGroup = $Global:PreferredDistributionLoc
-				Add-LogContent "Distribution was set to True but No Distribution Points or Groups were Selected, Using Preferred Distribution Group: $Global:PreferredDistributionLoc"
-				Try {
-					Start-CMContentDistribution -ApplicationName "$ApplicationName $ApplicationSWVersion" -DistributionPointGroupName $DistributionGroup -ErrorAction Stop
-				}
-				Catch {
-					$ErrorMessage = $_.Exception.Message
-					Add-LogContent "ERROR: Content Distribution Failed!"
-					Add-LogContent "ERROR: $ErrorMessage"
-					$Success = $false
+				$DistributionGroups = ($Global:PreferredDistributionLoc).Split(",")
+				Add-LogContent "Distribution was set to True but No Distribution Points or Groups were Selected, Using Preferred Distribution Group(s): $Global:PreferredDistributionLoc"
+				ForEach ($DistributionGroup In $DistributionGroups) {
+					Try {
+						Start-CMContentDistribution -ApplicationName "$ApplicationName $ApplicationSWVersion" -DistributionPointGroupName $DistributionGroup -ErrorAction Stop
+					}
+					Catch {
+						$ErrorMessage = $_.Exception.Message
+						Add-LogContent "ERROR: Content Distribution Failed!"
+						Add-LogContent "ERROR: $ErrorMessage"
+						$Success = $false
+					}
 				}
 			}
 		}

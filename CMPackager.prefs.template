@@ -29,7 +29,7 @@
 	<SendEmailPreference>True</SendEmailPreference>
 	<!-- NotifyOnDownloadFailure - [Boolean] Notify in Email if Downloading an application fails, requires SendEmailPreference to be True -->
 	<NotifyOnDownloadFailure>True</NotifyOnDownloadFailure>
-	<!-- PreferredDistributionLoc - [String] Distribution point GROUP to distribute content to if "DistributeContent" is set to true but no Distribution Points or Distribution Point Groups are set -->
+	<!-- PreferredDistributionLoc - [String] Comma delimited list of distribution point GROUP to distribute content to if "DistributeContent" is set to true but no Distribution Points or Distribution Point Groups are set -->
 	<PreferredDistributionLoc></PreferredDistributionLoc>
 	<!-- PreferredDeployCollection - [String] Collection to deploy Application to if "DeploySoftware" is Set to True, but no "DeploymentCollection" is set -->
 	<PreferredDeployCollection></PreferredDeployCollection>
