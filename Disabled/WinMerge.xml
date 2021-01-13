@@ -1,0 +1,68 @@
+<ApplicationDef>
+	<Application>
+		<Name>WinMerge</Name>
+		<Description>WinMerge is an Open Source differencing and merging tool for Windows. WinMerge can compare both folders and files, presenting differences in a visual text format that is easy to understand and handle.</Description>
+		<Publisher>WinMerge</Publisher>
+		<AutoInstall>False</AutoInstall>
+		<UserDocumentation>https://winmerge.org/docs/</UserDocumentation>
+		<Icon>WinMerge.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+			$Releases = 'https://winmerge.org/downloads/'
+			$Filename = (Invoke-WebRequest -Uri $Releases -UseBasicParsing).Links | Where-Object -Property href -Like '*WinMerge*x64*.exe*' | Select-Object -First 1 -expand href
+			[String]$Download.Version = $Filename -split '-|.exe' | select -Skip 2 -First 1
+			$URL = $Filename
+			$HTTPheaders = @{
+				'User-Agent' = '[Microsoft.PowerShell.Commands.PSUserAgent]::FireFox'
+			}
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>WinMerge.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>
+			$FullVersion = (Get-ItemProperty $DownloadFile).VersionInfo.FileVersion.TrimStart().TrimEnd()
+			$Version = ($FullVersion).Replace(".0","").TrimStart().TrimEnd()
+			</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>WinMerge Installer</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>WinMerge.exe /VERYSILENT /NORESTART</InstallProgram>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>WinMergeU.exe</Name>
+					<Path>%ProgramFiles%\WinMerge\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$FullVersion</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
