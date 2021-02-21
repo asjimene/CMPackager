@@ -434,6 +434,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$DownloadFile = "$TempDir\$DownloadFileName"
 			$AppRepoFolder = $Download.AppRepoFolder
 			$ExtraCopyFunctions = $Download.ExtraCopyFunctions
+			$RequireHigherVersion = [System.Convert]::ToBoolean($Download.RequireHigherVersion)
 
 			## Run the prefetch script if it exists, the prefetch script can be used to determine the location of the download URL, and optionally provide
 			## the software version before the download occurs
@@ -447,7 +448,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				## To Set the Download Version in the Prefetch Script, Simply set the variable $Download.Version to the [String]Version of the Application
 				$ApplicationSWVersion = $Download.Version
 				Add-LogContent "Prefetch Script Provided a Download Version of: $ApplicationSWVersion"
-				$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion ([string]$ApplicationSWVersion)
+				$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion ([string]$ApplicationSWVersion) -RequireHigherVersion:$RequireHigherVersion
 			}
 			else {
 				$newApp = $true
@@ -502,7 +503,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				}
 			}
 		
-			$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion $ApplicationSWVersion
+			$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion $ApplicationSWVersion -RequireHigherVersion:$RequireHigherVersion
 		
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
