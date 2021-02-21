@@ -1,4 +1,4 @@
-<#	
+﻿<#	
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
@@ -375,12 +375,23 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$ApplciationName,
 			[Parameter()]
 			[String]
-			$ApplciationSWVersion
+			$ApplciationSWVersion,
+			[Parameter()]
+			[Switch]
+			# Require versions to be higher than currently in CM as well as not previously added
+			$RequireHigherVersion
 		)
 
 		Push-Location
 		Set-Location $Global:CMSite
-		If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
+		If ($RequireHigherVersion) {
+			Add-LogContent "Requiring new version numbers to be higher than current"
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" | Sort-Object Version -Descending | Select -ExpandProperty Version -First 1 -ErrorAction SilentlyContinue
+			$newApp = $ApplicationSWVersion -gt $currentHighest
+			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
+			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
+		}
+		ElseIf ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
 			$newApp = $true			
 			Add-LogContent "$ApplicationSWVersion is a new Version"
 		}
