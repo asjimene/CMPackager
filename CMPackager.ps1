@@ -378,16 +378,25 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$ApplciationSWVersion,
 			[Parameter()]
 			[Switch]
-			# Require versions to be higher than currently in CM as well as not previously added
+			# Require versions that can be parsed as a version or int to be higher than currently in CM as well as not previously added
 			$RequireHigherVersion
 		)
 
 		Push-Location
 		Set-Location $Global:CMSite
-		If ($RequireHigherVersion) {
+		If ($RequireHigherVersion -and ($ApplicationSWVersion -as [version])) {
+			# Use [version] for proper sorting
 			Add-LogContent "Requiring new version numbers to be higher than current"
-			$currentHighest = Get-CMApplication -Name "$ApplicationName*" | Sort-Object Version -Descending | Select -ExpandProperty Version -First 1 -ErrorAction SilentlyContinue
-			$newApp = $ApplicationSWVersion -gt $currentHighest
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" | Select -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue | % {$_ -as [version]} | Sort -Descending | Select -First 1
+			$newApp = ($ApplicationSWVersion -as [version]) -gt $currentHighest
+			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
+			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
+		}
+		ElseIf ($RequireHigherVersion -and ($ApplicationSWVersion -as [int])) {
+			# Try [int]
+			Add-LogContent "Requiring new version numbers to be higher than current"
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" | Select -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue | % {$_ -as [int]} | Sort -Descending | Select -First 1
+			$newApp = ($ApplicationSWVersion -as [int]) -gt $currentHighest
 			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
 			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
 		}
