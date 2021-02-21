@@ -372,10 +372,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		param (
 			[Parameter()]
 			[String]
-			$ApplciationName,
+			$ApplicationName,
 			[Parameter()]
 			[String]
-			$ApplciationSWVersion,
+			$ApplicationSWVersion,
 			[Parameter()]
 			[Switch]
 			# Require versions that can be parsed as a version or int to be higher than currently in CM as well as not previously added
@@ -447,7 +447,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				## To Set the Download Version in the Prefetch Script, Simply set the variable $Download.Version to the [String]Version of the Application
 				$ApplicationSWVersion = $Download.Version
 				Add-LogContent "Prefetch Script Provided a Download Version of: $ApplicationSWVersion"
-				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$ApplicationSWVersion)
+				$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion ([string]$ApplicationSWVersion)
 			}
 			else {
 				$newApp = $true
@@ -502,7 +502,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				}
 			}
 		
-			$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion $ApplicationSWVersion
+			$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion $ApplicationSWVersion
 		
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
