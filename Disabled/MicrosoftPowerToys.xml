@@ -9,14 +9,21 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/microsoft/PowerToys/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*PowerToysSetup-*-x64.msi").href
+			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/microsoft/PowerToys/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*PowerToysSetup-*-x64.exe").href
+			$Download.Version = $LinkPath -replace '.*download/v' -replace '/PowerToysSetup.*$'
+			$Version = $Download.Version
+			$FullVersion = $Download.Version
 			$URL = "https://github.com$LinkPath"</PrefetchScript>
 			<URL></URL>
-			<DownloadFileName>PowerToysSetup.msi</DownloadFileName>
+			<DownloadFileName>PowerToysSetup.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
-			<ExtraCopyFunctions></ExtraCopyFunctions>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<ExtraCopyFunctions>pushd $DestinationPath
+			Start-Process .\PowerToysSetup.exe -ArgumentList '--extract_msi' -Wait
+			Move-Item .\PowerToysBootstrappedInstaller*.msi PowerToysSetup.msi
+			Remove-Item .\PowerToysSetup.exe
+			popd</ExtraCopyFunctions>
 		</Download>
 		</Downloads>
 	<DeploymentTypes>
