@@ -1,0 +1,122 @@
+<ApplicationDef>
+	<Application>
+		<Name>VcXsrv</Name>
+		<Description>Windows X-server based on the xorg git sources (like xming or cygwin's xwin), but compiled with Visual C++ 2012 Express Edition.</Description>
+		<Publisher>marha</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://sourceforge.net/projects/vcxsrv/</UserDocumentation>
+		<Icon>VcXsrv.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>[xml]$rss = Invoke-WebRequest https://sourceforge.net/projects/vcxsrv/rss | select -ExpandProperty Content
+$downloadurl = $rss.SelectNodes('//item').link | ? {$_ -like '*/vcxsrv-64.*.installer.exe*'} | select -First 1
+$URL = $downloadurl
+$version = $downloadurl -replace '^.*vcxsrv-64\.' -replace '\.installer\.exe/download'
+$download.Version = $version
+$FullVersion = $version
+$PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</PrefetchScript>
+			<!-- SourceForge will only present the file to a non-browser user agent -->
+			<DownloadFileName>vcxsrv-64.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<AppRepoFolder>x64</AppRepoFolder>
+			<!-- Remove the changed UserAgent -->
+			<ExtraCopyFunctions>$PSDefaultParameterValues.Remove('Invoke-WebRequest:UserAgent')</ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>[xml]$rss = Invoke-WebRequest https://sourceforge.net/projects/vcxsrv/rss | select -ExpandProperty Content
+$downloadurl = $rss.SelectNodes('//item').link | ? {$_ -like '*/vcxsrv.*.installer.exe*'} | select -First 1
+$URL = $downloadurl
+$version = $downloadurl -replace '^.*vcxsrv\.' -replace '\.installer\.exe/download'
+$download.Version = $version
+$FullVersion = $version
+$PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</PrefetchScript>
+			<!-- SourceForge will only present the file to a non-browser user agent -->
+			<DownloadFileName>vcxsrv-86.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<AppRepoFolder>x86</AppRepoFolder>
+			<!-- Remove the changed UserAgent -->
+			<ExtraCopyFunctions>$PSDefaultParameterValues.Remove('Invoke-WebRequest:UserAgent')</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>vcxsrv-64</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>vcxsrv-64.exe /S</InstallProgram>
+			<UninstallCmd>%ProgramFiles%\VcXsrv\uninstall.exe /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>vcxsrv.exe</Name>
+					<Path>%ProgramFiles%\VcXsrv\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>vcxsrv-86</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>vcxsrv-86.exe /S</InstallProgram>
+			<UninstallCmd>%ProgramFiles%\VcXsrv\uninstall.exe /S</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>vcxsrv.exe</Name>
+					<Path>%ProgramFiles%\VcXsrv\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
