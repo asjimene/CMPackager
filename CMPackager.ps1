@@ -1,4 +1,4 @@
-﻿<#	
+<#	
 	.NOTES
 	===========================================================================
 	 Created on:   	1/9/2018 11:34 AM
@@ -387,7 +387,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		If ($RequireHigherVersion -and ($ApplicationSWVersion -as [version])) {
 			# Use [version] for proper sorting
 			Add-LogContent "Requiring new version numbers to be higher than current"
-			$currentHighest = Get-CMApplication -Name "$ApplicationName*" | Select -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue | % {$_ -as [version]} | Sort -Descending | Select -First 1
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" |
+				Select-Object -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue |
+				ForEach-Object {$_ -as [version]} |
+				Sort-Object -Descending |
+				Select-Object -First 1
 			$newApp = ($ApplicationSWVersion -as [version]) -gt $currentHighest
 			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
 			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
@@ -395,7 +399,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		ElseIf ($RequireHigherVersion -and ($ApplicationSWVersion -as [int])) {
 			# Try [int]
 			Add-LogContent "Requiring new version numbers to be higher than current"
-			$currentHighest = Get-CMApplication -Name "$ApplicationName*" | Select -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue | % {$_ -as [int]} | Sort -Descending | Select -First 1
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" |
+				Select-Object -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue |
+				ForEach-Object {$_ -as [int]} |
+				Sort-Object -Descending |
+				Select-Object -First 1
 			$newApp = ($ApplicationSWVersion -as [int]) -gt $currentHighest
 			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
 			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
