@@ -67,6 +67,8 @@
 			$DestinationPath - The Path to the Repository
 			-->
 			<ExtraCopyFunctions>Custom Script to Copy Extra Files/Folders to Content Location, or post processing of downloaded files, runs after Files are copied to Content Location</ExtraCopyFunctions>
+			<!-- RequireHigherVersion - [Boolean] Require a version number to be higher than currently in CM to be "new" -->
+			<RequireHigherVersion></RequireHigherVersion>
 		</Download>
 		<!-- Below are some of the combinations that can be used for different types of downloads and deployment types, notice that each download has a deployment type that matches it-->
 		<Download DeploymentType="MSI">

@@ -372,15 +372,43 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		param (
 			[Parameter()]
 			[String]
-			$ApplciationName,
+			$ApplicationName,
 			[Parameter()]
 			[String]
-			$ApplciationSWVersion
+			$ApplicationSWVersion,
+			[Parameter()]
+			[Switch]
+			# Require versions that can be parsed as a version or int to be higher than currently in CM as well as not previously added
+			$RequireHigherVersion
 		)
 
 		Push-Location
 		Set-Location $Global:CMSite
-		If ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
+		If ($RequireHigherVersion -and ($ApplicationSWVersion -as [version])) {
+			# Use [version] for proper sorting
+			Add-LogContent "Requiring new version numbers to be higher than current"
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" |
+				Select-Object -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue |
+				ForEach-Object {$_ -as [version]} |
+				Sort-Object -Descending |
+				Select-Object -First 1
+			$newApp = ($ApplicationSWVersion -as [version]) -gt $currentHighest
+			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
+			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
+		}
+		ElseIf ($RequireHigherVersion -and ($ApplicationSWVersion -as [int])) {
+			# Try [int]
+			Add-LogContent "Requiring new version numbers to be higher than current"
+			$currentHighest = Get-CMApplication -Name "$ApplicationName*" |
+				Select-Object -ExpandProperty SoftwareVersion -ErrorAction SilentlyContinue |
+				ForEach-Object {$_ -as [int]} |
+				Sort-Object -Descending |
+				Select-Object -First 1
+			$newApp = ($ApplicationSWVersion -as [int]) -gt $currentHighest
+			if ($newApp) {Add-LogContent "$ApplicationSWVersion is a new and higher version"}
+			else {Add-LogContent "$ApplicationSWVersion is not new and higher - Moving to next application"}
+		}
+		ElseIf ((-not (Get-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -Fast)) -and (-not ([System.String]::IsNullOrEmpty($ApplicationSWVersion)))) {
 			$newApp = $true			
 			Add-LogContent "$ApplicationSWVersion is a new Version"
 		}
@@ -414,6 +442,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$DownloadFile = "$TempDir\$DownloadFileName"
 			$AppRepoFolder = $Download.AppRepoFolder
 			$ExtraCopyFunctions = $Download.ExtraCopyFunctions
+			$RequireHigherVersion = [System.Convert]::ToBoolean($Download.RequireHigherVersion)
 
 			## Run the prefetch script if it exists, the prefetch script can be used to determine the location of the download URL, and optionally provide
 			## the software version before the download occurs
@@ -427,7 +456,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				## To Set the Download Version in the Prefetch Script, Simply set the variable $Download.Version to the [String]Version of the Application
 				$ApplicationSWVersion = $Download.Version
 				Add-LogContent "Prefetch Script Provided a Download Version of: $ApplicationSWVersion"
-				$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion ([string]$ApplicationSWVersion)
+				$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion ([string]$ApplicationSWVersion) -RequireHigherVersion:$RequireHigherVersion
 			}
 			else {
 				$newApp = $true
@@ -482,7 +511,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				}
 			}
 		
-			$newApp = Invoke-VersionCheck -ApplciationName $ApplicationName -ApplciationSWVersion $ApplicationSWVersion
+			$newApp = Invoke-VersionCheck -ApplicationName $ApplicationName -ApplicationSWVersion $ApplicationSWVersion -RequireHigherVersion:$RequireHigherVersion
 		
 			## Create the Application folders and copy the download if the Application is New
 			If ($newapp) {
