@@ -19,7 +19,11 @@
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
 			<AppRepoFolder>x64</AppRepoFolder>
-			<ExtraCopyFunctions></ExtraCopyFunctions>
+			<ExtraCopyFunctions>if (Test-Path $ScriptRoot\ExtraFiles\git.inf) {
+			Copy-Item -Path $ScriptRoot\ExtraFiles\git.inf -Destination $DestinationPath
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType | Where-Object Name -eq $Download.DeploymentType
+			$AssociatedDeploymentType.InstallProgram += ' /LOADINF="git.inf"'
+			}</ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
 			<PrefetchScript>$URL = (((Invoke-WebRequest https://git-scm.com/download/win).Links) | where -Property OuterText -EQ "32-bit Git for Windows Setup").href
@@ -31,7 +35,11 @@
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
 			<AppRepoFolder>x86</AppRepoFolder>
-			<ExtraCopyFunctions></ExtraCopyFunctions>
+			<ExtraCopyFunctions>if (Test-Path $ScriptRoot\ExtraFiles\git.inf) {
+			Copy-Item -Path $ScriptRoot\ExtraFiles\git.inf -Destination $DestinationPath
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType | Where-Object Name -eq $Download.DeploymentType
+			$AssociatedDeploymentType.InstallProgram += ' /LOADINF="git.inf"'
+			}</ExtraCopyFunctions>
 		</Download>
 	</Downloads>
 	<DeploymentTypes>
