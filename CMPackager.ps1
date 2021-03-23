@@ -612,14 +612,13 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationIcon)))  {
-			$ApplicationIconPath = "$Global:IconRepo\$ApplicationIcon"
-			if (-not (Test-Path $ApplicationIconPath -ErrorAction SilentlyContinue)) {
-				$ApplicationIconPath = "$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon"
-				if (-not (Test-Path $ApplicationIconPath -ErrorAction SilentlyContinue)) {
-					$ApplicationIconPath = $null
-				}
+			if (Test-Path "$Global:IconRepo\$ApplicationIcon") {
+				$CmdSwitches += " -IconLocationFile ""$Global:IconRepo\$ApplicationIcon"""
+			} elseif (Test-Path "$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon") {
+				$CmdSwitches += " -IconLocationFile ""$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon"""
+			} else {
+				Add-LogContent "ERROR: Unable to find icon $ApplicationIcon, creating application without icon"
 			}
-			$CmdSwitches += ' -IconLocationFile "$ApplicationIconPath"'
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationDocURL)))  {
