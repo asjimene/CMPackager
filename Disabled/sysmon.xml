@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<!-- TODO: PrefetchScript to get version from docs -->
+			<PrefetchScript>if (((Invoke-WebRequest https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon).Content -match 'Sysmon v?(\d[\.\d]*)') -and $matches[1]) {$Download.Version = $matches[1]}</PrefetchScript>
 			<URL>https://live.sysinternals.com/Sysmon.exe</URL>
 			<DownloadFileName>Sysmon.exe</DownloadFileName>
 			<Version></Version>
