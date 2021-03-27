@@ -10,29 +10,25 @@
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
 			<!-- TODO: PrefetchScript to get version from docs -->
-			<URL>https://download.sysinternals.com/files/Sysmon.zip</URL>
-			<DownloadFileName>Sysmon.zip</DownloadFileName>
+			<URL>https://live.sysinternals.com/Sysmon.exe</URL>
+			<DownloadFileName>Sysmon.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>Expand-Archive $DownloadFile -DestinationPath "$TempDir\Sysmon"
-			$DownloadFileName = "Sysmon64.exe"
-			$DownloadFile = "$TempDir\Sysmon\$DownloadFileName"
-			$Version = (Get-Item $DownloadFile).VersionInfo.ProductVersion</DownloadVersionCheck>
-			<AppRepoFolder>x64</AppRepoFolder>
+			<DownloadVersionCheck>$Version = (Get-Item $DownloadFile).VersionInfo.ProductVersion</DownloadVersionCheck>
 			<!-- TODO: ExtraCopyFunctions to include sysmon config if present and add name to InstallProgram -->
 		</Download>
 	</Downloads>
 	<DeploymentTypes>
 		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>Sysmon64</DeploymentTypeName>
+			<DeploymentTypeName>Sysmon</DeploymentTypeName>
 			<InstallationType>Script</InstallationType>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>Sysmon64.exe -accepteula -i</InstallProgram>
+			<InstallProgram>Sysmon.exe -accepteula -i</InstallProgram>
 			<!-- Using %windir% leaves exe behind after uninstall -->
-			<UninstallCmd>Sysmon64.exe -u</UninstallCmd>
+			<UninstallCmd>Sysmon.exe -u</UninstallCmd>
 			<!-- <UninstallOption>NoneRequired</UninstallOption> -->
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<Force32bit>False</Force32bit>
@@ -48,25 +44,16 @@
 			<ScriptLanguage>PowerShell</ScriptLanguage>
 			<ScriptDetection32Bit>False</ScriptDetection32Bit>
 			<DetectionMethod>if (
-	(Get-Service Sysmon64 -ErrorAction SilentlyContinue) -and 
-	(Get-Service SysmonDrv -ErrorAction SilentlyContinue) -and 
+	(Get-Service Sysmon -ErrorAction SilentlyContinue) -and
+	(Get-Service SysmonDrv -ErrorAction SilentlyContinue) -and
 	(
-		(Test-Path $env:windir\Sysmon64.exe) -and 
-		((Get-Item $env:windir\Sysmon64.exe).VersionInfo.ProductVersion -as [version] -ge $Version)
+		(Test-Path $env:windir\Sysmon.exe) -and
+		((Get-Item $env:windir\Sysmon.exe).VersionInfo.ProductVersion -as [version] -ge $Version)
 	) -and (
-		(Test-Path $env:windir\SysmonDrv.sys) -and 
+		(Test-Path $env:windir\SysmonDrv.sys) -and
 		((Get-Item $env:windir\SysmonDrv.sys).VersionInfo.ProductVersion -as [version] -ge $Version)
 	)
 ) {"Installed"}</DetectionMethod>
-			<RequirementsRules>
-				<RequirementsRule>
-					<RequirementsRuleType>Existential</RequirementsRuleType>
-					<RequirementsRuleValue>
-						<RuleValue>True</RuleValue>
-					</RequirementsRuleValue>
-					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
-				</RequirementsRule>
-			</RequirementsRules>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
