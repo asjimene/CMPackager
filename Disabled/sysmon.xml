@@ -15,7 +15,12 @@
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = (Get-Item $DownloadFile).VersionInfo.ProductVersion</DownloadVersionCheck>
-			<!-- TODO: ExtraCopyFunctions to include sysmon config if present and add name to InstallProgram -->
+			<!-- If $ScriptRoot\ExtraFiles\sysmonconfig.xml exists, add to application -->
+			<ExtraCopyFunctions>if (Test-Path $ScriptRoot\ExtraFiles\sysmonconfig.xml) {
+			Copy-Item -Path $ScriptRoot\ExtraFiles\sysmonconfig.xml -Destination $DestinationPath
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType | Where-Object Name -eq $Download.DeploymentType
+			$AssociatedDeploymentType.InstallProgram += ' sysmonconfig.xml'
+			}</ExtraCopyFunctions>
 		</Download>
 	</Downloads>
 	<DeploymentTypes>
