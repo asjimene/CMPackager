@@ -70,6 +70,17 @@
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="git">
+					<InstallBehaviorExe>git.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="git bash">
+					<InstallBehaviorExe>git-bash.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="git cmd">
+					<InstallBehaviorExe>git-cmd.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
@@ -107,6 +118,17 @@
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="git">
+					<InstallBehaviorExe>git.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="git bash">
+					<InstallBehaviorExe>git-bash.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="git cmd">
+					<InstallBehaviorExe>git-cmd.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
