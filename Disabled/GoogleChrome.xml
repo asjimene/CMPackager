@@ -40,7 +40,9 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallationMSI>googlechromestandaloneenterprise64.msi</InstallationMSI>
-			<UninstallCmd></UninstallCmd>
+			<InstallProgram>msiexec.exe /i googlechromestandaloneenterprise64.msi /l*v install.log</InstallProgram>
+			<UninstallCmd>powershell.exe -noprofile -noninteractive -command ""`&amp; {exit ((Start-Process msiexec -ArgumentList /x,(gp HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*,HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* -ea si | ? DisplayName -eq 'Google Chrome' | select -ExpandProperty PSChildName),'/norestart','/qn','/l*v uninstall.log' -Wait -PassThru).ExitCode)}""</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<Force32bit>False</Force32bit>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
@@ -99,7 +101,9 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallationMSI>googlechromestandaloneenterprise.msi</InstallationMSI>
-			<UninstallCmd></UninstallCmd>
+			<InstallProgram>msiexec.exe /i googlechromestandaloneenterprise.msi /l*v install.log</InstallProgram>
+			<UninstallCmd>powershell.exe -noprofile -noninteractive -command ""`&amp; {exit ((Start-Process msiexec -ArgumentList /x,(gp HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*,HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* -ea si | ? DisplayName -eq 'Google Chrome' | select -ExpandProperty PSChildName),'/norestart','/qn','/l*v uninstall.log' -Wait -PassThru).ExitCode)}""</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<Force32bit>False</Force32bit>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
