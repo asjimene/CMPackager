@@ -83,6 +83,11 @@
 					<Is64Bit>True</Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Google Chrome">
+					<InstallBehaviorExe>chrome.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
@@ -127,6 +132,11 @@
 					<Is64Bit>False</Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Google Chrome">
+					<InstallBehaviorExe>chrome.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
