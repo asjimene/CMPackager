@@ -1131,7 +1131,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		
 			# Programs
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.InstallProgram))) {
-				$DepTypeInstallationProgram = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
+				$stDepTypeInstallCommand = ($DeploymentType.InstallProgram).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			}
 			
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.UninstallCmd))) {
@@ -1209,9 +1209,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 							$CmdSwitches += " $CmdSwitch"
 						}
 					}
-				
-					## Script Install Type Specific Arguments
-					$CmdSwitches += " -InstallCommand `'$DepTypeInstallationProgram`'"
 				
 					If ($DepTypeDetectionMethodType -eq "CustomScript") {
 						$DepTypeScriptLanguage = $DeploymentType.ScriptLanguage
@@ -1297,10 +1294,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					$DepTypeInstallationMSI = $DeploymentType.InstallationMSI
 					$DepTypeCommand = "Add-CMMsiDeploymentType -ApplicationName `"$DepTypeApplicationName`" -ContentLocation `"$DepTypeContentLocation\$DepTypeInstallationMSI`" -DeploymentTypeName `"$DepTypeDeploymentTypeName`""
 					$CmdSwitches = ""
-
-					If (-not ([string]::IsNullOrEmpty($DepTypeInstallationProgram))) {
-						$CmdSwitches += " -InstallCommand `"$DepTypeInstallationProgram`""
-					}
 
 					## Build the Rest of the command based on values in the xml
 					ForEach ($DepTypeVar In $(Get-Variable | Where-Object {
