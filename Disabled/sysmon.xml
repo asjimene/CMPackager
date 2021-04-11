@@ -1,0 +1,73 @@
+<ApplicationDef>
+	<Application>
+		<Name>Sysmon</Name>
+		<Description>System Monitor (Sysmon) is a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.</Description>
+		<Publisher>Sysinternals</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon</UserDocumentation>
+		<!-- <Icon></Icon> -->
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>if (((Invoke-WebRequest https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon).Content -match 'Sysmon v?(\d[\.\d]*)') -and $matches[1]) {$Download.Version = $matches[1]}</PrefetchScript>
+			<URL>https://live.sysinternals.com/Sysmon.exe</URL>
+			<DownloadFileName>Sysmon.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = (Get-Item $DownloadFile).VersionInfo.ProductVersion</DownloadVersionCheck>
+			<!-- If $ScriptRoot\ExtraFiles\sysmonconfig.xml exists, add to application -->
+			<ExtraCopyFunctions>if (Test-Path $ScriptRoot\ExtraFiles\sysmonconfig.xml) {
+			Copy-Item -Path $ScriptRoot\ExtraFiles\sysmonconfig.xml -Destination $DestinationPath
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType | Where-Object Name -eq $Download.DeploymentType
+			$AssociatedDeploymentType.InstallProgram += ' sysmonconfig.xml'
+			}</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Sysmon</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>Sysmon.exe -accepteula -i</InstallProgram>
+			<!-- Using %windir% leaves exe behind after uninstall -->
+			<UninstallCmd>Sysmon.exe -u</UninstallCmd>
+			<!-- <UninstallOption>NoneRequired</UninstallOption> -->
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<Force32bit>False</Force32bit>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<!-- Sysmon file version != product version -->
+			<!-- check sysmon service, sysmondrv service, sysmon64 version, sysmondrv version -->
+			<!-- TODO: Handle custom service + driver names -->
+			<DetectionMethodType>CustomScript</DetectionMethodType>
+			<ScriptLanguage>PowerShell</ScriptLanguage>
+			<ScriptDetection32Bit>False</ScriptDetection32Bit>
+			<DetectionMethod>if (
+	(Get-Service Sysmon -ErrorAction SilentlyContinue) -and
+	(Get-Service SysmonDrv -ErrorAction SilentlyContinue) -and
+	(
+		(Test-Path $env:windir\Sysmon.exe) -and
+		((Get-Item $env:windir\Sysmon.exe).VersionInfo.ProductVersion -as [version] -ge $Version)
+	) -and (
+		(Test-Path $env:windir\SysmonDrv.sys) -and
+		((Get-Item $env:windir\SysmonDrv.sys).VersionInfo.ProductVersion -as [version] -ge $Version)
+	)
+) {"Installed"}</DetectionMethod>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>True</Uninstall>
+	</Supersedence>
+	<Deployment>
+	</Deployment>
+</ApplicationDef>
