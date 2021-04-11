@@ -1297,6 +1297,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					$DepTypeInstallationMSI = $DeploymentType.InstallationMSI
 					$DepTypeCommand = "Add-CMMsiDeploymentType -ApplicationName `"$DepTypeApplicationName`" -ContentLocation `"$DepTypeContentLocation\$DepTypeInstallationMSI`" -DeploymentTypeName `"$DepTypeDeploymentTypeName`""
 					$CmdSwitches = ""
+
+					If (-not ([string]::IsNullOrEmpty($DepTypeInstallationProgram))) {
+						$CmdSwitches += " -InstallCommand `"$DepTypeInstallationProgram`""
+					}
+
 					## Build the Rest of the command based on values in the xml
 					ForEach ($DepTypeVar In $(Get-Variable | Where-Object {
 								$_.Name -like "swDepType*"
@@ -1319,10 +1324,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					## Special Arguments based on Detection Method
 					Switch ($DepTypeDetectionMethodType) {
 						MSI {
-							If (-not ([string]::IsNullOrEmpty($DepTypeInstallationProgram))) {
-								$CmdSwitches += " -InstallCommand `"$DepTypeInstallationProgram`""
-							}
-						
 							$DepTypeProductCode = $DeploymentType.ProductCode
 							If (-not ([string]::IsNullOrEmpty($DepTypeProductCode))) {
 								$CMDSwitch = "-ProductCode `"$DepTypeProductCode`""
@@ -1330,8 +1331,6 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 							}
 						}
 						CustomScript {
-							$CmdSwitches += " -InstallCommand `"$DepTypeInstallationProgram`""
-						
 							$DepTypeScriptLanguage = $DeploymentType.ScriptLanguage
 							If (-not ([string]::IsNullOrEmpty($DepTypeScriptLanguage))) {
 								$CMDSwitch = "-ScriptLanguage `"$DepTypeScriptLanguage`""
