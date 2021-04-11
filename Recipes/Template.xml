@@ -138,6 +138,10 @@
 			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
 			<!-- LogonReqType - [String] Logon requirement Type -->
 			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<!-- UninstallContentLocation - [string] Source for content to use with UninstallCmd if UninstallOption set to "Different" -->
+			<UninstallContentLocation></UninstallContentLocation>
+			<!-- UninstallOption - [string] Specify what content to use with UninstallCmd -->
+			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<!-- UserInteractionMode - [String] Visibility -->
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<!-- ReqUserInteraction - [Boolean] Allow User Interaction -->
@@ -273,6 +277,8 @@
 			<Force32bit></Force32bit>
 			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
 			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UninstallContentLocation></UninstallContentLocation>
+			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
 			<EstRuntimeMins></EstRuntimeMins>
@@ -297,6 +303,8 @@
 			<Force32bit></Force32bit>
 			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
 			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UninstallContentLocation></UninstallContentLocation>
+			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
 			<EstRuntimeMins></EstRuntimeMins>
@@ -318,6 +326,8 @@
 			<Force32bit></Force32bit>
 			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
 			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UninstallContentLocation></UninstallContentLocation>
+			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
 			<EstRuntimeMins></EstRuntimeMins>
@@ -342,6 +352,8 @@
 			<Force32bit></Force32bit>
 			<InstallationBehaviorType>[InstallForSystem/InstallForUser/InstallForSystemIfResourceIsDeviceOtherwiseInstallForUser]</InstallationBehaviorType>
 			<LogonReqType>[OnlyWhenNoUserLoggedOn/OnlyWhenUserLoggedOn/WhereOrNotUserLoggedOn/WhetherOrNotUserLoggedOn]</LogonReqType>
+			<UninstallContentLocation></UninstallContentLocation>
+			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
 			<EstRuntimeMins></EstRuntimeMins>
