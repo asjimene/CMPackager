@@ -1128,6 +1128,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$swDepTypeEnableBranchCache = [System.Convert]::ToBoolean($DeploymentType.BranchCache)
 			$swDepTypeContentFallback = [System.Convert]::ToBoolean($DeploymentType.ContentFallback)
 			$stDepTypeSlowNetworkDeploymentMode = $DeploymentType.OnSlowNetwork
+			$stDepTypeUninstallOption = $DeploymentType.UninstallOption
+			$stDepTypeUninstallContentLocation = $DeploymentType.UninstallContentLocation
 		
 			# Programs
 			if (-not ([System.String]::IsNullOrEmpty($DeploymentType.InstallProgram))) {
