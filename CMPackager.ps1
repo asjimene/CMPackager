@@ -1960,6 +1960,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	## Allow all Cookies to download (Prevents Script from Freezing)
 	Add-LogContent "Allowing All Cookies to Download (This prevents the script from freezing on a download)"
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /t REG_DWORD /v 1A10 /f /d 0
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 	## Create Global Conditions as defined in GlobalConditions.xml
 	$GlobalConditionsXML = (([xml](Get-Content "$ScriptRoot\GlobalConditions.xml")).GlobalConditions.GlobalCondition | Where-Object Name -NE "Template" )
