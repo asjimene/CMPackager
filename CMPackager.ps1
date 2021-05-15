@@ -569,6 +569,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationUserCategories = $Recipe.ApplicationDef.Application.UserCategories
 		$ApplicationAdminCategories = $Recipe.ApplicationDef.Application.AdminCategories
 		$ApplicationIcon = $Recipe.ApplicationDef.Application.Icon
+		$LocalizedName = $Recipe.ApplicationDef.Application.LocalizedName
 		$ApplicationAutoInstall = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.AutoInstall)
 		$ApplicationDisplaySupersedence = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.DisplaySupersedence)
 		$ApplicationIsFeatured = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Application.FeaturedApplication)
@@ -586,12 +587,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Add-LogContent "Creating Application: $ApplicationName $ApplicationSWVersion"
 
 		# Change the SW Center Display Name based on Setting
-		if ($Global:NoVersionInSWCenter) {
-			$ApplicationDisplayName = "$ApplicationName"
-		}
-		else {
-			$ApplicationDisplayName = "$ApplicationName $ApplicationSWVersion"
-		}
+		$ApplicationDisplayName = if ($LocalizedName) {$LocalizedName} else {$ApplicationName}
+		if (!$Global:NoVersionInSWCenter) { $ApplicationDisplayName += " $ApplicationSWVersion"}
 
 		Add-LogContent "Building application import command"
 
@@ -1954,7 +1951,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	## Create the Temp Folder if needed
 	Add-LogContent "Creating CMPackager Temp Folder"
 	if (-not (Test-Path $Global:TempDir)) {
-		New-Item -ItemType Container -Path "$Global:TempDir" -Force -ErrorAction SilentlyContinue
+		New-Item -ItemType Container -Path "$Global:TempDir" -Force -ErrorAction SilentlyContinue | Out-Null
 	}
 
 	## Allow all Cookies to download (Prevents Script from Freezing)
