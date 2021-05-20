@@ -29,7 +29,7 @@
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>WinSCP-Setup.exe /VerySilent</InstallProgram>
+			<InstallProgram>WinSCP-Setup.exe /VerySilent /ALLUSERS</InstallProgram>
 			<UninstallCmd>`"%ProgramFiles(x86)%\WinSCP\unins000.exe`" /VERYSILENT</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
