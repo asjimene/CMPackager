@@ -5,6 +5,8 @@
 		<Name></Name>
 		<!-- Description - [String] Software Center Description -->
 		<Description></Description>
+		<!-- Description - [String] Software Center Name -->
+		<LocalizedName></LocalizedName>
 		<!-- AdminDescription - [String] Application Administrative Description -->
 		<AdminDescription></AdminDescription>
 		<!-- Publisher - [String] Application Publisher -->
