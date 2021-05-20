@@ -15,7 +15,7 @@
 			<DownloadFileName>StellariumInstall.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
-			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<DownloadVersionCheck>$Version = ((Get-item $TempDir\$DownloadFileName).VersionInfo.ProductVersion).TrimStart().TrimEnd()</DownloadVersionCheck>
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 	</Downloads>
