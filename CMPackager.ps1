@@ -1574,14 +1574,22 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Push-Location
 		Set-Location $CMSite
 		If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
-			$UpdateSuperseded = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
-			$AllowRepair = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.AllowRepair)
+			$DeploymentSplat = @{
+				Name = "$ApplicationName $ApplicationSWVersion"
+				DeployAction = Install
+				DeployPurpose = Available
+				UserNotification = DisplaySoftwareCenterOnly
+				UpdateSuperseded = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
+				AllowRepairApp = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.AllowRepair)
+				ErrorAction = Stop
+			}
+
 			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
 				Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
 					Try {
 						Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
 						If ($UpdateSuperseded) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
-						New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -AllowRepairApp $AllowRepair -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -UpdateSupersedence:$UpdateSuperseded -ErrorAction Stop
+						New-CMApplicationDeployment -CollectionName $DeploymentCollection @DeploymentSplat
 					}
 					Catch {
 						$ErrorMessage = $_.Exception.Message
@@ -1594,7 +1602,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			ElseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
 				Try {
 					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $Global:PreferredDeployCollection"
-					New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -AllowRepairApp $AllowRepair -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
+					New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection @DeploymentSplat
 				}
 				Catch {
 					$ErrorMessage = $_.Exception.Message
