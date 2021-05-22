@@ -51,7 +51,8 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>Git-x64.exe /VERYSILENT /NORESTART</InstallProgram>
-			<UninstallCmd>`"%ProgramFiles%\Git\unins000.exe`" /VERYSILENT</UninstallCmd>
+			<UninstallCmd>"%ProgramFiles%\Git\unins000.exe" /VERYSILENT</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -99,7 +100,8 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>Git-x86.exe /VERYSILENT /NORESTART</InstallProgram>
-			<UninstallCmd>`"%ProgramFiles(x86)%\Git\unins000.exe`" /VERYSILENT</UninstallCmd>
+			<UninstallCmd>"%ProgramFiles(x86)%\Git\unins000.exe" /VERYSILENT</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -134,6 +136,10 @@
 	<Distribution>
 		<DistributeContent>True</DistributeContent>
 	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
 	<Deployment>
 		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
