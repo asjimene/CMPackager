@@ -1584,6 +1584,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				ErrorAction = 'Stop'
 			}
 
+			if (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeadlineOffset))) {
+				$DeploymentSplat['DeadlineDateTime'] = (Get-Date) + $Recipe.ApplicationDef.Deployment.DeadlineOffset
+			}
+
 			$DeploymentCollections = If (
 				-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))
 				) {
