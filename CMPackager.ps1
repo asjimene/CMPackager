@@ -1588,6 +1588,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$DeploymentSplat['DeadlineDateTime'] = (Get-Date) + $Recipe.ApplicationDef.Deployment.DeadlineOffset
 			}
 
+			if (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.TimeBaseOn))) {
+				# Only 'LocalTime' or 'UTC' are accepted values, but let CM error.
+				$DeploymentSplat['TimeBaseOn'] = $Recipe.ApplicationDef.Deployment.TimeBaseOn
+			}
+
 			$DeploymentCollections = If (
 				-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))
 				) {
