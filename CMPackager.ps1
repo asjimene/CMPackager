@@ -1576,33 +1576,27 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
 			$DeploymentSplat = @{
 				Name = "$ApplicationName $ApplicationSWVersion"
-				DeployAction = Install
-				DeployPurpose = Available
-				UserNotification = DisplaySoftwareCenterOnly
-				UpdateSuperseded = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
+				DeployAction = 'Install'
+				DeployPurpose = 'Available'
+				UserNotification = 'DisplaySoftwareCenterOnly'
+				UpdateSupersedence = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
 				AllowRepairApp = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.AllowRepair)
-				ErrorAction = Stop
+				ErrorAction = 'Stop'
 			}
 
-			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
-				Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
-					Try {
-						Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
-						If ($UpdateSuperseded) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
-						New-CMApplicationDeployment -CollectionName $DeploymentCollection @DeploymentSplat
-					}
-					Catch {
-						$ErrorMessage = $_.Exception.Message
-						Add-LogContent "ERROR: Deployment Failed!"
-						Add-LogContent "ERROR: $ErrorMessage"
-						$Success = $false
-					}
-				}
+			$DeploymentCollections = If (
+				-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))
+				) {
+				$Recipe.ApplicationDef.Deployment.DeploymentCollection
+			} elseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
+				$Global:PreferredDeployCollection
 			}
-			ElseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
+
+			Foreach ($DeploymentCollection in $DeploymentCollections) {
 				Try {
-					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $Global:PreferredDeployCollection"
-					New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection @DeploymentSplat
+					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
+					If ($DeploymentSplat.UpdateSupersedence) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
+					New-CMApplicationDeployment -CollectionName $DeploymentCollection @DeploymentSplat
 				}
 				Catch {
 					$ErrorMessage = $_.Exception.Message
