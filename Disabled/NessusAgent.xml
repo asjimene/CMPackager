@@ -1,0 +1,146 @@
+<ApplicationDef>
+	<Application>
+		<Name>Nessus Agent</Name>
+		<Description>Nessus Agents are lightweight, low-footprint programs that you install locally on hosts to supplement traditional network-based scanning or to provide visibility into gaps that are missed by traditional scanning. Nessus Agents collect vulnerability, compliance, and system data, and report that information back to a manager for analysis. With Nessus Agents, you extend scan flexibility and coverage. You can scan hosts without using credentials, as well as offline assets and endpoints that intermittently connect to the internet. You can also run large-scale concurrent agent scans with little network impact.</Description>
+		<Publisher>Tenable Inc.</Publisher>
+		<AutoInstall>False</AutoInstall>
+		<UserDocumentation>https://docs.tenable.com/NessusAgent.htm</UserDocumentation>
+		<Icon>NessusAgent.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<!-- Configure NESSUS_SERVER and NESSUS_KEY in DeploymentTypes as required -->
+			<PrefetchScript>$api = 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents'
+				$downloaditem = (Invoke-RestMethod $api).downloads | ? file -like 'NessusAgent-*-x64.msi'
+				$download.version = $downloaditem.meta_data.version
+				$version = $download.version
+				$url = "{0}/downloads/{1}/download?i_agree_to_tenable_license_agreement=true" -f $api, $downloaditem.id
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>NessusAgent-x64.msi</DownloadFileName>
+			<AppRepoFolder>x64</AppRepoFolder>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<!-- Installed files use a different version number to the installer, get the correct one for detection -->
+			<ExtraCopyFunctions>$nessusdversion = Get-MSISourceFileVersion -Msi (Join-Path $Global:TempDir NessusAgent-x64.msi) -FileName 'nessusd.exe'
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType | Where-Object Name -eq $Download.DeploymentType
+			$AssociatedDeploymentType.CustomDetectionMethods.DetectionClause.ExpectedValue = [string]$nessusdversion
+			</ExtraCopyFunctions>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<!-- Configure NESSUS_SERVER and NESSUS_KEY in DeploymentTypes as required -->
+			<PrefetchScript>$api = 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents'
+				$downloaditem = (Invoke-RestMethod $api).downloads | ? file -like 'NessusAgent-*-win32.msi'
+				$download.version = $downloaditem.meta_data.version
+				$version = $download.version
+				$url = "{0}/downloads/{1}/download?i_agree_to_tenable_license_agreement=true" -f $api, $downloaditem.id
+			</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>NessusAgent-x86.msi</DownloadFileName>
+			<AppRepoFolder>x86</AppRepoFolder>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<!-- Installed files use a different version number to the installer, get the correct one for detection -->
+			<ExtraCopyFunctions>$nessusdversion = Get-MSISourceFileVersion -Msi (Join-Path $Global:TempDir NessusAgent-x86.msi) -FileName 'nessusd.exe'
+			$AssociatedDeploymentType = $Recipe.ApplicationDef.DeploymentTypes.DeploymentType | Where-Object Name -eq $Download.DeploymentType
+			$AssociatedDeploymentType.CustomDetectionMethods.DetectionClause.ExpectedValue = [string]$nessusdversion
+			</ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>NessusAgent-x64.msi</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<Comments></Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>NessusAgent-x64.msi</InstallationMSI>
+			<InstallProgram>msiexec.exe /i NessusAgent-x64.msi /qn /norestart /l*v install.log NESSUS_SERVER="cloud.tenable.com:443" NESSUS_KEY="LINKINGKEYGOESHERE" NESSUS_OFFLINE_INSTALL="yes"</InstallProgram>
+			<UninstallCmd>msiexec.exe /x NessusAgent-x64.msi /q /qn /norestart /l*v uninstall.log</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>nessusd.exe</Name>
+					<Path>%ProgramFiles%\Tenable\Nessus Agent</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$nessusdversion</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>NessusAgent-x86.msi</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<Comments></Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>NessusAgent-x86.msi</InstallationMSI>
+			<InstallProgram>msiexec.exe /i NessusAgent-x86.msi /qn /norestart /l*v install.log NESSUS_SERVER="cloud.tenable.com:443" NESSUS_KEY="LINKINGKEYGOESHERE" NESSUS_OFFLINE_INSTALL="yes"</InstallProgram>
+			<UninstallCmd>msiexec.exe /x NessusAgent-x86.msi /q /qn /norestart /l*v uninstall.log</UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>10</EstRuntimeMins>
+			<MaxRuntimeMins>20</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>nessusd.exe</Name>
+					<Path>%ProgramFiles%\Tenable\Nessus Agent</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$nessusdversion</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>False</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+		<UpdateSuperseded>True</UpdateSuperseded>
+	</Deployment>
+</ApplicationDef>
