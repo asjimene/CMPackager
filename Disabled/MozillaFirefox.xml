@@ -12,6 +12,7 @@
 			<URL>https://download.mozilla.org/?product=firefox-msi-latest-ssl&amp;os=win64&amp;lang=en-US</URL>
 			<DownloadFileName>Firefoxx64.msi</DownloadFileName>
 			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<AppRepoFolder>x64</AppRepoFolder>
 			<FullVersion></FullVersion>
 			<Version></Version>
 		</Download>
@@ -19,6 +20,7 @@
 			<URL>https://download.mozilla.org/?product=firefox-msi-latest-ssl&amp;os=win&amp;lang=en-US</URL>
 			<DownloadFileName>Firefoxx86.msi</DownloadFileName>
 			<DownloadVersionCheck>$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<AppRepoFolder>x86</AppRepoFolder>
 			<FullVersion></FullVersion>
 			<Version></Version>
 		</Download>
@@ -29,8 +31,9 @@
 			<InstallationType>Script</InstallationType>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>msiexec.exe /i Firefoxx64.msi /qn /norestart</InstallProgram>
-			<UninstallCmd>`"%ProgramFiles%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
+			<InstallProgram>msiexec.exe /i Firefoxx64.msi /qn /norestart /l*v install.log</InstallProgram>
+			<UninstallCmd>"%ProgramFiles%\Mozilla Firefox\uninstall\helper.exe" -ms</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -50,6 +53,11 @@
 					<Is64Bit>True</Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Mozilla Firefox">
+					<InstallBehaviorExe>firefox.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
@@ -65,8 +73,9 @@
 			<InstallationType>Script</InstallationType>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>msiexec.exe /i Firefoxx86.msi /qn /norestart</InstallProgram>
-			<UninstallCmd>`"%ProgramFiles%\Mozilla Firefox\uninstall\helper.exe`" -ms</UninstallCmd>
+			<InstallProgram>msiexec.exe /i Firefoxx86.msi /qn /norestart /l*v install.log</InstallProgram>
+			<UninstallCmd>"%ProgramFiles%\Mozilla Firefox\uninstall\helper.exe" -ms</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -86,6 +95,11 @@
                     <Is64Bit>False</Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Mozilla Firefox">
+					<InstallBehaviorExe>firefox.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
@@ -97,5 +111,6 @@
 	</Supersedence>
 	<Deployment>
 		<DeploySoftware>True</DeploySoftware>
+		<UpdateSuperseded>True</UpdateSuperseded>
 	</Deployment>
 </ApplicationDef>

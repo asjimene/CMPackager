@@ -9,10 +9,9 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$content = Invoke-WebRequest https://github.com/PowerShell/PowerShell/releases/latest -UseBasicParsing
-			$LinkPath = ($content | Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*PowerShell-*-win-x64.msi").href
-			$URL = "https://github.com$LinkPath"
-			$Download.Version = if ($url -match "\d+\.\d+\.\d+(\.\d+)?") {$matches[0] + '.0'}
+			<PrefetchScript>$v = (Invoke-RestMethod https://aka.ms/pwsh-buildinfo-stable).ReleaseTag -replace '^v'
+			$download.version = $v + '.0'
+			$url = 'https://github.com/PowerShell/PowerShell/releases/download/v{0}/PowerShell-{0}-win-x64.msi' -f $v
 			</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>PowerShell.msi</DownloadFileName>
@@ -57,6 +56,11 @@
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="PowerShell">
+					<InstallBehaviorExe>pwsh.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
@@ -69,12 +73,14 @@
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
-		<DistributeContent>False</DistributeContent>
+		<DistributeContent>True</DistributeContent>
 	</Distribution>
 	<Supersedence>
 		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
 	</Supersedence>
 	<Deployment>
-		<DeploySoftware>False</DeploySoftware>
+		<DeploySoftware>True</DeploySoftware>
+		<UpdateSuperseded>True</UpdateSuperseded>
 	</Deployment>
 </ApplicationDef>

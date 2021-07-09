@@ -15,7 +15,7 @@ $URL = $downloadurl
 $version = $downloadurl -replace '^.*vcxsrv-64\.' -replace '\.installer\.exe/download'
 $download.Version = $version
 $FullVersion = $version
-$PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</PrefetchScript>
+if (!($PSDefaultParameterValues.ContainsKey('Invoke-WebRequest:UserAgent'))) {$PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')}</PrefetchScript>
 			<!-- SourceForge will only present the file to a non-browser user agent -->
 			<DownloadFileName>vcxsrv-64.exe</DownloadFileName>
 			<Version></Version>
@@ -32,7 +32,7 @@ $URL = $downloadurl
 $version = $downloadurl -replace '^.*vcxsrv\.' -replace '\.installer\.exe/download'
 $download.Version = $version
 $FullVersion = $version
-$PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</PrefetchScript>
+if (!($PSDefaultParameterValues.ContainsKey('Invoke-WebRequest:UserAgent'))) {$PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')}</PrefetchScript>
 			<!-- SourceForge will only present the file to a non-browser user agent -->
 			<DownloadFileName>vcxsrv-86.exe</DownloadFileName>
 			<Version></Version>
@@ -53,6 +53,7 @@ $PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</Pref
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>vcxsrv-64.exe /S</InstallProgram>
 			<UninstallCmd>%ProgramFiles%\VcXsrv\uninstall.exe /S</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -71,6 +72,14 @@ $PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</Pref
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="VcXsrv">
+					<InstallBehaviorExe>vcxsrv.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="XLaunch">
+					<InstallBehaviorExe>xlaunch.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
@@ -90,6 +99,7 @@ $PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</Pref
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>vcxsrv-86.exe /S</InstallProgram>
 			<UninstallCmd>%ProgramFiles%\VcXsrv\uninstall.exe /S</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -108,6 +118,14 @@ $PSDefaultParameterValues.Add('Invoke-WebRequest:UserAgent','NotABrowser')</Pref
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="VcXsrv">
+					<InstallBehaviorExe>vcxsrv.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+				<InstallBehaviorProcess DisplayName="XLaunch">
+					<InstallBehaviorExe>xlaunch.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>

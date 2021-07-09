@@ -9,10 +9,11 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$Download.Version = (Invoke-WebRequest https://go.microsoft.com/fwlink/?linkid=2155159 -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location -replace 'https://azuredatastudio-update.azurewebsites.net/' -replace '/win32-x64/stable'
+			<PrefetchScript>$Url = (Invoke-WebRequest https://azuredatastudio-update.azurewebsites.net/latest/win32-x64/stable -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
+			[string]$Download.Version = if ($Url -match '.*/azuredatastudio-windows-setup-(\d+\.\d+\.\d+)\.exe') {$matches[1]}
 			$Version = $Download.Version
 			$FullVersion = $Download.Version</PrefetchScript>
-			<URL>https://go.microsoft.com/fwlink/?linkid=2155159</URL>
+			<URL>https://azuredatastudio-update.azurewebsites.net/latest/win32-x64/stable</URL>
 			<DownloadFileName>azuredatastudio-setup.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
@@ -29,7 +30,8 @@
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
 			<InstallProgram>azuredatastudio-setup.exe /VERYSILENT /NORESTART /MERGETASKS=!runcode</InstallProgram>
-			<UninstallCmd>`"%ProgramFiles%\Azure Data Studio\unins000.exe`" /VERYSILENT</UninstallCmd>
+			<UninstallCmd>"%ProgramFiles%\Azure Data Studio\unins000.exe" /VERYSILENT</UninstallCmd>
+			<UninstallOption>NoneRequired</UninstallOption>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -48,6 +50,11 @@
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Azure Data Studio">
+					<InstallBehaviorExe>azuredatastudio.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 			<RequirementsRules>
 				<RequirementsRule>
 					<RequirementsRuleType>Existential</RequirementsRuleType>
@@ -64,6 +71,7 @@
 	</Distribution>
 	<Supersedence>
 		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
 	</Supersedence>
 	<Deployment>
 		<DeploySoftware>True</DeploySoftware>
