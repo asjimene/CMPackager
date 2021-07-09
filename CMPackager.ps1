@@ -1574,27 +1574,42 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Push-Location
 		Set-Location $CMSite
 		If ([System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.DeploySoftware)) {
-			$UpdateSuperseded = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
-			$AllowRepair = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.AllowRepair)
-			If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))) {
-				Foreach ($DeploymentCollection in ($Recipe.ApplicationDef.Deployment.DeploymentCollection)) {
-					Try {
-						Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
-						If ($UpdateSuperseded) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
-						New-CMApplicationDeployment -CollectionName $DeploymentCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -AllowRepairApp $AllowRepair -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -UpdateSupersedence:$UpdateSuperseded -ErrorAction Stop
-					}
-					Catch {
-						$ErrorMessage = $_.Exception.Message
-						Add-LogContent "ERROR: Deployment Failed!"
-						Add-LogContent "ERROR: $ErrorMessage"
-						$Success = $false
-					}
-				}
+			$DeploymentSplat = @{
+				Name = "$ApplicationName $ApplicationSWVersion"
+				DeployAction = 'Install'
+				DeployPurpose = 'Available'
+				UserNotification = 'DisplaySoftwareCenterOnly'
+				UpdateSupersedence = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.UpdateSuperseded)
+				AllowRepairApp = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Deployment.AllowRepair)
+				ErrorAction = 'Stop'
 			}
-			ElseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
+
+			if (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.AvailableOffset))) {
+				$DeploymentSplat['AvailableDateTime'] = (Get-Date) + $Recipe.ApplicationDef.Deployment.AvailableOffset
+			}
+
+			if (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeadlineOffset))) {
+				$DeploymentSplat['DeadlineDateTime'] = (Get-Date) + $Recipe.ApplicationDef.Deployment.DeadlineOffset
+			}
+
+			if (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.TimeBaseOn))) {
+				# Only 'LocalTime' or 'UTC' are accepted values, but let CM error.
+				$DeploymentSplat['TimeBaseOn'] = $Recipe.ApplicationDef.Deployment.TimeBaseOn
+			}
+
+			$DeploymentCollections = If (
+				-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Deployment.DeploymentCollection))
+				) {
+				$Recipe.ApplicationDef.Deployment.DeploymentCollection
+			} elseIf (-not ([String]::IsNullOrEmpty($Global:PreferredDeployCollection))) {
+				$Global:PreferredDeployCollection
+			}
+
+			Foreach ($DeploymentCollection in $DeploymentCollections) {
 				Try {
-					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $Global:PreferredDeployCollection"
-					New-CMApplicationDeployment -CollectionName $Global:PreferredDeployCollection -Name "$ApplicationName $ApplicationSWVersion" -DeployAction Install -AllowRepairApp $AllowRepair -DeployPurpose Available -UserNotification DisplaySoftwareCenterOnly -ErrorAction Stop
+					Add-LogContent "Deploying $ApplicationName $ApplicationSWVersion to $DeploymentCollection"
+					If ($DeploymentSplat.UpdateSupersedence) { Add-LogContent "UpdateSuperseded enabled, new package will automatically upgrade previous version" }
+					New-CMApplicationDeployment -CollectionName $DeploymentCollection @DeploymentSplat
 				}
 				Catch {
 					$ErrorMessage = $_.Exception.Message

@@ -389,6 +389,12 @@
 		<DeploySoftware></DeploySoftware>
 		<!-- UpdateSuperseded - [Boolean] Whether the deployment should automatically upgrade superseded versions -->
 		<UpdateSuperseded></UpdateSuperseded>
+		<!-- DeadlineOffset - [TimeSpan] Time after deployment that install will be enforced. Requires UpdateSuperseded = true for available deployments, eg 1.23:45 for 1 day, 23 hours, 45 minutes. https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings -->
+		<DeadlineOffset></DeadlineOffset>
+		<!-- AvailableOffset - [TimeSpan] Delay before deployment becomes available. See DeadlineOffset for details. -->
+		<AvailableOffset></AvailableOffset>
+		<!-- TimeBaseOn - Which time zone to use for the deployment -->
+		<TimeBaseOn>[LocalTime/UTC]</TimeBaseOn>
 		<!-- AllowRepair - [Boolean] Swtich for allowing users to repair applications from software center -->
 		<AllowRepair></AllowRepair>
 		<!-- DeploymentCollection - [String] Collection for the software to be deployed to -->
