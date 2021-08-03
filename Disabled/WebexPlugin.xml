@@ -1,0 +1,58 @@
+<ApplicationDef>
+	<Application>
+		<Name>Webex Productivity Tools</Name>
+		<Description>Webex Productivity Tools allow you to schedule, start, and join Webex meetings directly in Microsoft Outlook. The Windows version also supports integrations with Microsoft Office (Word, Excel and PowerPoint).</Description>
+		<Publisher>Cisco Systems</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<UserDocumentation>https://help.webex.com/1h3jqab/</UserDocumentation>
+		<Icon>WebexProductivityTools.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>
+				$Releases = "https://cisco.webex.com/webappng/sites/cisco/dashboard/download"
+				$ie = new-object -com internetexplorer.application
+				$ie.navigate("$Releases")
+				$ie.visible= $false
+				while ($ie.Busy -eq $true) 
+				{ 
+					Start-Sleep 1; 
+				}
+				[String]$Download.Version = ($ie.document.body.getElementsByClassName("wbx-plugin-version")| Select-Object -Property innerText ).innerText.TrimStart().TrimEnd()
+				$ie.Quit()
+				$Version = $Download.Version
+			</PrefetchScript>
+			<URL>https://akamaicdn.webex.com/client/webexplugin.msi</URL>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadFileName>webexplugin.msi</DownloadFileName>
+			<DownloadVersionCheck></DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>WebexPlugin Silent Install</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>webexplugin.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>15</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
