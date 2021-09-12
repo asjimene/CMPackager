@@ -598,21 +598,33 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		# Reference: https://docs.microsoft.com/en-us/powershell/module/configurationmanager/new-cmapplication
 		$NewAppCommand = 'New-CMApplication -Name "$ApplicationName $ApplicationSWVersion" -LocalizedName "$ApplicationDisplayName" -SoftwareVersion "$ApplicationSWVersion" -ReleaseDate $(Get-Date) -AutoInstall $ApplicationAutoInstall -DisplaySupersedenceInApplicationCatalog $ApplicationDisplaySupersedence -IsFeatured $ApplicationIsFeatured'
 		$CmdSwitches = ''
-	
+		$CmdLineHash = @{
+			Name = "$ApplicationName $ApplicationSWVersion"
+			LocalizedName = $ApplicationDisplayName
+			SoftwareVersion = $ApplicationSWVersion
+			ReleaseDate = $(Get-Date)
+			AutoInstall = $ApplicationAutoInstall
+			DisplaySupersedenceInApplicationCatalog = $ApplicationDisplaySupersedence
+			IsFeatured = $ApplicationIsFeatured
+		}
 		## Build the rest of the command based on values in the xml
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationPublisher)))  {
 			$CmdSwitches += ' -Publisher "$ApplicationPublisher"'
+			$CmdLineHash.Add('Publisher',$ApplicationPublisher)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationDescription)))  {
 			$CmdSwitches += ' -LocalizedDescription "$ApplicationDescription"'
+			$CmdLineHash.Add('LocalizedDescription',$ApplicationDescription)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationIcon)))  {
 			if (Test-Path "$Global:IconRepo\$ApplicationIcon") {
 				$CmdSwitches += " -IconLocationFile ""$Global:IconRepo\$ApplicationIcon"""
+				$CmdLineHash.Add('IconLocationFile', "$Global:IconRepo\$ApplicationIcon")
 			} elseif (Test-Path "$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon") {
 				$CmdSwitches += " -IconLocationFile ""$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon"""
+				$CmdLineHash.Add('IconLocationFile', "$ScriptRoot\ExtraFiles\Icons\$ApplicationIcon")
 			} else {
 				Add-LogContent "ERROR: Unable to find icon $ApplicationIcon, creating application without icon"
 			}
@@ -620,41 +632,50 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationDocURL)))  {
 			$CmdSwitches += ' -UserDocumentation "$ApplicationDocURL"'
+			$CmdLineHash.Add('UserDocumentation', $ApplicationDocURL)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationOptionalReference)))  {
 			$CmdSwitches += ' -OptionalReference "$ApplicationOptionalReference"'
+			$CmdLineHash.Add('OptionalReference', $ApplicationOptionalReference)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationAdminDescription)))  {
 			$CmdSwitches += ' -Description "$ApplicationAdminDescription"'
+			$CmdLineHash.Add('Description', $ApplicationAdminDescription)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationOwner)))  {
 			$CmdSwitches += ' -Owner "$ApplicationOwner"'
+			$CmdLineHash.Add('Owner', $ApplicationOwner)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationSupportContact)))  {
 			$CmdSwitches += ' -SupportContact "$ApplicationSupportContact"'
+			$CmdLineHash.Add('SupportContact', $ApplicationSupportContact)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationKeywords)))  {
 			$CmdSwitches += ' -Keyword "$ApplicationKeywords"'
+			$CmdLineHash.Add('Keyword', $ApplicationKeywords)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationLinkText)))  {
 			$CmdSwitches += ' -LinkText "$ApplicationLinkText"'
+			$CmdLineHash.Add('LinkText', $ApplicationLinkText)
 		}
 
 		If (-not ([System.String]::IsNullOrEmpty($ApplicationPrivacyUrl)))  {
 			$CmdSwitches += ' -PrivacyUrl "$ApplicationPrivacyUrl"'
+			$CmdLineHash.Add('PrivacyUrl', $ApplicationPrivacyUrl)
 		}
 	
 		## Run the New-CMApplication Command
-		$NewAppCommandFull = "$NewAppCommand$CmdSwitches"
-		Add-LogContent "Command: $NewAppCommandFull"
+		#$NewAppCommandFull = "$NewAppCommand$CmdSwitches"
+		#Add-LogContent "Command: $NewAppCommandFull"
 		Try {
-			Invoke-Expression $NewAppCommandFull | Out-Null
+			New-CMApplication $CmdLineHash
+		#	Invoke-Expression $NewAppCommandFull | Out-Null
 			Add-LogContent "Application Created"
 		}
 		Catch {
