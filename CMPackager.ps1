@@ -799,6 +799,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$detMethodCommand += " -Is64Bit"
 		}
 		If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.Path))) {
+			$DetectionMethod.Path = ($DetectionMethod.Path).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			$detMethodCommand += " -Path `'$($DetectionMethod.Path)`'"
 		}
 		If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.PropertyType))) {
@@ -818,6 +819,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			$detMethodCommand += " -Hive $($DetectionMethod.Hive)"
 		}
 		If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.KeyName))) {
+			$DetectionMethod.KeyName = ($DetectionMethod.KeyName).replace('$Version', $Version).replace('$FullVersion', $AppFullVersion)
 			$detMethodCommand += " -KeyName `"$($DetectionMethod.KeyName)`""
 		}
 		If (-not ([System.String]::IsNullOrEmpty($DetectionMethod.ValueName))) {
