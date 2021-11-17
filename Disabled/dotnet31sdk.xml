@@ -1,6 +1,6 @@
 <ApplicationDef>
 	<Application>
-		<Name>.NET 6.0 SDK</Name>
+		<Name>.NET Core 3.1 SDK</Name>
 		<Description>.NET is a free, cross-platform, open-source developer platform for building many different types of applications.</Description>
 		<Publisher>Microsoft</Publisher>
 		<UserDocumentation>https://docs.microsoft.com/dotnet/</UserDocumentation>
@@ -8,23 +8,23 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$releases = Invoke-RestMethod https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/6.0/releases.json
+			<PrefetchScript>$releases = Invoke-RestMethod https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/3.1/releases.json
 $version = $releases.'latest-sdk'
 $Download.Version = $version
 $url = (($releases.releases.sdks | ? version -eq $version).files | ? rid -eq 'win-x64' | ? name -like '*.exe').url</PrefetchScript>
 			<URL></URL>
-			<DownloadFileName>dotnet-sdk-6.0-win-x64.exe</DownloadFileName>
+			<DownloadFileName>dotnet-sdk-3.1-win-x64.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<AppRepoFolder>x64</AppRepoFolder>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$releases = Invoke-RestMethod https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/6.0/releases.json
+			<PrefetchScript>$releases = Invoke-RestMethod https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/3.1/releases.json
 $version = $releases.'latest-sdk'
 $Download.Version = $version
 $url = (($releases.releases.sdks | ? version -eq $version).files | ? rid -eq 'win-x86' | ? name -like '*.exe').url</PrefetchScript>
 			<URL></URL>
-			<DownloadFileName>dotnet-sdk-6.0-win-x86.exe</DownloadFileName>
+			<DownloadFileName>dotnet-sdk-3.1-win-x86.exe</DownloadFileName>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<AppRepoFolder>x86</AppRepoFolder>
@@ -32,14 +32,14 @@ $url = (($releases.releases.sdks | ? version -eq $version).files | ? rid -eq 'wi
 	</Downloads>
 	<DeploymentTypes>
 		<DeploymentType Name="DeploymentType1">
-			<DeploymentTypeName>dotnet-sdk-6.0-win-x64</DeploymentTypeName>
+			<DeploymentTypeName>dotnet-sdk-3.1-win-x64</DeploymentTypeName>
 			<InstallationType>Script</InstallationType>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>dotnet-sdk-6.0-win-x64.exe /install /quiet /norestart /log install.log</InstallProgram>
-			<UninstallCmd>dotnet-sdk-6.0-win-x64.exe /uninstall /quiet /norestart /log uninstall.log</UninstallCmd>
+			<InstallProgram>dotnet-sdk-3.1-win-x64.exe /install /quiet /norestart /log install.log</InstallProgram>
+			<UninstallCmd>dotnet-sdk-3.1-win-x64.exe /uninstall /quiet /norestart /log uninstall.log</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
@@ -68,14 +68,14 @@ $url = (($releases.releases.sdks | ? version -eq $version).files | ? rid -eq 'wi
 			</RequirementsRules>
 		</DeploymentType>
 		<DeploymentType Name="DeploymentType2">
-			<DeploymentTypeName>dotnet-sdk-6.0-win-x86</DeploymentTypeName>
+			<DeploymentTypeName>dotnet-sdk-3.1-win-x86</DeploymentTypeName>
 			<InstallationType>Script</InstallationType>
 			<CacheContent>False</CacheContent>
 			<BranchCache>True</BranchCache>
 			<ContentFallback>True</ContentFallback>
 			<OnSlowNetwork>Download</OnSlowNetwork>
-			<InstallProgram>dotnet-sdk-6.0-win-x86.exe /install /quiet /norestart /log install.log</InstallProgram>
-			<UninstallCmd>dotnet-sdk-6.0-win-x86.exe /uninstall /quiet /norestart /log uninstall.log</UninstallCmd>
+			<InstallProgram>dotnet-sdk-3.1-win-x86.exe /install /quiet /norestart /log install.log</InstallProgram>
+			<UninstallCmd>dotnet-sdk-3.1-win-x86.exe /uninstall /quiet /norestart /log uninstall.log</UninstallCmd>
 			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
 			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
 			<UserInteractionMode>Hidden</UserInteractionMode>
