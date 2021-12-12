@@ -102,6 +102,7 @@
                                     <xs:element name="Value" type="xs:string" />
                                     <xs:element name="Is64Bit" type="xs:string" />
                                     <xs:element name="Existence" type="xs:string" />
+                                    <xs:element name="ProductCode" type="xs:string" />
                                   </xs:choice>
                                 </xs:sequence>
                               </xs:complexType>
