@@ -257,7 +257,7 @@
 				<DependencyGroup GroupName="Dependency1">
 					<!-- Each "DependencyGroup" Can have multiple applications defined-->
 					<DependencyGroupApp AppName="(Required)[SCCM Application Name]">
-						<DependentDepType>[Optional - Not specifying this will add all Deployment types]</DependentDepType>
+						<DependencyDepType>[Optional - Not specifying this will add all Deployment types]</DependencyDepType>
 						<DependencyAutoInstall>(Required)[True/False]</DependencyAutoInstall>
 					</DependencyGroupApp>
 				</DependencyGroup>

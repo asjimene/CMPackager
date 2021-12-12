@@ -54,7 +54,7 @@
 			<Dependencies>
 				<DependencyGroup GroupName="Visual Studio Cpp redistributable">
 					<DependencyGroupApp AppName="Visual Studio CPP redist">
-						<DependentDepType>Silently Install VCRedist</DependentDepType>
+						<DependencyDepType>Silently Install VCRedist</DependencyDepType>
 						<DependencyAutoInstall>True</DependencyAutoInstall>
 					</DependencyGroupApp>
 				</DependencyGroup>
