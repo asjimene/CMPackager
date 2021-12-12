@@ -132,7 +132,7 @@
                           <xs:sequence>
                             <xs:element maxOccurs="unbounded" name="RequirementsRule">
                               <xs:complexType>
-                                <xs:sequence>
+                                <xs:all>
                                   <xs:element name="RequirementsRuleType" type="xs:string" />
                                   <xs:element name="RequirementsRuleValue">
                                     <xs:complexType>
@@ -143,7 +143,14 @@
                                   </xs:element>
                                   <xs:element minOccurs="0" name="RequirementsRuleOperator" type="xs:string" />
                                   <xs:element minOccurs="0" name="RequirementsRuleGlobalCondition" type="xs:string" />
-                                </xs:sequence>
+                                  <xs:element name="RequirementsRuleValue2" minOccurs="0">
+                                    <xs:complexType>
+                                      <xs:sequence>
+                                        <xs:element maxOccurs="unbounded" name="RuleValue" type="xs:string" />
+                                      </xs:sequence>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:all>
                               </xs:complexType>
                             </xs:element>
                           </xs:sequence>
