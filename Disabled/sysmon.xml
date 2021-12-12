@@ -69,5 +69,6 @@
 		<Uninstall>True</Uninstall>
 	</Supersedence>
 	<Deployment>
+		<DeploySoftware>False</DeploySoftware>
 	</Deployment>
 </ApplicationDef>

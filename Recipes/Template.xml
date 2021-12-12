@@ -149,9 +149,9 @@
 			<!-- ReqUserInteraction - [Boolean] Allow User Interaction -->
 			<ReqUserInteraction></ReqUserInteraction>
 			<!-- EstRuntimeMins - [Int] Estimated Run Time -->
-			<EstRuntimeMins></EstRuntimeMins>
+			<EstRuntimeMins>5</EstRuntimeMins>
 			<!-- MaxRuntimeMins - [int] Maximum Run Time -->
-			<MaxRuntimeMins></MaxRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<!-- RebootBehavior - [String]Reboot after Install -->
 			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
 			<!-- DetectionMethodType - [String] Type Of DetectionMethod -->
@@ -257,7 +257,7 @@
 				<DependencyGroup GroupName="Dependency1">
 					<!-- Each "DependencyGroup" Can have multiple applications defined-->
 					<DependencyGroupApp AppName="(Required)[SCCM Application Name]">
-						<DependentDepType>[Optional - Not specifying this will add all Deployment types]</DependentDepType>
+						<DependencyDepType>[Optional - Not specifying this will add all Deployment types]</DependencyDepType>
 						<DependencyAutoInstall>(Required)[True/False]</DependencyAutoInstall>
 					</DependencyGroupApp>
 				</DependencyGroup>
@@ -283,8 +283,8 @@
 			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
-			<EstRuntimeMins></EstRuntimeMins>
-			<MaxRuntimeMins></MaxRuntimeMins>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
 			<DetectionMethodType>(Required)[MSI]</DetectionMethodType>
 			<ScriptLanguage>[String] Language for Detection Method [PowerShell/VBScript]</ScriptLanguage>
@@ -309,8 +309,8 @@
 			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
-			<EstRuntimeMins></EstRuntimeMins>
-			<MaxRuntimeMins></MaxRuntimeMins>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
 			<DetectionMethodType>(Required)[MSI]</DetectionMethodType>
 		</DeploymentType>
@@ -332,8 +332,8 @@
 			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
-			<EstRuntimeMins></EstRuntimeMins>
-			<MaxRuntimeMins></MaxRuntimeMins>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
 			<DetectionMethodType>(Required)[CustomScript]</DetectionMethodType>
 			<ScriptLanguage>(Required)[PowerShell/VBScript]</ScriptLanguage>
@@ -358,8 +358,8 @@
 			<UninstallOption>[SameAsInstall/NoneRequired/Different]</UninstallOption>
 			<UserInteractionMode>[Hidden/Normal/Minimized/Maximized]</UserInteractionMode>
 			<ReqUserInteraction></ReqUserInteraction>
-			<EstRuntimeMins></EstRuntimeMins>
-			<MaxRuntimeMins></MaxRuntimeMins>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>[BasedOnExitCode/ForceLogOff/ForceReboot/NoAction/ProgramReboot]</RebootBehavior>
 			<DetectionMethodType>(Required)[CustomScript]</DetectionMethodType>
 			<ScriptLanguage>[String] Language for Detection Method [PowerShell/VBScript]</ScriptLanguage>
