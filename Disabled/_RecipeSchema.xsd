@@ -6,15 +6,26 @@
       <xs:sequence>
         <xs:element name="Application">
           <xs:complexType>
-            <xs:sequence>
+            <xs:all>
               <xs:element name="Name" type="xs:string" />
-              <xs:element name="Description" type="xs:string" />
-              <xs:element name="LocalizedName" type="xs:string" />
-              <xs:element name="Publisher" type="xs:string" />
-              <xs:element name="AutoInstall" type="xs:string" />
-              <xs:element name="UserDocumentation" type="xs:string" />
-              <xs:element name="Icon" type="xs:string" />
-            </xs:sequence>
+              <xs:element name="Description" type="xs:string" minOccurs="0" />
+              <xs:element name="LocalizedName" type="xs:string" minOccurs="0" />
+              <xs:element name="Publisher" type="xs:string" minOccurs="0" />
+              <xs:element name="AutoInstall" type="xs:string" minOccurs="0" />
+              <xs:element name="UserDocumentation" type="xs:string" minOccurs="0" />
+              <xs:element name="Icon" type="xs:string" minOccurs="0" />
+              <xs:element name="OptionalReference" type="xs:string" minOccurs="0" />
+              <xs:element name="LinkText" type="xs:string" minOccurs="0" />
+              <xs:element name="PrivacyUrl" type="xs:string" minOccurs="0" />
+              <xs:element name="Owner" type="xs:string" minOccurs="0" />
+              <xs:element name="SupportContact" type="xs:string" minOccurs="0" />
+              <xs:element name="AdminCategories" type="xs:string" minOccurs="0" />
+              <xs:element name="UserCategories" type="xs:string" minOccurs="0" />
+              <xs:element name="Keywords" type="xs:string" minOccurs="0" />
+              <xs:element name="FeaturedApplication" type="xs:string" minOccurs="0" />
+              <xs:element name="DisplaySupersedence" type="xs:string" minOccurs="0" />
+              <xs:element name="FolderPath" type="xs:string" minOccurs="0" />
+            </xs:all>
           </xs:complexType>
         </xs:element>
         <xs:element name="Downloads">
