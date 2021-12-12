@@ -85,8 +85,8 @@
                       <xs:element name="DetectionMethod" type="xs:string" />
                       <xs:element name="CustomDetectionMethods">
                         <xs:complexType>
-                          <xs:sequence>
-                            <xs:element name="DetectionClause">
+                          <xs:choice maxOccurs="unbounded">
+                            <xs:element name="DetectionClause" maxOccurs="unbounded" >
                               <xs:complexType>
                                 <xs:sequence>
                                   <xs:choice maxOccurs="unbounded">
@@ -107,7 +107,21 @@
                                 </xs:sequence>
                               </xs:complexType>
                             </xs:element>
-                          </xs:sequence>
+                            <xs:element name="DetectionClauseExpression" minOccurs="0" maxOccurs="unbounded" >
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element name="DetectionClauseConnector">
+                                    <xs:complexType>
+                                      <xs:sequence>
+                                        <xs:element type="xs:byte" name="ConnectorClause"/>
+                                        <xs:element type="xs:string" name="ConnectorClauseConnector"/>
+                                      </xs:sequence>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:sequence>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:choice>
                         </xs:complexType>
                       </xs:element>
                       <xs:element name="RequirementsRules">
