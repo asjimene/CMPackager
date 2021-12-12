@@ -62,7 +62,7 @@ $url = "$base$ver$number\windows\vmrc-windows.tar"
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$Version</ExpectedValue>
 					<ExpressionOperator>GreaterEquals</ExpressionOperator>
-					<Force32bit>True</Force32bit>
+					<Is64Bit>False</Is64Bit>
 					<Value>True</Value>
 				</DetectionClause>
 			</CustomDetectionMethods>
