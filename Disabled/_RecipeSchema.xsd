@@ -199,7 +199,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Distribution">
+        <xs:element name="Distribution" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="DistributeContent" type="xs:string" />
