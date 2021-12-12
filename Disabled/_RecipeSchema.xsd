@@ -10,6 +10,7 @@
               <xs:element name="Name" type="xs:string" />
               <xs:element name="Description" type="xs:string" minOccurs="0" />
               <xs:element name="LocalizedName" type="xs:string" minOccurs="0" />
+              <xs:element name="AdminDescription" type="xs:string" minOccurs="0" />
               <xs:element name="Publisher" type="xs:string" minOccurs="0" />
               <xs:element name="AutoInstall" type="xs:string" minOccurs="0" />
               <xs:element name="UserDocumentation" type="xs:string" minOccurs="0" />
@@ -70,6 +71,7 @@
                       <xs:element name="InstallProgram" type="xs:string" />
                       <xs:element name="InstallationMSI" type="xs:string" />
                       <xs:element name="UninstallCmd" type="xs:string" />
+                      <xs:element name="RepairCmd" type="xs:string" />
                       <xs:element name="Force32bit" type="xs:string" />
                       <xs:element name="InstallationBehaviorType" type="xs:string" />
                       <xs:element name="LogonReqType" type="xs:string" />
@@ -204,6 +206,7 @@
             <xs:sequence>
               <xs:element name="DistributeContent" type="xs:string" />
               <xs:element minOccurs="0" name="DistributeToGroup" type="xs:string" />
+              <xs:element minOccurs="0" name="DistributeToDPs" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -223,6 +226,7 @@
               <xs:element name="AvailableOffset" type="xs:string" minOccurs="0" />
               <xs:element name="DeadlineOffset" type="xs:string" minOccurs="0" />
               <xs:element name="TimeBaseOn" type="xs:string" minOccurs="0" />
+              <xs:element name="AllowRepair" type="xs:string" minOccurs="0" />
               <xs:element minOccurs="0" name="DeploymentCollection" type="xs:string" />
             </xs:all>
           </xs:complexType>
