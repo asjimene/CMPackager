@@ -82,6 +82,7 @@
                       <xs:element name="RebootBehavior" type="xs:string" />
                       <xs:element name="DetectionMethodType" type="xs:string" />
                       <xs:element name="ScriptLanguage" type="xs:string" />
+                      <xs:element name="ScriptDetection32Bit" type="xs:string" />
                       <xs:element name="DetectionMethod" type="xs:string" />
                       <xs:element name="CustomDetectionMethods">
                         <xs:complexType>
