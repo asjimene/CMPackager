@@ -191,16 +191,16 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Deployment" minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Deployment" minOccurs="0" maxOccurs="unbounded" >
           <xs:complexType>
-            <xs:sequence>
+            <xs:all>
               <xs:element name="DeploySoftware" type="xs:string" />
-              <xs:element name="UpdateSuperseded" type="xs:string" />
-              <xs:element name="AvailableOffset" type="xs:string" />
-              <xs:element name="DeadlineOffset" type="xs:string" />
-              <xs:element name="TimeBaseOn" type="xs:string" />
+              <xs:element name="UpdateSuperseded" type="xs:string" minOccurs="0" />
+              <xs:element name="AvailableOffset" type="xs:string" minOccurs="0" />
+              <xs:element name="DeadlineOffset" type="xs:string" minOccurs="0" />
+              <xs:element name="TimeBaseOn" type="xs:string" minOccurs="0" />
               <xs:element minOccurs="0" name="DeploymentCollection" type="xs:string" />
-            </xs:sequence>
+            </xs:all>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
