@@ -383,7 +383,7 @@
 		<!-- Uninstall previous version before installing the latest -->
 		<Uninstall>[Boolean]</Uninstall>
 	</Supersedence>
-	<!-- You can optionally deploy the application to a specified Collection here -->
+	<!-- You can optionally deploy the application to one or more specified Collections here -->
 	<Deployment>
 		<!-- DeploySoftware - [Boolean] Switch for Software Deployment, Application should be distributed before deployment -->
 		<DeploySoftware></DeploySoftware>
