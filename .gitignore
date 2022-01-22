@@ -5,5 +5,8 @@ CMPackager.prefs
 # Ignore Recipes Folder
 Recipes/*
 
+# Ignore vscode
+.vscode/*
+
 # Except for the Template.xml
 !Recipes/Template.xml

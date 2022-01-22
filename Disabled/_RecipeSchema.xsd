@@ -222,6 +222,8 @@
             <xs:all>
               <xs:element name="Supersedence" type="xs:string" minOccurs="0" />
               <xs:element name="Uninstall" type="xs:string" minOccurs="0" />
+              <xs:element name="CleanupSuperseded" type="xs:string" minOccurs="0" />
+              <xs:element name="KeepSuperseded" type="xs:string" minOccurs="0" />
             </xs:all>
           </xs:complexType>
         </xs:element>
