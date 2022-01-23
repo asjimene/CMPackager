@@ -1681,6 +1681,50 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		Write-Output $true
 	}
 
+	function Invoke-ApplicationCleanup {
+		param (
+			$Recipe
+		)
+		If (-not ([string]::IsNullOrEmpty($Recipe.ApplicationDef.Supersedence.CleanupSuperseded))) {
+			$CleanupEnabled = [System.Convert]::ToBoolean($Recipe.ApplicationDef.Supersedence.CleanupSuperseded)
+		}
+		else {
+			$CleanupEnabled = $false
+		}
+		$ApplicationName = $Recipe.ApplicationDef.Application.Name
+		$CleanupEnabled = $Recipe.ApplicationDef.Supersedence.CleanupSuperseded
+		$keep = $Recipe.ApplicationDef.Supersedence.KeepSuperseded
+
+		Write-Host "Cleanup is $CleanupEnabled"
+		if ($CleanupEnabled) {
+			
+			Push-Location
+			Set-Location $CMSite
+			Write-Output $Keep, $ApplicationName
+			$Applications = Get-CMApplication -Name "$ApplicationName*" | Where-Object IsSuperseded -eq $true | Sort-Object DateCreated
+			$Applications = $Applications | Select-Object -First ($Applications.Count - $keep)
+			ForEach ($Application in $Applications) {
+				# Get the content location and remove it
+				Write-Host "Cleaning up $($Application.LocalizedDisplayName)"
+				Pop-Location
+				$ApplicationXML = [Microsoft.ConfigurationManagement.ApplicationManagement.Serialization.SccmSerializer]::DeserializeFromString($Application.SDMPackageXML, $true)
+				$Location = $ApplicationXML.DeploymentTypes[0].Installer.Contents | Select-Object -ExpandProperty Location # BUGBUG: Get all the deployment locations and remove them
+				Remove-Item -LiteralPath $Location -Recurse
+				# Remove the deployments and app itself
+				Set-Location $CMSite
+				$Application | Get-CMApplicationDeployment | Remove-CMApplicationDeployment -Force
+				Get-CMApplication $Application.LocalizedDisplayName | Remove-CMApplication -Force
+				## Send an Email if an Application was successfully cleaned up and record the Application Name and Version for the Email
+				$Global:SendEmail = $true; $Global:SendEmail | Out-Null
+				$Global:EmailBody += "      - Removed $($Application.LocalizedDisplayName) `n"
+				Add-LogContent "Removed $($Application.LocalizedDisplayName) $($Application.SoftwareVersion)`n"
+			}
+			Pop-Location
+			
+		}
+		Write-Output $true
+	}	
+
 	Function Send-EmailMessage {
 		Add-LogContent "Sending Email"
 		$Global:EmailBody += "`n`nThis message was automatically generated"
@@ -2021,6 +2065,8 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$ApplicationDistribution = $false
 		$ApplicationSupersedence = $false
 		$ApplicationDeployment = $false
+		$ApplicationCleanup = $false
+		
 	
 		try {
 			## Import Recipe
@@ -2055,6 +2101,11 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			If ($ApplicationSupersedence) {
 				Write-Output "Application Deployment"
 				$ApplicationDeployment = Invoke-ApplicationDeployment -Recipe $ApplicationRecipe
+				Add-logContent "Completed Processing of $Recipe"
+			}
+			If ($ApplicationDeployment) {
+				Write-Output "Application Cleanup"
+				$ApplicationDeployment = Invoke-ApplicationCleanup -Recipe $ApplicationRecipe
 				Add-logContent "Completed Processing of $Recipe"
 			}
 			if ($Global:TemplateApplicationCreatedFlag -eq $true) {
