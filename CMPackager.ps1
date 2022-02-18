@@ -1695,12 +1695,12 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 		$CleanupEnabled = $Recipe.ApplicationDef.Supersedence.CleanupSuperseded
 		$keep = $Recipe.ApplicationDef.Supersedence.KeepSuperseded
 
-		Write-Host "Cleanup is $CleanupEnabled"
+		Write-Output "Cleanup is $CleanupEnabled"
 		if ($CleanupEnabled) {
 			
 			Push-Location
 			Set-Location $CMSite
-			Write-Output $Keep, $ApplicationName
+			Write-Output "Keeping $Keep superseded revisions of $ApplicationName"
 			$Applications = Get-CMApplication -Name "$ApplicationName*" | Where-Object IsSuperseded -eq $true | Sort-Object DateCreated
 			$Applications = $Applications | Select-Object -First ($Applications.Count - $keep)
 			ForEach ($Application in $Applications) {
@@ -1710,7 +1710,9 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$ApplicationXML = [Microsoft.ConfigurationManagement.ApplicationManagement.Serialization.SccmSerializer]::DeserializeFromString($Application.SDMPackageXML, $true)
 				$Location = $ApplicationXML.DeploymentTypes[0].Installer.Contents | Select-Object -ExpandProperty Location # BUGBUG: Get all the deployment locations and remove them
 				Remove-Item -LiteralPath $Location -Recurse
+				Add-LogContent "Removed application content from $Location`n"
 				# Remove the deployments and app itself
+				Push-Location
 				Set-Location $CMSite
 				$Application | Get-CMApplicationDeployment | Remove-CMApplicationDeployment -Force
 				Get-CMApplication $Application.LocalizedDisplayName | Remove-CMApplication -Force

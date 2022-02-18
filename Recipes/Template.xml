@@ -382,6 +382,10 @@
 		<Supersedence>[Boolean]</Supersedence>
 		<!-- Uninstall previous version before installing the latest -->
 		<Uninstall>[Boolean]</Uninstall>
+		<!-- Cleanup superseded versions of this application -->
+		<CleanupSuperseded>[Boolean]</CleanupSuperseded>
+		<!-- Keep this many superseded versions of the application -->
+		<KeepSuperseded>[int]</KeepSuperseded>
 	</Supersedence>
 	<!-- You can optionally deploy the application to one or more specified Collections here -->
 	<Deployment>
