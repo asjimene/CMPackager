@@ -20,7 +20,23 @@
 
 [CmdletBinding()]
 param (
-	[switch]$Setup = $false
+	[switch]$Setup = $false,
+
+	[ValidateScript({
+		if (-not ($_ | Resolve-Path | Test-Path -PathType Leaf)) {
+			throw "File doesn't exist or a file wasn't specified."
+		}
+		return $true
+	})]
+	[System.IO.FileInfo]$PreferenceFile = "$ScriptRoot\CMPackager.prefs",
+	
+	[ValidateScript({
+		if (-not ($_ | Resolve-Path | Test-Path -PathType Container)) {
+			throw "Directory doesn't exist or a directory wasn't specified."
+		}
+		return $true
+	})]
+	[System.IO.FileInfo]$RecipePath = "$PSScriptRoot\Recipes"
 )
 DynamicParam {  
 	$ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
@@ -29,7 +45,7 @@ DynamicParam {
 	$AttribColl = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
 	$AttribColl.Add($ParamAttrib)
 	$AttribColl.Add((New-Object System.Management.Automation.AliasAttribute('Recipe')))
-	$configurationFileNames = Get-ChildItem -Path "$PSScriptRoot\Recipes" | Select-Object -ExpandProperty Name
+	$configurationFileNames = Get-ChildItem -Path $($RecipePath | Resolve-Path) | Select-Object -ExpandProperty Name
 	$AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute($configurationFileNames)))
 	$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string[]], $AttribColl)
 	$RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
@@ -42,13 +58,18 @@ process {
 
 	$Global:ScriptRoot = $PSScriptRoot
 
-	if (-not (Test-Path "$ScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue)) {
+	[string]$PreferenceFile = $PreferenceFile.Name | Resolve-Path
+	[string]$RecipePath = $RecipePath.Name | Resolve-Path
+
+	Write-Host "Preference file: $($PreferenceFile), Recipe path: $($RecipePath)"
+
+	if (-not (Test-Path $PreferenceFile -ErrorAction SilentlyContinue)) {
 		$Setup = $true
 	}
 	## Global Variables (Only load if not setup)
 	# Import the Prefs file
 	if (-not ($Setup)) {
-		[xml]$PackagerPrefs = Get-Content $ScriptRoot\CMPackager.prefs
+		[xml]$PackagerPrefs = Get-Content $PreferenceFile
 
 		# Packager Vars
 		$Global:TempDir = $PackagerPrefs.PackagerPrefs.TempDir
@@ -78,8 +99,8 @@ process {
 		$Global:SendEmailPreference = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.SendEmailPreference)
 		$Global:NotifyOnDownloadFailure = [System.Convert]::ToBoolean($PackagerPrefs.PackagerPrefs.NotifyOnDownloadFailure)
 
-		$Global:EmailSubject = "CMPackager Report - $(Get-Date -format d)"
-		$Global:EmailBody = "New Application Updates Packaged on $(Get-Date -Format d)`n`n"
+		$Global:EmailSubject = "CMPackager Report [$Global:CMSite] - $(Get-Date -format d)"
+		$Global:EmailBody = "[$Global:CMSite] New Application Updates Packaged on $(Get-Date -Format d)`n`n"
 
 		#This gets switched to True if Applications are Packaged
 		$Global:SendEmail = $false
@@ -102,8 +123,8 @@ process {
 		"PreferredDeployCollection"           = "WPFcomboBoxPreferredDeployColl"
 	}
 		 
-	if (Test-Path "$PSScriptRoot\CMPackager.prefs" -ErrorAction SilentlyContinue) {
-		$CMPackagerXML = [XML](Get-Content "$PSScriptRoot\CMPackager.prefs")
+	if (Test-Path $PreferenceFile -ErrorAction SilentlyContinue) {
+		$CMPackagerXML = [XML](Get-Content $PreferenceFile)
 	}
 	else {
 		$CMPackagerXML = [XML](Get-Content "$PSScriptRoot\CMPackager.prefs.template")
@@ -2003,7 +2024,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					Update-GUI
 				}
 				$CMPackagerXML.PackagerPrefs.LogPath = "$(Split-Path $WPFtextBoxWorkingDir.Text -Parent)\CMPackager.log"
-				$CMPackagerXML.Save("$PSScriptRoot\CMPackager.prefs")
+				$CMPackagerXML.Save($PreferenceFile)
 				$form.Cursor = "Arrow"
 			})
 
@@ -2053,7 +2074,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	}
 
 	## Get the Recipes
-	$RecipeList = Get-ChildItem $ScriptRoot\Recipes\ | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
+	$RecipeList = Get-ChildItem $RecipePath | Select-Object -Property Name -ExpandProperty Name | Where-Object -Property Name -NE "Template.xml" | Sort-Object -Property Name
 	Add-LogContent -Content "All Recipes: $RecipeList"
 	if (-not ([System.String]::IsNullOrEmpty($PSBoundParameters.SingleRecipe))) {
 		$RecipeList = $RecipeList | Where-Object { $_ -in $PSBoundParameters.SingleRecipe }
@@ -2074,7 +2095,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 			## Import Recipe
 			Add-LogContent "Importing Content for $Recipe"
 			Write-Output "Begin Processing: $Recipe"
-			[xml]$ApplicationRecipe = Get-Content "$PSScriptRoot\Recipes\$Recipe"
+			[xml]$ApplicationRecipe = Get-Content $(Join-Path -Path $RecipePath -ChildPath $Recipe)
 		
 			## Perform Packaging Tasks
 			Write-Output "Download"
