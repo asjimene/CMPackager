@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = "https://2.na.dl.wireshark.org/win64/$((Invoke-WebRequest https://2.na.dl.wireshark.org/win64/ |select -ExpandProperty Links | where outerText -like "*.msi" | sort -Property InnerText -Descending)[0].href)"</PrefetchScript>
+			<PrefetchScript>$URL = "https://www.wireshark.org/download/win64/$((Invoke-WebRequest https://www.wireshark.org/download/win64/ | Select -ExpandProperty Links | Where outerHTML -like '*latest.msi`">Wireshark*').href)"</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Wireshark.msi</DownloadFileName>
 			<Version></Version>
