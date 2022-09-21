@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL =  Invoke-WebRequest -URI "https://www.dell.com/support/kbdoc/en-us/000177080/dell-command-monitor" -UseBasicParsing | Select-Object -ExpandProperty Links | Where-Object OuterHTML -like "*>64-bit<*" | Select-Object -Index 0 | Select-Object -ExpandProperty href 
+			<PrefetchScript>$URL = Invoke-WebRequest -URI "https://www.dell.com/support/kbdoc/en-us/000177080/dell-command-monitor" -UseBasicParsing | Select-Object -ExpandProperty Links | Where-Object OuterHTML -like "*>64-bit<*" | Select-Object -Index 0 | Select-Object -ExpandProperty href 
 </PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>Dell-Command-Monitor-64.exe</DownloadFileName>
