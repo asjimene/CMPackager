@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$URL = Invoke-WebRequest 'https://filezilla-project.org/download.php?show_all=1' -UseBasicParsing | Select-Object -ExpandProperty Links | Where-Object href -like '*win64-setup.exe*' | Select-Object -First 1 -ExpandProperty href</PrefetchScript>
+			<PrefetchScript>$URL = Invoke-WebRequest 'https://filezilla-project.org/download.php?show_all=1' -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' | Select-Object -ExpandProperty Links | Where-Object href -like '*win64-setup.exe*' | Select-Object -First 1 -ExpandProperty href</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>FileZilla-win64-setup.exe</DownloadFileName>
 			<Version></Version>
@@ -18,7 +18,7 @@
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-		<PrefetchScript>$URL = Invoke-WebRequest 'https://filezilla-project.org/download.php?show_all=1' -UseBasicParsing | Select-Object -ExpandProperty Links | Where-Object href -like '*win32-setup.exe*' | Select-Object -First 1 -ExpandProperty href</PrefetchScript>
+		<PrefetchScript>$URL = Invoke-WebRequest 'https://filezilla-project.org/download.php?show_all=1' -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' | Select-Object -ExpandProperty Links | Where-Object href -like '*win32-setup.exe*' | Select-Object -First 1 -ExpandProperty href</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>FileZilla-win32-setup.exe</DownloadFileName>
 			<Version></Version>
