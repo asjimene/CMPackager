@@ -9,8 +9,9 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$LinkPath = ((Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/latest -UseBasicParsing)| Select-Object -ExpandProperty Links | Where-Object -Property href -Like "*npp.*.Installer.x64.exe").href
-			$URL = "https://github.com$LinkPath"</PrefetchScript>
+			<PrefetchScript> $linkPath = ((Invoke-WebRequest -URI https://notepad-plus-plus.org -UseBasicParsing) | Select-Object -ExpandProperty links | Where-Object -Property href -like "/downloads/v*").href 
+			$downloadurl = "https://notepad-plus-plus.org$linkpath"
+			$url = ((Invoke-WebRequest -URI $downloadurl -UseBasicParsing) | Select-Object -ExpandProperty links | Where-Object -Property href -like "*npp.*.installer.x64.exe").href | Select-Object -Index 0</PrefetchScript>
 			<URL></URL>
 			<DownloadFileName>NotePadppInstallerx64.exe</DownloadFileName>
 			<Version></Version>
