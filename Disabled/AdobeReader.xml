@@ -12,7 +12,7 @@
 			<PrefetchScript>#Script found at https://oceansls.com/2022/06/27/downloading-and-installing-adobe-reader-with-powershell/
 $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $session.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36"
-$result = Invoke-RestMethod -Uri "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&country=US&nativeOs=Windows%2010&api_key=dc-get-adobereader-cdn" `
+$result = Invoke-RestMethod -Uri "https://rdc.adobe.io/reader/products?lang=mui&amp;site=enterprise&amp;os=Windows%2011&amp;country=US&amp;nativeOs=Windows%2010&amp;api_key=dc-get-adobereader-cdn" `
     -WebSession $session `
     -Headers @{
         "Accept"="*/*"
