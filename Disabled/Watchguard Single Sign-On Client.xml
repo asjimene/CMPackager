@@ -1,0 +1,54 @@
+<ApplicationDef>
+	<Application>
+		<Name>Watchguard Single Sign-On Client</Name>
+		<Description>Watchguard Single Sign-On Client</Description>
+		<Publisher>Watchguard</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<Icon>watchguard_sso_client.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$productName = 'Firebox Cloud'
+$webSoftwareHome = Invoke-WebRequest -Uri 'https://software.watchguard.com/SoftwareHome'
+if ($webSoftwareHome.Content -match "var\s+devices\s*=\s*(\[.+\])") {
+    $productID = ((($Matches[1] | ConvertFrom-Json) | Where-Object Title -eq "Firebox and XTM").ProductFamilies | Where-Object Title -eq $productName).ID
+    $url = (Invoke-WebRequest -Uri "https://software.watchguard.com/SoftwareDownloads?current=true&amp;familyId=$($productID)" -UseBasicParsing | Select-Object -ExpandProperty links | Where-Object -Property href -like "*WG-Authentication-Client*.msi").href
+}</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>WG-Authentication-Client.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>[String]$Version = ([String](Get-MSIInfo -Path $DownloadFile -Property ProductVersion)).TrimStart().TrimEnd()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Watchguard Single Sign-On Client Silent Install</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<Comments>Silent Installer for Watchguard SSO Client</Comments>
+			<Language>English</Language>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallationMSI>WG-Authentication-Client.msi</InstallationMSI>
+			<UninstallCmd></UninstallCmd>
+			<Force32bit>False</Force32bit>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<ReqUserInteraction>False</ReqUserInteraction>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>MSI</DetectionMethodType>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>

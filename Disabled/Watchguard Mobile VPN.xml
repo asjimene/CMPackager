@@ -1,0 +1,61 @@
+<ApplicationDef>
+	<Application>
+		<Name>Watchguard VPN with SSL</Name>
+		<Description>Watchguard Mobile VPN with SSL Client</Description>
+		<Publisher>Watchguard</Publisher>
+		<AutoInstall>True</AutoInstall>
+		<Icon>watchguard_mobilevpn.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$productName = 'Firebox Cloud'
+$webSoftwareHome = Invoke-WebRequest -Uri 'https://software.watchguard.com/SoftwareHome'
+if ($webSoftwareHome.Content -match "var\s+devices\s*=\s*(\[.+\])") {
+    $productID = ((($Matches[1] | ConvertFrom-Json) | Where-Object Title -eq "Firebox and XTM").ProductFamilies | Where-Object Title -eq $productName).ID
+    $url = (Invoke-WebRequest -Uri "https://software.watchguard.com/SoftwareDownloads?current=true&amp;familyId=$($productID)" -UseBasicParsing | Select-Object -ExpandProperty links | Where-Object -Property href -like "*WG-MVPN-SSL*.exe").href
+}</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>WG-MVPN-SSL.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>$Version = (Get-item $TempDir\$DownloadFileName).VersionInfo.FileVersion.Trim()</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Watchguard VPN with SSL Silent Installer </DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>WG-MVPN-SSL.exe /TYPE="full" /SP- /SILENT /VERYSILENT /NORESTART</InstallProgram>
+			<UninstallCmd>`"%ProgramFiles(x86)%\WatchGuard\WatchGuard Mobile VPN with SSL\unins000.exe`" /SILENT /VERYSILENT /NORESTART</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>1</EstRuntimeMins>
+			<MaxRuntimeMins>15</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>wgsslvpnc.exe</Name>
+					<Path>%ProgramFiles%\WatchGuard\WatchGuard Mobile VPN with SSL\</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
