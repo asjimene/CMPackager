@@ -39,7 +39,7 @@ Add-LogContent $URL</PrefetchScript>
 			<Version></Version>
 			<FullVersion></FullVersion>
 			<DownloadVersionCheck>$Version = (((Get-item $TempDir\InstallReaderDC.exe).VersionInfo.FileVersion).Substring(0,10))
-			$FileVersion = ((Get-item $TempDir\InstallReaderDC.exe).VersionInfo.FileVersion)</DownloadVersionCheck>
+			$Version = ((Get-item $TempDir\InstallReaderDC.exe).VersionInfo.FileVersion)</DownloadVersionCheck>
 			<ExtraCopyFunctions>&amp; $ScriptRoot\7za.exe x "$TempDir\InstallReaderDC.exe" -o"$TempDir\AdobeReaderTemp" -y
 			Copy-Item $TempDir\AdobeReaderTemp\* -Destination $DestinationPath -Force -Recurse
 			# You can Create an Adobe Reader MST and have it copied here
@@ -63,24 +63,33 @@ Add-LogContent $URL</PrefetchScript>
 			<EstRuntimeMins>15</EstRuntimeMins>
 			<MaxRuntimeMins>60</MaxRuntimeMins>
 			<RebootBehavior>BasedOnExitCode</RebootBehavior>
-			<DetectionMethodType>MSI</DetectionMethodType>
+			<DetectionMethodType>Custom</DetectionMethodType>
 			<CustomDetectionMethods>
 				<DetectionClause>
 					<DetectionClauseType>File</DetectionClauseType>
 					<Name>AcroRd32.exe</Name>
 					<Path>%ProgramFiles(x86)%\Adobe\Acrobat Reader DC\Reader</Path>
 					<PropertyType>Version</PropertyType>
-					<ExpectedValue>$FileVersion</ExpectedValue>
+					<ExpectedValue>$Version</ExpectedValue>
 					<ExpressionOperator>IsEquals</ExpressionOperator>
 					<Value>True</Value>
-					<Is64Bit></Is64Bit>
+					<Is64Bit>True</Is64Bit>
 				</DetectionClause>
 			</CustomDetectionMethods>
+			<InstallBehavior>
+				<InstallBehaviorProcess DisplayName="Adobe Acrobat Reader DC">
+					<InstallBehaviorExe>AcroRd32.exe</InstallBehaviorExe>
+				</InstallBehaviorProcess>
+			</InstallBehavior>
 		</DeploymentType>
 	</DeploymentTypes>
 	<Distribution>
 		<DistributeContent>True</DistributeContent>
 	</Distribution>
+	<Supersedence>
+		<Supersedence>False</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
 	<Deployment>
 		<DeploySoftware>True</DeploySoftware>
 	</Deployment>
