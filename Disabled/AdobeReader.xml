@@ -68,7 +68,7 @@ Add-LogContent $URL</PrefetchScript>
 				<DetectionClause>
 					<DetectionClauseType>File</DetectionClauseType>
 					<Name>AcroRd32.exe</Name>
-					<Path>%ProgramFiles%\Adobe\Acrobat Reader DC\Reader</Path>
+					<Path>%ProgramFiles(x86)%\Adobe\Acrobat Reader DC\Reader</Path>
 					<PropertyType>Version</PropertyType>
 					<ExpectedValue>$Version</ExpectedValue>
 					<ExpressionOperator>IsEquals</ExpressionOperator>
