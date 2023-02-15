@@ -9,7 +9,7 @@
 	</Application>
 	<Downloads>
 		<Download DeploymentType="DeploymentType1">
-			<PrefetchScript>$Download.Version = ((Invoke-RestMethod https://omahaproxy.appspot.com/all.json) | ? os -eq 'win' | select -expand versions | ? channel -eq 'stable' | select -expand version) -as [string]</PrefetchScript>
+			<PrefetchScript></PrefetchScript>
 			<URL>https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise64.msi</URL>
 			<DownloadFileName>googlechromestandaloneenterprise64.msi</DownloadFileName>
 			<DownloadVersionCheck>#Script to check version
@@ -20,7 +20,7 @@
 			<ExtraCopyFunctions></ExtraCopyFunctions>
 		</Download>
 		<Download DeploymentType="DeploymentType2">
-			<PrefetchScript>$Download.Version = ((Invoke-RestMethod https://omahaproxy.appspot.com/all.json) | ? os -eq 'win' | select -expand versions | ? channel -eq 'stable' | select -expand version) -as [string]</PrefetchScript>
+			<PrefetchScript></PrefetchScript>
 			<URL>https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise.msi</URL>
 			<DownloadFileName>googlechromestandaloneenterprise.msi</DownloadFileName>
 			<DownloadVersionCheck>#Script to check version
