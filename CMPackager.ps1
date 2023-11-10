@@ -1602,13 +1602,16 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				$DeploymentSplat = @{
 					Name = "$ApplicationName $ApplicationSWVersion"
 					DeployAction = 'Install'
-					DeployPurpose = 'Available'
 					UserNotification = 'DisplaySoftwareCenterOnly'
 					UpdateSupersedence = [System.Convert]::ToBoolean($Deployment.UpdateSuperseded)
 					AllowRepairApp = [System.Convert]::ToBoolean($Deployment.AllowRepair)
 					ErrorAction = 'Stop'
 				}
 
+				if (-not ([string]::IsNullOrEmpty($Deployment.Purpose))) {
+					$DeploymentSplat['DeployPurpose'] = $Deployment.Purpose
+				}
+				
 				if (-not ([string]::IsNullOrEmpty($Deployment.AvailableOffset))) {
 					$DeploymentSplat['AvailableDateTime'] = (Get-Date) + $Deployment.AvailableOffset
 				}

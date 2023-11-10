@@ -391,6 +391,8 @@
 	<Deployment>
 		<!-- DeploySoftware - [Boolean] Switch for Software Deployment, Application should be distributed before deployment -->
 		<DeploySoftware></DeploySoftware>
+		<!-- Purpose - Whether the deployment is mandatory or optional. Defaults to Available if not specified -->
+		<Purpose>[Required/Available]</Purpose>
 		<!-- UpdateSuperseded - [Boolean] Whether the deployment should automatically upgrade superseded versions -->
 		<UpdateSuperseded></UpdateSuperseded>
 		<!-- DeadlineOffset - [TimeSpan] Time after deployment that install will be enforced. Requires UpdateSuperseded = true for available deployments, eg 1.23:45 for 1 day, 23 hours, 45 minutes. https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings -->
