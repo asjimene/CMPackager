@@ -36,7 +36,7 @@ param (
 		}
 		return $true
 	})]
-	[System.IO.FileInfo]$RecipePath = "$PSScriptRoot\Recipes"
+	[System.IO.DirectoryInfo]$RecipePath = "$PSScriptRoot\Recipes"
 )
 DynamicParam {
 	# If RecipePath is specified populate list of available recipes from custom recipe location  
