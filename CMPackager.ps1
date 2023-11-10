@@ -28,7 +28,7 @@ param (
 		}
 		return $true
 	})]
-	[System.IO.FileInfo]$PreferenceFile = "$ScriptRoot\CMPackager.prefs",
+	[System.IO.FileInfo]$PreferenceFile = "$PSScriptRoot\CMPackager.prefs",
 	
 	[ValidateScript({
 		if (-not ($_ | Resolve-Path | Test-Path -PathType Container)) {
@@ -38,28 +38,39 @@ param (
 	})]
 	[System.IO.FileInfo]$RecipePath = "$PSScriptRoot\Recipes"
 )
-DynamicParam {  
-	$ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
-	$ParamAttrib.Mandatory = $false
-	$ParamAttrib.ParameterSetName = '__AllParameterSets'
-	$AttribColl = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
-	$AttribColl.Add($ParamAttrib)
-	$AttribColl.Add((New-Object System.Management.Automation.AliasAttribute('Recipe')))
-	$configurationFileNames = Get-ChildItem -Path $($RecipePath | Resolve-Path) | Select-Object -ExpandProperty Name
-	$AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute($configurationFileNames)))
-	$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string[]], $AttribColl)
-	$RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
-	$RuntimeParamDic.Add('SingleRecipe', $RuntimeParam)
-	return  $RuntimeParamDic
+DynamicParam {
+	# If RecipePath is specified populate list of available recipes from custom recipe location  
+	if ($PSBoundParameters['RecipePath']) {
+		$configurationFileNames = Get-ChildItem *.xml -Path $($PSBoundParameters['RecipePath']) | Select-Object -ExpandProperty Name
+	}
+	else 
+	{
+	# If RecipePath is note specified, check to see if running from the CMPackager directory and populate from standard recipe directory
+		if ((test-path .\Recipes) -and (test-path .\cmpackager.ps1)) {
+			$configurationFileNames = Get-ChildItem *.xml -Path .\Recipes | Select-Object -ExpandProperty Name
+		}
+	}
+	# Make SingleRecipe parameter availabe only if possible recipes are found in the above checked custom or standard dirs
+	if ($configurationFileNames) {
+		$ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
+		$ParamAttrib.Mandatory = $false
+		$ParamAttrib.ParameterSetName = '__AllParameterSets'
+		$AttribColl = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
+		$AttribColl.Add($ParamAttrib)
+		$AttribColl.Add((New-Object System.Management.Automation.AliasAttribute('Recipe')))
+		$AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute($configurationFileNames)))
+		$RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('SingleRecipe', [string[]], $AttribColl)
+		$RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+		$RuntimeParamDic.Add('SingleRecipe', $RuntimeParam)
+		return  $RuntimeParamDic
+	}
 }
+
 process {
 
 	$Global:ScriptVersion = "20.05.06.0"
 
 	$Global:ScriptRoot = $PSScriptRoot
-
-	[string]$PreferenceFile = $PreferenceFile.Name | Resolve-Path
-	[string]$RecipePath = $RecipePath.Name | Resolve-Path
 
 	Write-Host "Preference file: $($PreferenceFile), Recipe path: $($RecipePath)"
 
@@ -1611,7 +1622,7 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 				if (-not ([string]::IsNullOrEmpty($Deployment.Purpose))) {
 					$DeploymentSplat['DeployPurpose'] = $Deployment.Purpose
 				}
-				
+
 				if (-not ([string]::IsNullOrEmpty($Deployment.AvailableOffset))) {
 					$DeploymentSplat['AvailableDateTime'] = (Get-Date) + $Deployment.AvailableOffset
 				}
