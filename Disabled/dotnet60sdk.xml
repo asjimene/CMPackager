@@ -1,0 +1,107 @@
+<ApplicationDef>
+	<Application>
+		<Name>.NET 6.0 SDK</Name>
+		<Description>.NET is a free, cross-platform, open-source developer platform for building many different types of applications.</Description>
+		<Publisher>Microsoft</Publisher>
+		<UserDocumentation>https://docs.microsoft.com/dotnet/</UserDocumentation>
+		<Icon>dotnet.png</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<PrefetchScript>$releases = Invoke-RestMethod https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/6.0/releases.json
+$version = $releases.'latest-sdk'
+$Download.Version = $version
+$url = (($releases.releases.sdks | ? version -eq $version).files | ? rid -eq 'win-x64' | ? name -like '*.exe').url</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>dotnet-sdk-6.0-win-x64.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder>x64</AppRepoFolder>
+		</Download>
+		<Download DeploymentType="DeploymentType2">
+			<PrefetchScript>$releases = Invoke-RestMethod https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/6.0/releases.json
+$version = $releases.'latest-sdk'
+$Download.Version = $version
+$url = (($releases.releases.sdks | ? version -eq $version).files | ? rid -eq 'win-x86' | ? name -like '*.exe').url</PrefetchScript>
+			<URL></URL>
+			<DownloadFileName>dotnet-sdk-6.0-win-x86.exe</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<AppRepoFolder>x86</AppRepoFolder>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>dotnet-sdk-6.0-win-x64</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>dotnet-sdk-6.0-win-x64.exe /install /quiet /norestart /log install.log</InstallProgram>
+			<UninstallCmd>dotnet-sdk-6.0-win-x64.exe /uninstall /quiet /norestart /log uninstall.log</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<!-- %programfiles%\dotnet\sdk\$version\dotnet.dll -->
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>Directory</DetectionClauseType>
+					<Name>$Version</Name>
+					<Path>%ProgramFiles%\dotnet\sdk\</Path>
+					<Existence>True</Existence>
+					<Is64Bit>True</Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+			<RequirementsRules>
+				<RequirementsRule>
+					<RequirementsRuleType>Existential</RequirementsRuleType>
+					<RequirementsRuleValue>
+						<RuleValue>True</RuleValue>
+					</RequirementsRuleValue>
+					<RequirementsRuleGlobalCondition>AutoPackage - OSArchitecture x64</RequirementsRuleGlobalCondition>
+				</RequirementsRule>
+			</RequirementsRules>
+		</DeploymentType>
+		<DeploymentType Name="DeploymentType2">
+			<DeploymentTypeName>dotnet-sdk-6.0-win-x86</DeploymentTypeName>
+			<InstallationType>Script</InstallationType>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>dotnet-sdk-6.0-win-x86.exe /install /quiet /norestart /log install.log</InstallProgram>
+			<UninstallCmd>dotnet-sdk-6.0-win-x86.exe /uninstall /quiet /norestart /log uninstall.log</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>30</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>Directory</DetectionClauseType>
+					<Name>$Version</Name>
+					<Path>%ProgramFiles%\dotnet\sdk\</Path>
+					<Existence>True</Existence>
+					<Is64Bit>False</Is64Bit>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
