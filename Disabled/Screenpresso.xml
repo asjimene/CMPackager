@@ -1,0 +1,62 @@
+<ApplicationDef>
+	<Application>
+		<Name>Screenpresso</Name>
+		<Description>Screenpresso captures your desktop (screenshots and HD videos) for your training documents, collaborative design work, IT bug reports, and more…</Description>
+		<Publisher>Learnpulse</Publisher>
+		<AutoInstall>False</AutoInstall>
+		<UserDocumentation>https://www.screenpresso.com/</UserDocumentation>
+		<Icon>Screenpresso.ico</Icon>
+	</Application>
+	<Downloads>
+		<Download DeploymentType="DeploymentType1">
+			<URL>https://www.screenpresso.com/binaries/releases/stable/dotnet47/ScreenpressoSetup.msi</URL>
+			<DownloadFileName>ScreenpressoSetup.msi</DownloadFileName>
+			<Version></Version>
+			<FullVersion></FullVersion>
+			<DownloadVersionCheck>#Script to check version
+			$version = ([string] (Get-AppLockerFileInformation -Path "$Global:TempDir\$DownloadFileName" | select -ExpandProperty Publisher | select BinaryVersion)).TrimStart('@{BinaryVersion=').trim("}")</DownloadVersionCheck>
+			<ExtraCopyFunctions></ExtraCopyFunctions>
+		</Download>
+	</Downloads>
+	<DeploymentTypes>
+		<DeploymentType Name="DeploymentType1">
+			<DeploymentTypeName>Screenpresso x64 silent install</DeploymentTypeName>
+			<InstallationType>MSI</InstallationType>
+			<InstallationMSI>ScreenpressoSetup.msi</InstallationMSI>
+			<CacheContent>False</CacheContent>
+			<BranchCache>True</BranchCache>
+			<ContentFallback>True</ContentFallback>
+			<OnSlowNetwork>Download</OnSlowNetwork>
+			<InstallProgram>msiexec /i ScreenpressoSetup.msi /q /norestart /l*v install.log</InstallProgram>
+			<UninstallCmd>powershell.exe -noprofile -noninteractive -command ""`&amp; {exit ((Get-Package screenpresso | Uninstall-Package -AllVersions -force).ExitCode)}""</UninstallCmd>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<LogonReqType>WhetherOrNotUserLoggedOn</LogonReqType>
+			<UserInteractionMode>Hidden</UserInteractionMode>
+			<EstRuntimeMins>5</EstRuntimeMins>
+			<MaxRuntimeMins>60</MaxRuntimeMins>
+			<RebootBehavior>BasedOnExitCode</RebootBehavior>
+			<DetectionMethodType>Custom</DetectionMethodType>
+			<CustomDetectionMethods>
+				<DetectionClause>
+					<DetectionClauseType>File</DetectionClauseType>
+					<Name>screenpresso.exe</Name>
+					<Path>%ProgramFiles%\Learnpulse\Screenpresso</Path>
+					<PropertyType>Version</PropertyType>
+					<ExpectedValue>$Version</ExpectedValue>
+					<ExpressionOperator>GreaterEquals</ExpressionOperator>
+					<Value>True</Value>
+				</DetectionClause>
+			</CustomDetectionMethods>
+		</DeploymentType>
+	</DeploymentTypes>
+	<Distribution>
+		<DistributeContent>True</DistributeContent>
+	</Distribution>
+	<Supersedence>
+		<Supersedence>True</Supersedence>
+		<Uninstall>False</Uninstall>
+	</Supersedence>
+	<Deployment>
+		<DeploySoftware>True</DeploySoftware>
+	</Deployment>
+</ApplicationDef>
