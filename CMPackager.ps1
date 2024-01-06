@@ -1704,10 +1704,10 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 					Write-Host "Superseding $($DeploymentType.LocalizedDisplayName)"
 					$SupersededDeploymentType = $OldAppDeploymentTypes | Where-Object LocalizedDisplayName -eq $DeploymentType.LocalizedDisplayName
 					if ($UninstallOldApp) {
-						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType -IsUninstall $true | Out-Null
+						Set-CMApplicationSupersedence -Name $NewApp.LocalizedDisplayName -CurrentDeploymentType $DeploymentType -SupersededApplication $OldApp -OldDeploymentType $SupersededDeploymentType -IsUninstall $true | Out-Null
 					}
 					else {
-						Add-CMDeploymentTypeSupersedence -SupersedingDeploymentType $DeploymentType -SupersededDeploymentType $SupersededDeploymentType | Out-Null
+						Set-CMApplicationSupersedence -Name $NewApp.LocalizedDisplayName -CurrentDeploymentType $DeploymentType -SupersededApplication $OldApp -OldDeploymentType $SupersededDeploymentType -IsUninstall $false | Out-Null
 					}
 				}
 			}
