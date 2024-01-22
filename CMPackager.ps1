@@ -1765,13 +1765,31 @@ Combines the output from Get-ChildItem with the Get-ExtensionAttribute function,
 	Function Send-EmailMessage {
 		Add-LogContent "Sending Email"
 		$Global:EmailBody += "`n`nThis message was automatically generated"
-		Try {
-			Send-MailMessage -To $EmailTo -Subject $EmailSubject -From $EmailFrom -Body $Global:EmailBody -SmtpServer $EmailServer -ErrorAction Stop
-		}
-		Catch {
+
+		$msg = $null
+
+		try {
+			$msg = New-Object Net.Mail.MailMessage
+			$smtp = New-Object Net.Mail.SmtpClient($EmailServer)
+
+			$msg.From = $EmailFrom
+			$EmailTo | ForEach-Object {
+				$msg.To.Add($_)
+			}
+			$msg.Subject = $EmailSubject
+			$msg.Body = $Global:EmailBody
+
+			$smtp.Send($msg)
+			Add-LogContent "Email Sent to $EmailTo"
+		} catch {
 			$ErrorMessage = $_.Exception.Message
 			Add-LogContent "ERROR: Sending Email Failed!"
 			Add-LogContent "ERROR: $ErrorMessage"
+		} finally {
+			$smtp.Dispose()
+			if ($msg) {
+				$msg.Dispose()
+			}
 		}
 	}
 
